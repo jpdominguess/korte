@@ -122,7 +122,7 @@ O repositório utilizará **trunk-based development**:
 
 ## 4.3 Prioridades do backlog
 
-- **MVP** — necessário para a primeira apresentação do projeto;
+- **MVP** — base do sistema, pronta até o fim da Sprint 2;
 - **Must** — necessário para a entrega final;
 - **Should** — implementado caso o escopo principal esteja concluído e estável.
 
@@ -561,9 +561,9 @@ A publicação em produção ocorre automaticamente após a integração na `mai
 
 # 12. Entregas por etapa
 
-## 12.1 Primeira etapa — meados de outubro
+## 12.1 Primeira etapa — 02/10
 
-A apresentação intermediária deverá mostrar:
+A primeira apresentação deverá mostrar:
 
 - integrantes;
 - tema e problema;
@@ -574,12 +574,11 @@ A apresentação intermediária deverá mostrar:
 - protótipo inicial;
 - abordagem Full Stack;
 - tecnologias de front-end, back-end e banco;
-- visão inicial da arquitetura;
-- parte da implementação funcionando.
+- visão inicial da arquitetura.
 
 ### Meta técnica do MVP
 
-Até essa etapa, o objetivo é demonstrar:
+Até o fim da Sprint 2 (15/10), o objetivo é ter funcionando:
 
 1. autenticação;
 2. perfis básicos;
