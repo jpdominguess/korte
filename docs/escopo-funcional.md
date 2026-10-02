@@ -517,7 +517,7 @@ A nomenclatura final pode ser refinada durante a modelagem, mantendo as regras d
 
 Serão produzidos:
 
-- protótipo das telas principais no Figma ou equivalente;
+- protótipo das telas principais em HTML;
 - diagrama de casos de uso;
 - diagrama de classes;
 - MER do banco de dados;

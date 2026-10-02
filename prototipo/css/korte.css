@@ -88,7 +88,7 @@ svg.lucide { width: 20px; height: 20px; stroke-width: 2; flex-shrink: 0; }
 .ic-16 svg.lucide, svg.lucide.ic-16 { width: 16px; height: 16px; }
 .ic-24 svg.lucide, svg.lucide.ic-24 { width: 24px; height: 24px; }
 
-/* Frames (tamanho fixo, como no Figma) */
+/* Frames (tamanho fixo) */
 .frame {
   position: relative;
   overflow: hidden;
