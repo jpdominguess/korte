@@ -1,0 +1,120 @@
+erDiagram
+    user ||--o| barbershop : administra
+    user ||--o| barber_profile : "atende como"
+    barber_profile ||--o{ barber_service : realiza
+    service ||--o{ barber_service : "é realizado por"
+    barber_profile ||--o{ work_schedule : tem
+    barber_profile ||--o{ schedule_block : tem
+    barber_profile ||--o{ appointment : atende
+    service ||--o{ appointment : "é agendado em"
+    user |o--o{ appointment : "agenda (cliente)"
+    appointment ||--o| payment : "é pago por"
+    plan ||--|{ plan_service : cobre
+    service ||--o{ plan_service : "é coberto por"
+    user ||--o{ subscription : assina
+    plan ||--o{ subscription : "é assinado em"
+    subscription ||--o{ subscription_usage : registra
+    appointment ||--o| subscription_usage : consome
+    subscription ||--o{ payment : "ativação e renovação"
+
+    barbershop {
+        uuid id PK
+        uuid owner_id FK
+        text name
+        text cep
+        text street
+        text number
+        text district
+        text city
+        text state
+        text phone
+        text whatsapp
+        text logo_url
+    }
+    user {
+        uuid id PK
+        text name
+        text email UK
+        text phone
+        text role "OWNER, BARBER ou CLIENT"
+        timestamptz created_at
+    }
+    barber_profile {
+        uuid id PK
+        uuid user_id FK, UK
+        bool active
+    }
+    service {
+        uuid id PK
+        text name
+        text description
+        int duration_min
+        numeric price
+        bool active
+    }
+    barber_service {
+        uuid barber_profile_id PK, FK
+        uuid service_id PK, FK
+    }
+    work_schedule {
+        uuid id PK
+        uuid barber_profile_id FK
+        int weekday
+        time start_time
+        time end_time
+    }
+    schedule_block {
+        uuid id PK
+        uuid barber_profile_id FK
+        timestamptz starts_at
+        timestamptz ends_at
+        text reason
+    }
+    appointment {
+        uuid id PK
+        uuid barber_profile_id FK
+        uuid service_id FK
+        uuid client_id FK "nulo para cliente avulso"
+        text walk_in_name
+        text walk_in_phone
+        timestamptz starts_at
+        timestamptz ends_at
+        text status "AGENDADO, CONCLUIDO, CANCELADO ou FALTOU"
+        timestamptz created_at
+    }
+    payment {
+        uuid id PK
+        uuid appointment_id FK
+        uuid subscription_id FK
+        numeric amount
+        text method "CASH, PIX, DEBIT ou CREDIT"
+        text origin "APPOINTMENT, ACTIVATION ou RENEWAL"
+        timestamptz paid_at
+    }
+    plan {
+        uuid id PK
+        text name
+        numeric price
+        int uses_per_cycle
+        bool active
+    }
+    plan_service {
+        uuid plan_id PK, FK
+        uuid service_id PK, FK
+    }
+    subscription {
+        uuid id PK
+        uuid client_id FK
+        uuid plan_id FK
+        date cycle_start
+        date cycle_end
+        int total_uses
+        int used_uses
+        timestamptz canceled_at
+    }
+    subscription_usage {
+        uuid id PK
+        uuid subscription_id FK
+        uuid appointment_id FK, UK
+        timestamptz used_at
+    }

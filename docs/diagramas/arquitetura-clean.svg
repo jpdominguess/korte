@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="780" viewBox="0 0 1500 780" font-family="Manrope, sans-serif">
+  <rect width="1500" height="780" fill="#FFFFFF"/>
+  <circle cx="380" cy="380" r="340" fill="#CDD1EC"/>
+  <path d="M40,380 A340,340 0 0,0 720,380 Z" fill="#ECEEF9"/>
+  <line x1="40" y1="380" x2="720" y2="380" stroke="#FFFFFF" stroke-width="3"/>
+  <circle cx="380" cy="380" r="228" fill="#2F3A8F" stroke="#FFFFFF" stroke-width="3"/>
+  <circle cx="380" cy="380" r="116" fill="#050929" stroke="#FFFFFF" stroke-width="3"/>
+  <text x="380" y="90" text-anchor="middle" font-size="19" font-weight="700" fill="#050929">Presentation</text>
+  <text x="380" y="686" text-anchor="middle" font-size="19" font-weight="700" fill="#050929">Infrastructure</text>
+  <text x="380" y="200" text-anchor="middle" font-size="19" font-weight="700" fill="#FFFFFF">Application</text>
+  <text x="380" y="387" text-anchor="middle" font-size="19" font-weight="700" fill="#FFFFFF">Domain</text>
+  <rect x="820" y="90" width="26" height="26" rx="6" fill="#050929" stroke="#D6D6D2"/>
+  <text x="860" y="109" font-size="17" font-weight="700" fill="#050929">Domain</text>
+  <text x="860" y="134" font-size="13.5" font-weight="600" fill="#2F3A8F" font-family="Consolas, monospace">src/domain</text>
+  <text x="860" y="158" font-size="14" fill="#5A5E78">Entidades e regras de negócio: Appointment,</text>
+  <text x="860" y="179" font-size="14" fill="#5A5E78">Subscription, BarberProfile, Service e eventos</text>
+  <rect x="820" y="230" width="26" height="26" rx="6" fill="#2F3A8F" stroke="#D6D6D2"/>
+  <text x="860" y="249" font-size="17" font-weight="700" fill="#050929">Application</text>
+  <text x="860" y="274" font-size="13.5" font-weight="600" fill="#2F3A8F" font-family="Consolas, monospace">src/application</text>
+  <text x="860" y="298" font-size="14" fill="#5A5E78">Casos de uso (CreateAppointment, CompleteAppointment,</text>
+  <text x="860" y="319" font-size="14" fill="#5A5E78">RenewSubscription) e interfaces dos repositórios</text>
+  <rect x="820" y="370" width="26" height="26" rx="6" fill="#CDD1EC" stroke="#D6D6D2"/>
+  <text x="860" y="389" font-size="17" font-weight="700" fill="#050929">Presentation</text>
+  <text x="860" y="414" font-size="13.5" font-weight="600" fill="#2F3A8F" font-family="Consolas, monospace">app/</text>
+  <text x="860" y="438" font-size="14" fill="#5A5E78">Páginas e componentes React, Server Actions</text>
+  <text x="860" y="459" font-size="14" fill="#5A5E78">e rotas /api (controllers)</text>
+  <rect x="820" y="510" width="26" height="26" rx="6" fill="#ECEEF9" stroke="#D6D6D2"/>
+  <text x="860" y="529" font-size="17" font-weight="700" fill="#050929">Infrastructure</text>
+  <text x="860" y="554" font-size="13.5" font-weight="600" fill="#2F3A8F" font-family="Consolas, monospace">src/infrastructure</text>
+  <text x="860" y="578" font-size="14" fill="#5A5E78">Repositórios Prisma, Better Auth e adapters</text>
+  <text x="860" y="599" font-size="14" fill="#5A5E78">de Brevo e ViaCEP</text>
+  <text x="820" y="666" font-size="15" font-weight="700" fill="#050929">Regra da dependência</text>
+  <text x="820" y="690" font-size="14" fill="#5A5E78">As camadas de fora usam as de dentro, nunca o contrário:</text>
+  <text x="820" y="711" font-size="14" fill="#5A5E78">o domínio não conhece Next.js, Prisma nem o banco.</text>
+</svg>

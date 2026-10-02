@@ -1,0 +1,105 @@
+classDiagram
+    direction TB
+
+    class User {
+        -id: string
+        -name: string
+        -email: string
+        -phone: string
+        -role: OWNER | BARBER | CLIENT
+        +isOwner() bool
+        +canManage(appointment) bool
+    }
+    class Barbershop {
+        -name: string
+        -address: Address
+        -phone: string
+        -whatsapp: string
+        -logoUrl: string
+    }
+    class BarberProfile {
+        -active: bool
+        +performs(service) bool
+        +isAvailable(start, end) bool
+    }
+    class Service {
+        -name: string
+        -description: string
+        -durationMin: int
+        -price: Money
+        -active: bool
+    }
+    class WorkSchedule {
+        -weekday: int
+        -startTime: Time
+        -endTime: Time
+    }
+    class ScheduleBlock {
+        -startsAt: DateTime
+        -endsAt: DateTime
+        -reason: string
+    }
+    class Appointment {
+        -startsAt: DateTime
+        -endsAt: DateTime
+        -status: AppointmentStatus
+        -walkInName: string
+        -walkInPhone: string
+        +complete(payment)
+        +completeWithSubscription(subscription)
+        +cancel(by, now)
+        +markNoShow(now)
+    }
+    class AppointmentStatus {
+        <<enumeration>>
+        AGENDADO
+        CONCLUIDO
+        CANCELADO
+        FALTOU
+    }
+    class Payment {
+        -amount: Money
+        -method: PaymentMethod
+        -origin: PaymentOrigin
+        -paidAt: DateTime
+    }
+    class Plan {
+        -name: string
+        -price: Money
+        -usesPerCycle: int
+        -active: bool
+        +covers(service) bool
+    }
+    class Subscription {
+        -cycleStart: Date
+        -cycleEnd: Date
+        -totalUses: int
+        -usedUses: int
+        -canceledAt: Date
+        +situation(today) string
+        +isUsable(today) bool
+        +consumeUse(appointment)
+        +renew(today)
+        +cancel(today)
+    }
+    class SubscriptionUsage {
+        -usedAt: DateTime
+    }
+
+    Barbershop "*" --> "1" User : dono
+    Barbershop "1" o-- "*" BarberProfile : equipe
+    User "1" -- "0..1" BarberProfile : atende como
+    BarberProfile "*" -- "*" Service : realiza
+    BarberProfile "1" *-- "*" WorkSchedule
+    BarberProfile "1" *-- "*" ScheduleBlock
+    Appointment "*" --> "1" BarberProfile
+    Appointment "*" --> "1" Service
+    Appointment "*" --> "0..1" User : cliente
+    Appointment --> AppointmentStatus
+    Appointment "1" -- "0..1" Payment
+    Plan "*" -- "*" Service : cobre
+    Subscription "*" --> "1" Plan
+    Subscription "*" --> "1" User : cliente
+    Subscription "1" *-- "*" SubscriptionUsage
+    SubscriptionUsage "0..1" --> "1" Appointment
+    Subscription "1" -- "*" Payment : ativação e renovação

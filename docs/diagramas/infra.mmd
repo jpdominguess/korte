@@ -1,0 +1,27 @@
+flowchart LR
+    subgraph DEV["Desenvolvimento"]
+        APP["npm run dev"]
+        PG[("PostgreSQL<br>Docker Compose")]
+        APP --> PG
+    end
+    GH["GitHub<br>branch curta + pull request"]
+    subgraph CI["GitHub Actions"]
+        L["lint"] --> T["checagem de tipos"] --> B["build"]
+    end
+    subgraph PROD["Produção"]
+        VC["Vercel<br>Next.js"]
+        SB[("Supabase<br>PostgreSQL")]
+        VC --> SB
+    end
+    U["Navegador<br>celular ou computador"]
+    BREVO["Brevo<br>e-mail"]
+    CEP["ViaCEP"]
+    WA["wa.me<br>WhatsApp"]
+
+    DEV -- git push --> GH
+    GH -- pull request --> CI
+    CI -- merge na main --> VC
+    U -- HTTPS --> VC
+    VC --> BREVO
+    VC --> CEP
+    U -. link .-> WA

@@ -1,0 +1,42 @@
+classDiagram
+    direction TB
+
+    class CreateAppointment {
+        +execute(command)
+    }
+    class AppointmentRepository {
+        <<interface>>
+        +findByBarberAndDay(barberId, date)
+        +save(appointment)
+    }
+    class PrismaAppointmentRepository
+    CreateAppointment --> AppointmentRepository
+    AppointmentRepository <|.. PrismaAppointmentRepository
+
+    class EventPublisher {
+        +subscribe(eventType, handler)
+        +publish(event)
+    }
+    class EventHandler {
+        <<interface>>
+        +handle(event)
+    }
+    class SendConfirmationEmail
+    CreateAppointment ..> EventPublisher : publica AppointmentCreated
+    EventPublisher o--> "*" EventHandler
+    EventHandler <|.. SendConfirmationEmail
+
+    class EmailService {
+        <<interface>>
+        +send(to, subject, body)
+    }
+    class BrevoEmailAdapter
+    SendConfirmationEmail --> EmailService
+    EmailService <|.. BrevoEmailAdapter
+
+    class AddressService {
+        <<interface>>
+        +findByCep(cep) Address
+    }
+    class ViaCepAdapter
+    AddressService <|.. ViaCepAdapter
