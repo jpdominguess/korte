@@ -1,0 +1,18 @@
+# Materiais da disciplina (não versionar)
+/*.pdf
+
+# Dependências e build
+node_modules/
+.next/
+out/
+dist/
+coverage/
+
+# Variáveis de ambiente
+.env
+.env*.local
+!.env.example
+
+# Sistema
+.DS_Store
+Thumbs.db
