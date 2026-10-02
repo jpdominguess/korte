@@ -1,36 +1,28 @@
 sequenceDiagram
     autonumber
     actor Cliente
-    participant UI as Tela de agendamento
-    participant SA as Server Action
+    participant UI as Tela (Server Action)
     participant UC as CreateAppointment
     participant Rep as AppointmentRepository
-    participant BD as PostgreSQL
     participant Ev as EventPublisher
     participant Obs as SendConfirmationEmail
-    participant Mail as BrevoEmailAdapter
 
     Cliente->>UI: escolhe serviço, barbeiro e horário
-    UI->>SA: envia o formulário
-    SA->>SA: valida sessão, perfil e dados
-    SA->>UC: execute(command)
+    UI->>UI: valida sessão, perfil e dados
+    UI->>UC: execute(command)
     UC->>Rep: findByBarberAndDay(barbeiro, data)
-    Rep->>BD: SELECT
-    BD-->>Rep: agendamentos, bloqueios e expediente
-    Rep-->>UC: dados do dia
-    UC->>UC: confere se o horário ainda está livre (RN02)
-    UC->>Rep: save(appointment) com status AGENDADO
-    Rep->>BD: INSERT em transação
-    alt outro cliente gravou o mesmo horário antes
-        BD-->>Rep: violação da restrição de horário
-        Rep-->>UC: erro de horário indisponível
-        UC-->>SA: erro de negócio
-        SA-->>UI: "Esse horário acabou de ser ocupado"
+    Rep-->>UC: agenda, bloqueios e expediente
+    UC->>UC: confere se o horário está livre
+    UC->>Rep: save(appointment)
+    alt horário ocupado no mesmo instante
+        Rep-->>UC: conflito no banco
+        UC-->>UI: horário indisponível
+        UI-->>Cliente: "Esse horário acabou de ser ocupado"
     else gravado
-        BD-->>Rep: ok
+        Rep-->>UC: ok
         UC->>Ev: publish(AppointmentCreated)
         Ev-)Obs: handle(evento)
-        Obs->>Mail: send(e-mail de confirmação)
-        UC-->>SA: agendamento criado
-        SA-->>UI: mostra a confirmação
+        Obs-)Obs: envia o e-mail pelo Brevo
+        UC-->>UI: agendamento criado
+        UI-->>Cliente: tela de confirmação
     end

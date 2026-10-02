@@ -1,0 +1,58 @@
+erDiagram
+    appointment ||--o| payment : "é pago por"
+    plan ||--|{ plan_service : cobre
+    service ||--o{ plan_service : "é coberto por"
+    user ||--o{ subscription : assina
+    plan ||--o{ subscription : "é assinado em"
+    subscription ||--o{ subscription_usage : registra
+    appointment ||--o| subscription_usage : consome
+    subscription ||--o{ payment : "ativação e renovação"
+
+    user {
+        uuid id PK
+        text name
+    }
+    service {
+        uuid id PK
+        text name
+    }
+    appointment {
+        uuid id PK
+        text status
+    }
+    payment {
+        uuid id PK
+        uuid appointment_id FK
+        uuid subscription_id FK
+        numeric amount
+        text method "CASH, PIX, DEBIT ou CREDIT"
+        text origin "APPOINTMENT, ACTIVATION ou RENEWAL"
+        timestamptz paid_at
+    }
+    plan {
+        uuid id PK
+        text name
+        numeric price
+        int uses_per_cycle
+        bool active
+    }
+    plan_service {
+        uuid plan_id PK, FK
+        uuid service_id PK, FK
+    }
+    subscription {
+        uuid id PK
+        uuid client_id FK
+        uuid plan_id FK
+        date cycle_start
+        date cycle_end
+        int total_uses
+        int used_uses
+        timestamptz canceled_at
+    }
+    subscription_usage {
+        uuid id PK
+        uuid subscription_id FK
+        uuid appointment_id FK, UK
+        timestamptz used_at
+    }
