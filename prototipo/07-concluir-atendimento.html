@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Concluir atendimento · Korte</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/korte.css">
+<style>
+  .pagina-cab { align-items: center; margin-bottom: 12px; }
+  .agenda-nav { display: flex; align-items: center; gap: 24px; }
+  .agenda-nav__data { display: flex; align-items: center; gap: 6px; }
+  .agenda-nav__dia { margin-left: 8px; font-size: var(--t-16); font-weight: 600; }
+  .legenda { margin-bottom: 16px; }
+  .legenda__total { margin-left: auto; font-variant-numeric: tabular-nums; }
+  .busca { width: 260px; }
+  .busca .input { height: 36px; font-size: var(--t-14); background: var(--fundo); }
+  .sobreposicao { position: absolute; inset: 0; background: rgba(5, 9, 41, .5); z-index: 40; }
+  .modal {
+    position: absolute; z-index: 50;
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 820px;
+    background: var(--superficie);
+    border-radius: var(--raio-card);
+    box-shadow: var(--sombra-modal);
+  }
+  .modal__cab { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 20px 24px; border-bottom: 1px solid var(--borda); }
+  .modal__titulo { font-size: var(--t-20); font-weight: 700; line-height: 1.3; }
+  .modal__sub { font-size: var(--t-14); color: var(--texto-2); margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .modal__corpo { display: grid; grid-template-columns: 1fr 300px; }
+  .modal__esq { padding: 20px 24px 24px; }
+  .modal__dir { padding: 20px 24px 24px; border-left: 1px solid var(--borda); background: var(--fundo); }
+  .modal__secao { font-size: var(--t-14); font-weight: 700; margin-bottom: 8px; }
+  .modal__rodape { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 24px; border-top: 1px solid var(--borda); }
+  .modal__rodape .acoes { display: flex; gap: 8px; }
+  .modal__nota { font-size: var(--t-14); color: var(--texto-2); }
+
+  .cliente { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .cliente__nome { font-size: var(--t-16); font-weight: 700; line-height: 1.3; display: flex; align-items: center; gap: 8px; }
+  .cliente__meta { font-size: var(--t-14); color: var(--texto-2); line-height: 1.4; font-variant-numeric: tabular-nums; }
+
+  .servico { display: grid; grid-template-columns: 40px 1fr auto; align-items: center; gap: 12px; padding: 14px 16px; border: 1px solid var(--borda); border-radius: var(--raio-controle); }
+  .servico__icone { width: 40px; height: 40px; border-radius: var(--raio-controle); background: var(--muted); display: grid; place-items: center; color: var(--texto-2); }
+  .servico__nome { font-size: var(--t-16); font-weight: 700; line-height: 1.35; }
+  .servico__meta { font-size: var(--t-12); color: var(--texto-2); line-height: 1.4; }
+  .servico__valor { font-size: var(--t-16); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  .clube { margin-top: 16px; padding: 16px; border: 1px solid #CDE6D7; border-radius: var(--raio-controle); background: var(--sucesso-bg); }
+  .clube .check { align-items: flex-start; font-size: var(--t-14); }
+  .clube .check input { margin-top: 1px; flex-shrink: 0; }
+  .clube strong { display: block; font-size: var(--t-14); line-height: 1.4; }
+  .clube__desc { display: block; font-size: var(--t-14); color: var(--texto-2); margin-top: 2px; }
+  .usos { display: flex; align-items: center; gap: 10px; margin-top: 12px; padding-left: 26px; font-size: var(--t-12); font-weight: 600; color: var(--texto-2); }
+  .usos__barra { display: flex; gap: 4px; }
+  .usos__barra i { width: 32px; height: 8px; border-radius: 4px; background: var(--sucesso); display: block; }
+  .usos__barra i.usado { background: #C5DECF; }
+  .usos__barra i.agora { background: var(--superficie); box-shadow: inset 0 0 0 2px var(--sucesso); }
+
+  .historico { margin-top: 16px; align-items: flex-start; }
+  .historico > svg.lucide { margin-top: 2px; }
+  .historico p { font-size: var(--t-14); color: var(--texto-2); }
+  .historico strong { color: var(--texto); font-weight: 600; }
+
+  .totais { display: flex; flex-direction: column; gap: 8px; font-size: var(--t-14); }
+  .totais div { display: flex; justify-content: space-between; gap: 12px; }
+  .totais dt { color: var(--texto-2); }
+  .totais dd { font-variant-numeric: tabular-nums; font-weight: 600; }
+  .totais .desconto dd { color: var(--sucesso); }
+  .totais .total { padding-top: 12px; margin-top: 4px; border-top: 1px solid var(--borda); align-items: baseline; }
+  .totais .total dt { color: var(--texto); font-weight: 700; font-size: var(--t-16); }
+  .totais .total dd { font-size: var(--t-24); font-weight: 700; letter-spacing: -.01em; }
+
+  .formas { border: 0; padding: 0; margin: 20px 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .formas legend { padding: 0; margin-bottom: 8px; font-size: var(--t-14); font-weight: 700; }
+  .forma { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 10px 12px; border: 1px solid var(--borda-controle); border-radius: var(--raio-controle); background: var(--superficie); font-size: var(--t-14); font-weight: 600; cursor: pointer; }
+  .forma input { position: absolute; opacity: 0; }
+  .forma svg.lucide { color: var(--texto-2); }
+  .formas:disabled .forma { opacity: .5; cursor: not-allowed; }
+  .formas__nota { display: flex; gap: 8px; margin-top: 12px; font-size: var(--t-12); color: var(--texto-2); line-height: 1.45; }
+  .formas__nota svg.lucide { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; }
+</style>
+</head>
+<body>
+<div class="frame frame--desktop">
+<div class="app">
+
+  <aside class="sidebar">
+    <a class="sidebar__logo" href="index.html">Korte</a>
+    <p class="sidebar__grupo">Dia a dia</p>
+    <nav class="sidebar__nav">
+      <a class="nav-item" href="08-painel-dono.html"><i data-lucide="layout-dashboard"></i>Painel</a>
+      <a class="nav-item is-ativo" href="06-agenda-geral.html" aria-current="page"><i data-lucide="calendar"></i>Agenda</a>
+    </nav>
+    <p class="sidebar__grupo">Cadastros</p>
+    <nav class="sidebar__nav">
+      <a class="nav-item" href="#"><i data-lucide="users"></i>Barbeiros</a>
+      <a class="nav-item" href="#"><i data-lucide="scissors"></i>Serviços</a>
+      <a class="nav-item" href="#"><i data-lucide="clock"></i>Expedientes</a>
+      <a class="nav-item" href="09-planos-assinaturas.html"><i data-lucide="repeat"></i>Planos e assinaturas</a>
+    </nav>
+    <div class="sidebar__rodape">
+      <a class="nav-item" href="#"><i data-lucide="store"></i>Barbearia</a>
+    </div>
+  </aside>
+
+  <div class="principal">
+    <header class="topo">
+      <div class="topo__barbearia">
+        <span class="topo__logo-barbearia">VR</span>
+        <div><div class="topo__nome">Barbearia Vila Rica</div><div class="topo__local">Centro, Piracicaba/SP</div></div>
+      </div>
+      <div class="topo__acoes">
+        <div class="input-grupo busca">
+          <span class="input-grupo__icone"><i data-lucide="search" class="ic-16"></i></span>
+          <input class="input" type="search" placeholder="Buscar cliente">
+        </div>
+        <button class="btn btn--fantasma btn--icone btn-notificacao" aria-label="Notificações"><i data-lucide="bell"></i></button>
+        <div class="topo__usuario">
+          <span class="avatar avatar--sm avatar--escuro">RM</span>
+          <div><div class="topo__usuario-nome">Rafael Moura</div><div class="topo__usuario-papel">Dono</div></div>
+          <i data-lucide="chevron-down" class="ic-16 texto-2"></i>
+        </div>
+      </div>
+    </header>
+
+    <main class="conteudo">
+      <div class="pagina-cab">
+        <div class="agenda-nav">
+          <h1 class="pagina-cab__titulo">Agenda</h1>
+          <div class="agenda-nav__data">
+            <button class="btn btn--secundario btn--icone btn--sm" aria-label="Dia anterior"><i data-lucide="chevron-left"></i></button>
+            <button class="btn btn--secundario btn--sm">Hoje</button>
+            <button class="btn btn--secundario btn--icone btn--sm" aria-label="Próximo dia"><i data-lucide="chevron-right"></i></button>
+            <span class="agenda-nav__dia">Sexta-feira, 16 de outubro de 2026</span>
+          </div>
+        </div>
+        <div class="pagina-cab__acoes">
+          <div class="segmentado" role="group" aria-label="Visualização">
+            <button class="is-ativo" aria-pressed="true">Dia</button>
+            <button aria-pressed="false">Semana</button>
+          </div>
+          <button class="btn btn--primario"><i data-lucide="calendar-plus"></i>Novo agendamento</button>
+        </div>
+      </div>
+
+      <div class="legenda">
+        <span class="legenda__item"><span class="legenda__amostra bloco--agendado"><i data-lucide="clock"></i></span>Agendado</span>
+        <span class="legenda__item"><span class="legenda__amostra bloco--concluido"><i data-lucide="check"></i></span>Concluído</span>
+        <span class="legenda__item"><span class="legenda__amostra bloco--cancelado"><i data-lucide="x"></i></span>Cancelado</span>
+        <span class="legenda__item"><span class="legenda__amostra bloco--faltou"><i data-lucide="user-x"></i></span>Faltou</span>
+        <span class="legenda__item"><span class="bloco__tag" style="margin:0">Clube</span>Assinante do clube</span>
+        <span class="legenda__item"><span class="legenda__amostra hachurado" style="border-color: var(--borda-controle); border-style: dashed;"></span>Almoço e bloqueios</span>
+        <span class="legenda__total">40 agendamentos · 25 concluídos · 12 agendados</span>
+      </div>
+
+      <div class="agenda" data-agenda></div>
+    </main>
+  </div>
+
+</div>
+
+  <div class="sobreposicao"></div>
+  <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+    <header class="modal__cab">
+      <div>
+        <h2 class="modal__titulo" id="modal-titulo">Concluir atendimento</h2>
+        <p class="modal__sub">Diego Santana · sex, 16/10 · 15:00 às 15:30</p>
+      </div>
+      <button class="btn btn--fantasma btn--icone" aria-label="Fechar"><i data-lucide="x"></i></button>
+    </header>
+
+    <div class="modal__corpo">
+      <div class="modal__esq">
+        <div class="cliente">
+          <span class="avatar">LA</span>
+          <div>
+            <div class="cliente__nome">Lucas Almeida <span class="badge badge--marinho">Clube Corte</span></div>
+            <div class="cliente__meta">(19) 99734-2108 · lucas.almeida@email.com</div>
+          </div>
+        </div>
+
+        <h3 class="modal__secao">Serviço</h3>
+        <div class="servico">
+          <span class="servico__icone"><i data-lucide="scissors"></i></span>
+          <div>
+            <div class="servico__nome">Corte</div>
+            <div class="servico__meta">30 min · com Diego Santana</div>
+          </div>
+          <span class="servico__valor">R$ 45,00</span>
+        </div>
+
+        <div class="clube">
+          <label class="check">
+            <input type="checkbox" checked>
+            <span><strong>Coberto pelo Clube Corte · 3 de 4 usos restantes</strong>
+            <span class="clube__desc">Assinatura ativa até 01/11/2026. Ao concluir, o atendimento sai por R$ 0,00 e sobram 2 usos.</span></span>
+          </label>
+          <div class="usos" aria-hidden="true">
+            <span class="usos__barra"><i class="usado"></i><i class="agora"></i><i></i><i></i></span>
+            <span style="white-space: nowrap">Usado em 10/10 · hoje · 2 livres</span>
+          </div>
+        </div>
+
+        <div class="aviso aviso--neutro historico">
+          <i data-lucide="history"></i>
+          <p><strong>Cliente desde mar/2025 · 14 atendimentos.</strong> Último em 10/10: Corte com o Diego, pelo Clube Corte.</p>
+        </div>
+      </div>
+
+      <div class="modal__dir">
+        <h3 class="modal__secao">Valor</h3>
+        <dl class="totais">
+          <div><dt>Corte</dt><dd>R$ 45,00</dd></div>
+          <div class="desconto"><dt>Clube Corte (1 uso)</dt><dd>− R$ 45,00</dd></div>
+          <div class="total"><dt>Valor final</dt><dd>R$ 0,00</dd></div>
+        </dl>
+
+        <fieldset class="formas" disabled>
+          <legend>Forma de pagamento</legend>
+          <label class="forma"><input type="radio" name="forma"><i data-lucide="banknote"></i>Dinheiro</label>
+          <label class="forma"><input type="radio" name="forma"><i data-lucide="qr-code"></i>PIX</label>
+          <label class="forma"><input type="radio" name="forma"><i data-lucide="credit-card"></i>Débito</label>
+          <label class="forma"><input type="radio" name="forma"><i data-lucide="credit-card"></i>Crédito</label>
+        </fieldset>
+        <p class="formas__nota"><i data-lucide="info"></i>Sem cobrança neste atendimento. Para cobrar os R$ 45,00, desmarque o uso do Clube Corte.</p>
+      </div>
+    </div>
+
+    <footer class="modal__rodape">
+      <span class="modal__nota">O agendamento passa para Concluído.</span>
+      <div class="acoes">
+        <button class="btn btn--secundario">Voltar</button>
+        <button class="btn btn--primario"><i data-lucide="check"></i>Concluir atendimento</button>
+      </div>
+    </footer>
+  </section>
+</div>
+<script src="js/agenda.js"></script>
+<script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>

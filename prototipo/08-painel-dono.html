@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Painel · Korte</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/korte.css">
+<style>
+  .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 24px; }
+  .kpi { padding: 20px 24px; }
+  .kpi__rotulo { display: flex; align-items: center; gap: 8px; font-size: var(--t-14); font-weight: 600; color: var(--texto-2); }
+  .kpi__rotulo svg.lucide { width: 16px; height: 16px; }
+  .kpi__valor { font-size: var(--t-32); font-weight: 700; line-height: 1.2; margin-top: 8px; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+  .kpi__rodape { margin-top: 8px; font-size: var(--t-14); color: var(--texto-2); font-variant-numeric: tabular-nums; }
+  .kpi__rodape strong { color: var(--texto); font-weight: 600; }
+
+  .linha-2 { display: grid; grid-template-columns: 7fr 5fr; gap: 24px; }
+  .grafico { padding: 4px 24px 16px; }
+  .grafico svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .grafico text { font-family: var(--fonte-ui); font-variant-numeric: tabular-nums; }
+  .eixo { font-size: 12px; fill: var(--texto-2); }
+  .eixo--fraco { fill: var(--texto-3); }
+  .grade { stroke: var(--borda); stroke-width: 1; }
+  .barra { fill: var(--destaque); }
+  .barra:hover { fill: var(--marinho); }
+  .rotulo-valor { font-size: 12px; font-weight: 700; fill: var(--texto); }
+  .card__cab .total-periodo { text-align: right; line-height: 1.3; }
+  .total-periodo strong { display: block; font-size: var(--t-20); font-variant-numeric: tabular-nums; }
+  .total-periodo span { font-size: var(--t-12); color: var(--texto-2); }
+
+  .linha-2 > .card { display: flex; flex-direction: column; }
+  .grafico { flex: 1; }
+  .resumo-grafico { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--borda); }
+  .resumo-grafico div { padding: 14px 24px; border-left: 1px solid var(--borda); }
+  .resumo-grafico div:first-child { border-left: 0; }
+  .resumo-grafico span { display: block; font-size: var(--t-12); color: var(--texto-2); }
+  .resumo-grafico strong { display: block; font-size: var(--t-16); font-variant-numeric: tabular-nums; margin-top: 2px; }
+  .distribuicao td, .distribuicao th { padding-left: 16px; padding-right: 16px; }
+  .distribuicao td:first-child, .distribuicao th:first-child { padding-left: 24px; }
+  .distribuicao td:last-child, .distribuicao th:last-child { padding-right: 24px; }
+  .distribuicao tbody td { height: 60px; padding-top: 0; padding-bottom: 0; }
+  .barbeiro-cel { display: flex; align-items: center; gap: 10px; }
+  .barbeiro-cel strong { font-weight: 600; white-space: nowrap; }
+  .participacao { display: flex; align-items: center; gap: 10px; }
+  .participacao__trilho { width: 88px; height: 6px; border-radius: 3px; background: var(--muted); }
+  .participacao__trilho i { display: block; height: 100%; border-radius: 3px; background: var(--destaque); }
+  .participacao span { width: 32px; text-align: right; font-size: var(--t-12); font-weight: 600; color: var(--texto-2); font-variant-numeric: tabular-nums; }
+  .distribuicao .num { font-variant-numeric: tabular-nums; }
+  .distribuicao tfoot td { height: 44px; border-top: 1px solid var(--borda); font-variant-numeric: tabular-nums; }
+  .distribuicao tfoot tr.soma td { font-weight: 700; }
+  .distribuicao tfoot tr.assinaturas td { color: var(--texto-2); }
+  .distribuicao tfoot tr.total td { background: var(--fundo); font-weight: 700; }
+  .distribuicao tfoot tr.total td:first-child { border-bottom-left-radius: 11px; }
+  .distribuicao tfoot tr.total td:last-child { border-bottom-right-radius: 11px; }
+</style>
+</head>
+<body>
+<div class="frame frame--desktop">
+<div class="app">
+
+  <aside class="sidebar">
+    <a class="sidebar__logo" href="index.html">Korte</a>
+    <p class="sidebar__grupo">Dia a dia</p>
+    <nav class="sidebar__nav">
+      <a class="nav-item is-ativo" href="08-painel-dono.html" aria-current="page"><i data-lucide="layout-dashboard"></i>Painel</a>
+      <a class="nav-item" href="06-agenda-geral.html"><i data-lucide="calendar"></i>Agenda</a>
+    </nav>
+    <p class="sidebar__grupo">Cadastros</p>
+    <nav class="sidebar__nav">
+      <a class="nav-item" href="#"><i data-lucide="users"></i>Barbeiros</a>
+      <a class="nav-item" href="#"><i data-lucide="scissors"></i>Serviços</a>
+      <a class="nav-item" href="#"><i data-lucide="clock"></i>Expedientes</a>
+      <a class="nav-item" href="09-planos-assinaturas.html"><i data-lucide="repeat"></i>Planos e assinaturas</a>
+    </nav>
+    <div class="sidebar__rodape">
+      <a class="nav-item" href="#"><i data-lucide="store"></i>Barbearia</a>
+    </div>
+  </aside>
+
+  <div class="principal">
+    <header class="topo">
+      <div class="topo__barbearia">
+        <span class="topo__logo-barbearia">VR</span>
+        <div><div class="topo__nome">Barbearia Vila Rica</div><div class="topo__local">Centro, Piracicaba/SP</div></div>
+      </div>
+      <div class="topo__acoes">
+        <button class="btn btn--fantasma btn--icone btn-notificacao" aria-label="Notificações"><i data-lucide="bell"></i></button>
+        <div class="topo__usuario">
+          <span class="avatar avatar--sm avatar--escuro">RM</span>
+          <div><div class="topo__usuario-nome">Rafael Moura</div><div class="topo__usuario-papel">Dono</div></div>
+          <i data-lucide="chevron-down" class="ic-16 texto-2"></i>
+        </div>
+      </div>
+    </header>
+
+    <main class="conteudo">
+      <div class="pagina-cab">
+        <div>
+          <h1 class="pagina-cab__titulo">Painel</h1>
+          <p class="pagina-cab__sub">Outubro de 2026, de 1 a 16/10</p>
+        </div>
+        <div class="pagina-cab__acoes">
+          <button class="btn btn--secundario"><i data-lucide="calendar"></i>Este mês<i data-lucide="chevron-down"></i></button>
+          <button class="btn btn--secundario"><i data-lucide="download"></i>Baixar relatório</button>
+        </div>
+      </div>
+
+      <section class="kpis" aria-label="Indicadores do mês">
+        <div class="card kpi">
+          <div class="kpi__rotulo"><i data-lucide="banknote"></i>Faturamento registrado</div>
+          <div class="kpi__valor">R$ 16.873</div>
+          <div class="kpi__rodape"><strong>R$ 15.091</strong> em atendimentos + <strong>R$ 1.782</strong> em assinaturas</div>
+        </div>
+        <div class="card kpi">
+          <div class="kpi__rotulo"><i data-lucide="scissors"></i>Atendimentos concluídos</div>
+          <div class="kpi__valor">421</div>
+          <div class="kpi__rodape"><strong>364</strong> pagos e <strong>57</strong> cobertos pelo Clube Corte</div>
+        </div>
+        <div class="card kpi">
+          <div class="kpi__rotulo"><i data-lucide="repeat"></i>Assinaturas ativas</div>
+          <div class="kpi__valor">24</div>
+          <div class="kpi__rodape"><strong>18</strong> ativações e renovações no mês, R$ 99 cada</div>
+        </div>
+      </section>
+
+      <div class="linha-2">
+        <section class="card">
+          <div class="card__cab" style="border-bottom: 0;">
+            <div>
+              <h2 class="card__titulo">Faturamento registrado por dia</h2>
+              <p class="card__sub">Atendimentos e assinaturas · domingo e segunda a barbearia fecha</p>
+            </div>
+            <div class="total-periodo"><strong>R$ 14.038</strong><span>nos últimos 14 dias</span></div>
+          </div>
+          <div class="grafico">
+            <svg viewBox="0 0 604 302" role="img" aria-labelledby="graf-titulo graf-desc">
+              <title id="graf-titulo">Faturamento registrado por dia, de 03/10 a 16/10</title>
+              <desc id="graf-desc">Maior valor no sábado, 10/10, com R$ 2.035. Hoje, 16/10, R$ 1.513.</desc>
+              <!-- grade -->
+              <line class="grade" x1="44" x2="604" y1="12" y2="12"/>
+              <line class="grade" x1="44" x2="604" y1="61.6" y2="61.6"/>
+              <line class="grade" x1="44" x2="604" y1="111.2" y2="111.2"/>
+              <line class="grade" x1="44" x2="604" y1="160.8" y2="160.8"/>
+              <line class="grade" x1="44" x2="604" y1="210.4" y2="210.4"/>
+              <line x1="44" x2="604" y1="260" y2="260" stroke="#D6D6D2"/>
+              <text class="eixo" x="34" y="16" text-anchor="end">2.500</text>
+              <text class="eixo" x="34" y="65.6" text-anchor="end">2.000</text>
+              <text class="eixo" x="34" y="115.2" text-anchor="end">1.500</text>
+              <text class="eixo" x="34" y="164.8" text-anchor="end">1.000</text>
+              <text class="eixo" x="34" y="214.4" text-anchor="end">500</text>
+              <text class="eixo" x="34" y="264" text-anchor="end">0</text>
+
+              <!-- barras: altura = valor / 2.500 × 248 -->
+              <path class="barra" d="M53 260V71.5a4 4 0 0 1 4-4h14a4 4 0 0 1 4 4V260Z"><title>sáb, 03/10: R$ 1.940</title></path>
+              <line x1="98" x2="110" y1="257" y2="257" stroke="#D6D6D2" stroke-width="2" stroke-linecap="round"/>
+              <line x1="138" x2="150" y1="257" y2="257" stroke="#D6D6D2" stroke-width="2" stroke-linecap="round"/>
+              <path class="barra" d="M173 260V163.8a4 4 0 0 1 4-4h14a4 4 0 0 1 4 4V260Z"><title>ter, 06/10: R$ 1.010</title></path>
+              <path class="barra" d="M213 260V150.4a4 4 0 0 1 4-4h14a4 4 0 0 1 4 4V260Z"><title>qua, 07/10: R$ 1.145</title></path>
+              <path class="barra" d="M253 260V136.0a4 4 0 0 1 4-4h14a4 4 0 0 1 4 4V260Z"><title>qui, 08/10: R$ 1.290</title></path>
+              <path class="barra" d="M293 260V103.3a4 4 0 0 1 4-4h14a4 4 0 0 1 4 4V260Z"><title>sex, 09/10: R$ 1.620</title></path>
+              <path class="barra" d="M333 260V62.1a4 4 0 0 1 4-4h14a4 4 0 0 1 4 4V260Z"><title>sáb, 10/10: R$ 2.035</title></path>
+              <line x1="378" x2="390" y1="257" y2="257" stroke="#D6D6D2" stroke-width="2" stroke-linecap="round"/>
+              <line x1="418" x2="430" y1="257" y2="257" stroke="#D6D6D2" stroke-width="2" stroke-linecap="round"/>
+              <path class="barra" d="M453 260V158.4a4 4 0 0 1 4-4h14a4 4 0 0 1 4 4V260Z"><title>ter, 13/10: R$ 1.065</title></path>
+              <path class="barra" d="M493 260V146.9a4 4 0 0 1 4-4h14a4 4 0 0 1 4 4V260Z"><title>qua, 14/10: R$ 1.180</title></path>
+              <path class="barra" d="M533 260V141.0a4 4 0 0 1 4-4h14a4 4 0 0 1 4 4V260Z"><title>qui, 15/10: R$ 1.240</title></path>
+              <path class="barra" d="M573 260V113.9a4 4 0 0 1 4-4h14a4 4 0 0 1 4 4V260Z" style="fill: var(--marinho)"><title>sex, 16/10 (hoje): R$ 1.513</title></path>
+
+              <!-- rótulos selecionados -->
+              <text class="rotulo-valor" x="344" y="50" text-anchor="middle">2.035</text>
+              <text class="rotulo-valor" x="584" y="102" text-anchor="middle">1.513</text>
+
+              <!-- dias -->
+              <g class="eixo" text-anchor="middle">
+                <text x="64" y="280">03</text>
+                <text x="104" y="280" class="eixo--fraco">04</text><text x="144" y="280" class="eixo--fraco">05</text>
+                <text x="184" y="280">06</text><text x="224" y="280">07</text><text x="264" y="280">08</text>
+                <text x="304" y="280">09</text><text x="344" y="280">10</text>
+                <text x="384" y="280" class="eixo--fraco">11</text><text x="424" y="280" class="eixo--fraco">12</text>
+                <text x="464" y="280">13</text><text x="504" y="280">14</text><text x="544" y="280">15</text>
+                <text x="584" y="280" style="fill: var(--texto); font-weight: 700">16</text>
+              </g>
+              <g class="eixo eixo--fraco" text-anchor="middle" style="font-size: 11px">
+                <text x="64" y="296">sáb</text><text x="104" y="296">dom</text><text x="144" y="296">seg</text><text x="184" y="296">ter</text>
+                <text x="224" y="296">qua</text><text x="264" y="296">qui</text><text x="304" y="296">sex</text><text x="344" y="296">sáb</text>
+                <text x="384" y="296">dom</text><text x="424" y="296">seg</text><text x="464" y="296">ter</text><text x="504" y="296">qua</text>
+                <text x="544" y="296">qui</text><text x="584" y="296" style="fill: var(--texto); font-weight: 700">hoje</text>
+              </g>
+            </svg>
+          </div>
+          <div class="resumo-grafico">
+            <div><span>Média por dia aberto</span><strong>R$ 1.404</strong></div>
+            <div><span>Melhor dia</span><strong>sáb, 10/10 · R$ 2.035</strong></div>
+            <div><span>Hoje, sex 16/10</span><strong>R$ 1.513</strong></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card__cab">
+            <div>
+              <h2 class="card__titulo">Distribuição por barbeiro</h2>
+              <p class="card__sub">Atendimentos concluídos de 1 a 16/10</p>
+            </div>
+          </div>
+          <table class="tabela distribuicao">
+            <thead>
+              <tr><th>Barbeiro</th><th class="dir">Atend.</th><th>Participação</th><th class="dir">Faturamento</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div class="barbeiro-cel"><span class="avatar avatar--sm">RM</span><strong>Rafael Moura</strong></div></td>
+                <td class="dir num">128</td>
+                <td><div class="participacao"><span class="participacao__trilho"><i style="width:100%"></i></span><span>30%</span></div></td>
+                <td class="dir num">R$ 4.770</td>
+              </tr>
+              <tr>
+                <td><div class="barbeiro-cel"><span class="avatar avatar--sm">TL</span><strong>Thiago Lemos</strong></div></td>
+                <td class="dir num">118</td>
+                <td><div class="participacao"><span class="participacao__trilho"><i style="width:92%"></i></span><span>28%</span></div></td>
+                <td class="dir num">R$ 4.196</td>
+              </tr>
+              <tr>
+                <td><div class="barbeiro-cel"><span class="avatar avatar--sm">DS</span><strong>Diego Santana</strong></div></td>
+                <td class="dir num">112</td>
+                <td><div class="participacao"><span class="participacao__trilho"><i style="width:88%"></i></span><span>27%</span></div></td>
+                <td class="dir num">R$ 3.985</td>
+              </tr>
+              <tr>
+                <td><div class="barbeiro-cel"><span class="avatar avatar--sm">CF</span><strong>Caio Ferreira</strong></div></td>
+                <td class="dir num">63</td>
+                <td><div class="participacao"><span class="participacao__trilho"><i style="width:49%"></i></span><span>15%</span></div></td>
+                <td class="dir num">R$ 2.140</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="soma"><td>Atendimentos</td><td class="dir">421</td><td></td><td class="dir">R$ 15.091</td></tr>
+              <tr class="assinaturas"><td colspan="3">Ativações e renovações do Clube Corte</td><td class="dir">R$ 1.782</td></tr>
+              <tr class="total"><td colspan="3">Faturamento registrado</td><td class="dir">R$ 16.873</td></tr>
+            </tfoot>
+          </table>
+        </section>
+      </div>
+    </main>
+  </div>
+
+</div>
+</div>
+<script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>

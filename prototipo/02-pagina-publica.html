@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Barbearia Vila Rica · Agendamento online</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/korte.css">
+<style>
+  .pub { background: var(--fundo); }
+  .capa { background: var(--marinho); color: #fff; padding-bottom: 20px; }
+  .capa__linha { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .capa__botao { width: 36px; height: 36px; display: grid; place-items: center; border-radius: var(--raio-controle); color: #fff; background: rgba(255, 255, 255, .08); border: 0; }
+  .capa__conteudo { padding: 16px 16px 0; }
+  .capa__nome { font-family: var(--fonte-marca); font-size: var(--t-32); line-height: 1.15; font-weight: 400; }
+  .capa__endereco { margin-top: 8px; font-size: var(--t-14); color: rgba(255, 255, 255, .72); line-height: 1.45; }
+  .capa__horario { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-size: var(--t-14); color: rgba(255, 255, 255, .85); }
+
+  .secao { padding: 20px 16px 0; }
+  .secao__titulo { font-family: var(--fonte-marca); font-size: var(--t-24); font-weight: 400; line-height: 1.2; margin-bottom: 10px; display: flex; align-items: baseline; justify-content: space-between; }
+  .secao__titulo small { font-family: var(--fonte-ui); font-size: var(--t-12); font-weight: 600; color: var(--texto-2); }
+
+  .clube { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; border: 1px solid var(--marinho); border-radius: var(--raio-card); background: var(--superficie); }
+  .clube__nome { font-weight: 700; line-height: 1.3; }
+  .clube__meta { font-size: var(--t-12); color: var(--texto-2); line-height: 1.4; margin-top: 2px; }
+  .clube__preco { text-align: right; white-space: nowrap; flex-shrink: 0; font-variant-numeric: tabular-nums; line-height: 1.2; }
+  .clube__preco strong { display: block; font-size: var(--t-20); }
+  .clube__preco span { font-size: var(--t-12); color: var(--texto-2); }
+
+  .servicos { background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio-card); }
+  .servico { display: flex; align-items: center; justify-content: space-between; height: 44px; padding: 0 16px; border-bottom: 1px solid var(--borda); }
+  .servico:last-child { border-bottom: 0; }
+  .servico__nome { font-size: var(--t-16); font-weight: 600; }
+  .servico__dur { font-size: var(--t-14); color: var(--texto-2); margin-left: 8px; font-weight: 500; }
+  .servico__preco { font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  .barbeiros { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .barbeiro { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: var(--t-14); font-weight: 600; }
+  .barbeiro .avatar { width: 44px; height: 44px; font-size: var(--t-16); }
+
+  .barra-acao__linha { display: flex; gap: 8px; }
+  .btn-whats { width: auto; padding: 0 16px; }
+</style>
+</head>
+<body>
+<div class="frame frame--celular pub">
+
+  <header class="capa">
+    <div class="status-bar status-bar--escura">
+      <span>9:41</span>
+      <span class="status-bar__icones">
+        <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor" aria-hidden="true"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor" aria-hidden="true"><path d="M8 2.2c2.3 0 4.4.9 6 2.4l1.2-1.3A10.4 10.4 0 0 0 8 .4C5.2.4 2.7 1.5.8 3.3L2 4.6a8.6 8.6 0 0 1 6-2.4Zm0 3.6c1.3 0 2.5.5 3.4 1.3l1.2-1.3A6.7 6.7 0 0 0 8 4c-1.8 0-3.4.7-4.6 1.8l1.2 1.3c.9-.8 2.1-1.3 3.4-1.3Zm0 3.6c-.6 0-1.1.2-1.5.6L8 11.6l1.5-1.6c-.4-.4-.9-.6-1.5-.6Z"/></svg>
+        <svg width="27" height="13" viewBox="0 0 27 13" fill="none" aria-hidden="true"><rect x=".5" y=".5" width="23" height="12" rx="3.5" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="17" height="9" rx="2" fill="currentColor"/><path d="M25 4.5v4c.8-.3 1.3-1.1 1.3-2s-.5-1.7-1.3-2Z" fill="currentColor" opacity=".45"/></svg>
+      </span>
+    </div>
+
+    <div class="capa__conteudo">
+      <div class="capa__linha">
+        <h1 class="capa__nome">Barbearia Vila Rica</h1>
+        <button class="capa__botao" aria-label="Compartilhar"><i data-lucide="share-2"></i></button>
+      </div>
+      <p class="capa__endereco">Rua Governador Pedro de Toledo, 1240<br>Centro, Piracicaba/SP</p>
+      <div class="capa__horario">
+        <span class="badge badge--concluido badge--ponto">Aberto agora</span>
+        <span>Ter a sáb, das 9h às 19h</span>
+      </div>
+    </div>
+  </header>
+
+  <section class="secao">
+    <h2 class="secao__titulo">Serviços</h2>
+
+    <ul class="servicos">
+      <li class="servico"><span><span class="servico__nome">Corte</span><span class="servico__dur num">30 min</span></span><span class="servico__preco">R$ 45</span></li>
+      <li class="servico"><span><span class="servico__nome">Barba</span><span class="servico__dur num">20 min</span></span><span class="servico__preco">R$ 35</span></li>
+      <li class="servico"><span><span class="servico__nome">Sobrancelha</span><span class="servico__dur num">10 min</span></span><span class="servico__preco">R$ 15</span></li>
+      <li class="servico"><span><span class="servico__nome">Pigmentação</span><span class="servico__dur num">30 min</span></span><span class="servico__preco">R$ 40</span></li>
+      <li class="servico"><span><span class="servico__nome">Corte infantil</span><span class="servico__dur num">30 min</span></span><span class="servico__preco">R$ 35</span></li>
+    </ul>
+  </section>
+
+  <section class="secao">
+    <h2 class="secao__titulo">Clube de assinatura</h2>
+    <div class="clube">
+      <div>
+        <div class="clube__nome">Clube Corte</div>
+        <div class="clube__meta">4 cortes a cada 30 dias · contratação no balcão</div>
+      </div>
+      <div class="clube__preco"><strong>R$ 99</strong><span>por mês</span></div>
+    </div>
+  </section>
+
+  <section class="secao">
+    <h2 class="secao__titulo">Barbeiros</h2>
+    <div class="barbeiros">
+      <div class="barbeiro"><span class="avatar">RM</span>Rafael</div>
+      <div class="barbeiro"><span class="avatar">DS</span>Diego</div>
+      <div class="barbeiro"><span class="avatar">TL</span>Thiago</div>
+      <div class="barbeiro"><span class="avatar">CF</span>Caio</div>
+    </div>
+  </section>
+
+  <div class="barra-acao">
+    <div class="barra-acao__linha">
+      <a class="btn btn--secundario btn--lg btn-whats" href="https://wa.me/5519998124470" aria-label="Falar no WhatsApp: (19) 99812-4470"><i data-lucide="message-circle"></i>WhatsApp</a>
+      <a class="btn btn--primario btn--lg" style="flex:1" href="03-agendar-horario.html">Agendar horário</a>
+    </div>
+  </div>
+  <div class="indicador-home"></div>
+
+</div>
+<script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Minha agenda · Korte</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/korte.css">
+<style>
+  .cab { background: var(--superficie); border-bottom: 1px solid var(--borda); }
+  .cab__linha { display: flex; align-items: center; justify-content: space-between; padding: 4px 16px 8px; }
+  .cab__linha h1 { font-size: var(--t-24); font-weight: 700; line-height: 1.2; letter-spacing: -.01em; }
+  .cab__acoes { display: flex; align-items: center; gap: 4px; }
+  .cab__data { display: grid; grid-template-columns: 36px 1fr 36px; align-items: center; gap: 8px; padding: 0 12px 12px; }
+  .cab__dia { text-align: center; line-height: 1.3; }
+  .cab__dia strong { display: block; font-size: var(--t-16); }
+  .cab__dia span { font-size: var(--t-12); color: var(--texto-2); font-variant-numeric: tabular-nums; }
+
+  .lista { background: var(--superficie); border-bottom: 1px solid var(--borda); }
+  .ag { display: grid; grid-template-columns: 52px 1fr auto; align-items: center; column-gap: 12px; padding: 8px 16px; border-bottom: 1px solid var(--borda); min-height: 56px; }
+  .ag__hora { line-height: 1.25; font-variant-numeric: tabular-nums; }
+  .ag__hora strong { display: block; font-size: var(--t-14); font-weight: 700; }
+  .ag__hora span { font-size: var(--t-12); color: var(--texto-2); }
+  .ag__info { min-width: 0; line-height: 1.3; }
+  .ag__cliente { font-size: var(--t-16); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ag__servico { font-size: var(--t-14); color: var(--texto-2); display: flex; align-items: center; gap: 6px; }
+  .ag__servico .badge { height: 20px; padding: 0 8px; font-size: 11px; }
+  .ag--passado .ag__hora strong { color: var(--texto-2); }
+  .ag--cancelado .ag__cliente { text-decoration: line-through; color: var(--texto-2); font-weight: 500; }
+
+  .bloqueio { display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 16px; border-bottom: 1px solid var(--borda); font-size: var(--t-14); color: var(--texto-2); font-weight: 600; }
+  .bloqueio svg.lucide { width: 16px; height: 16px; }
+  .bloqueio .num { font-weight: 500; }
+
+  .ag--atual { background: var(--info-bg); border-bottom-color: #D9DCF0; padding-top: 12px; padding-bottom: 12px; }
+  .ag--atual .ag__hora strong { color: var(--destaque); }
+  .ag--atual .badge--agendado { background: var(--superficie); box-shadow: inset 0 0 0 1px #D5D9F1; }
+  .agora { display: inline-block; margin-top: 2px; font-size: 11px; font-weight: 700; color: var(--destaque); }
+  .ag__extra { grid-column: 1 / 4; display: flex; gap: 8px; margin-top: 12px; }
+  .ag__extra .btn--secundario { background: var(--superficie); }
+  .ag__extra .btn--fantasma { color: var(--erro); }
+</style>
+</head>
+<body>
+<div class="frame frame--celular">
+
+  <header class="cab">
+    <div class="status-bar">
+      <span>15:12</span>
+      <span class="status-bar__icones">
+        <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor" aria-hidden="true"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor" aria-hidden="true"><path d="M8 2.2c2.3 0 4.4.9 6 2.4l1.2-1.3A10.4 10.4 0 0 0 8 .4C5.2.4 2.7 1.5.8 3.3L2 4.6a8.6 8.6 0 0 1 6-2.4Zm0 3.6c1.3 0 2.5.5 3.4 1.3l1.2-1.3A6.7 6.7 0 0 0 8 4c-1.8 0-3.4.7-4.6 1.8l1.2 1.3c.9-.8 2.1-1.3 3.4-1.3Zm0 3.6c-.6 0-1.1.2-1.5.6L8 11.6l1.5-1.6c-.4-.4-.9-.6-1.5-.6Z"/></svg>
+        <svg width="27" height="13" viewBox="0 0 27 13" fill="none" aria-hidden="true"><rect x=".5" y=".5" width="23" height="12" rx="3.5" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="12" height="9" rx="2" fill="currentColor"/><path d="M25 4.5v4c.8-.3 1.3-1.1 1.3-2s-.5-1.7-1.3-2Z" fill="currentColor" opacity=".45"/></svg>
+      </span>
+    </div>
+    <div class="cab__linha">
+      <h1>Minha agenda</h1>
+      <div class="cab__acoes">
+        <button class="btn btn--fantasma btn--icone btn-notificacao" aria-label="Notificações"><i data-lucide="bell"></i></button>
+        <span class="avatar avatar--sm">DS</span>
+      </div>
+    </div>
+    <div class="cab__data">
+      <button class="btn btn--secundario btn--icone btn--sm" aria-label="Dia anterior"><i data-lucide="chevron-left"></i></button>
+      <div class="cab__dia"><strong>Hoje, sex 16 de outubro</strong><span>9 agendamentos · 4 concluídos</span></div>
+      <button class="btn btn--secundario btn--icone btn--sm" aria-label="Próximo dia"><i data-lucide="chevron-right"></i></button>
+    </div>
+  </header>
+
+  <ol class="lista">
+    <li class="ag ag--passado">
+      <div class="ag__hora"><strong>09:00</strong><span>30 min</span></div>
+      <div class="ag__info"><div class="ag__cliente">Matheus Oliveira</div><div class="ag__servico">Corte</div></div>
+      <span class="badge badge--concluido">Concluído</span>
+    </li>
+    <li class="ag ag--passado">
+      <div class="ag__hora"><strong>09:30</strong><span>30 min</span></div>
+      <div class="ag__info"><div class="ag__cliente">Gabriel Rocha</div><div class="ag__servico">Corte</div></div>
+      <span class="badge badge--faltou">Faltou</span>
+    </li>
+    <li class="ag ag--passado">
+      <div class="ag__hora"><strong>10:00</strong><span>20 min</span></div>
+      <div class="ag__info"><div class="ag__cliente">João Batista Silva</div><div class="ag__servico">Barba</div></div>
+      <span class="badge badge--concluido">Concluído</span>
+    </li>
+    <li class="ag ag--passado ag--cancelado">
+      <div class="ag__hora"><strong>11:00</strong><span>30 min</span></div>
+      <div class="ag__info"><div class="ag__cliente">Bruno Carvalho</div><div class="ag__servico">Corte</div></div>
+      <span class="badge badge--cancelado">Cancelado</span>
+    </li>
+    <li class="ag ag--passado">
+      <div class="ag__hora"><strong>11:30</strong><span>30 min</span></div>
+      <div class="ag__info"><div class="ag__cliente">Ricardo Tavares</div><div class="ag__servico">Pigmentação</div></div>
+      <span class="badge badge--concluido">Concluído</span>
+    </li>
+    <li class="bloqueio hachurado"><i data-lucide="utensils"></i>Almoço <span class="num">12:30 às 13:30</span></li>
+    <li class="ag ag--passado">
+      <div class="ag__hora"><strong>14:00</strong><span>30 min</span></div>
+      <div class="ag__info"><div class="ag__cliente">Pedro Henrique Costa</div><div class="ag__servico">Corte</div></div>
+      <span class="badge badge--concluido">Concluído</span>
+    </li>
+    <li class="ag ag--atual">
+      <div class="ag__hora"><strong>15:00</strong><span class="agora">agora</span></div>
+      <div class="ag__info"><div class="ag__cliente">Lucas Almeida</div><div class="ag__servico">Corte <span class="badge badge--marinho">Clube Corte</span></div></div>
+      <span class="badge badge--agendado">Agendado</span>
+      <div class="ag__extra">
+        <a class="btn btn--primario btn--sm" href="07-concluir-atendimento.html"><i data-lucide="check"></i>Concluir</a>
+        <button class="btn btn--secundario btn--sm"><i data-lucide="user-x"></i>Marcar falta</button>
+        <button class="btn btn--fantasma btn--sm">Cancelar</button>
+      </div>
+    </li>
+    <li class="ag">
+      <div class="ag__hora"><strong>16:00</strong><span>20 min</span></div>
+      <div class="ag__info"><div class="ag__cliente">Felipe Nunes</div><div class="ag__servico">Barba</div></div>
+      <span class="badge badge--agendado">Agendado</span>
+    </li>
+    <li class="ag">
+      <div class="ag__hora"><strong>17:30</strong><span>30 min</span></div>
+      <div class="ag__info"><div class="ag__cliente">André Luiz Prado</div><div class="ag__servico">Corte</div></div>
+      <span class="badge badge--agendado">Agendado</span>
+    </li>
+  </ol>
+
+  <nav class="nav-inferior" aria-label="Navegação principal">
+    <a class="nav-inferior__item is-ativo" href="05-agenda-barbeiro.html" aria-current="page"><i data-lucide="calendar"></i>Agenda</a>
+    <a class="nav-inferior__item" href="#"><i data-lucide="calendar-plus"></i>Novo</a>
+    <a class="nav-inferior__item" href="#"><i data-lucide="history"></i>Histórico</a>
+    <a class="nav-inferior__item" href="#"><i data-lucide="circle-user"></i>Perfil</a>
+  </nav>
+  <div class="indicador-home"></div>
+
+</div>
+<script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>

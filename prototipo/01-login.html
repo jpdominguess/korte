@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Entrar · Korte</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/korte.css">
+<style>
+  .login { display: grid; grid-template-columns: 600px 1fr; }
+
+  .login__marca {
+    display: flex; flex-direction: column;
+    padding: 48px;
+    background: var(--marinho);
+    color: #fff;
+  }
+  .login__logo { font-size: 40px; line-height: 1; }
+  .login__mensagem { margin-top: auto; max-width: 460px; }
+  .login__mensagem h1 { font-size: var(--t-32); font-weight: 600; line-height: 1.25; letter-spacing: -.015em; }
+  .login__mensagem p { margin-top: 16px; font-size: var(--t-16); color: rgba(255, 255, 255, .72); }
+
+  .previa {
+    margin-top: 40px;
+    border: 1px solid rgba(255, 255, 255, .1);
+    border-radius: var(--raio-card);
+    background: var(--marinho-hover);
+  }
+  .previa__cab { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid rgba(255, 255, 255, .08); }
+  .previa__dia { font-size: var(--t-14); font-weight: 700; }
+  .previa__barbeiro { display: flex; align-items: center; gap: 8px; font-size: var(--t-12); color: rgba(255, 255, 255, .72); }
+  .previa__barbeiro .avatar { background: rgba(255, 255, 255, .12); color: #fff; }
+  .previa__linha { display: grid; grid-template-columns: 48px 1fr auto; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid rgba(255, 255, 255, .06); }
+  .previa__linha:last-child { border-bottom: 0; }
+  .previa__hora { font-size: var(--t-14); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .previa__cliente { font-size: var(--t-14); font-weight: 600; line-height: 1.3; }
+  .previa__servico { font-size: var(--t-12); color: rgba(255, 255, 255, .6); line-height: 1.3; }
+
+  .login__rodape { margin-top: 48px; display: flex; gap: 16px; font-size: var(--t-12); color: rgba(255, 255, 255, .5); }
+  .login__rodape a { color: inherit; text-decoration: none; }
+
+  .login__lado { display: flex; flex-direction: column; padding: 32px 48px; }
+  .login__topo { display: flex; justify-content: flex-end; font-size: var(--t-14); color: var(--texto-2); gap: 6px; }
+  .login__quadro { width: 400px; margin: auto; }
+  .login__titulo { font-size: var(--t-32); font-weight: 700; letter-spacing: -.015em; line-height: 1.2; }
+  .login__sub { margin-top: 8px; color: var(--texto-2); }
+  .login__form { display: flex; flex-direction: column; gap: 20px; margin-top: 32px; }
+  .login__form .btn--lg { margin-top: 4px; }
+  .login__divisor { height: 1px; background: var(--borda); margin: 32px 0 24px; }
+  .login__criar { font-size: var(--t-14); color: var(--texto-2); text-align: center; }
+  .login__criar a { font-weight: 600; }
+  .login__cliente { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: var(--t-12); color: var(--texto-2); }
+  .olho { color: var(--texto-2); }
+</style>
+</head>
+<body>
+<div class="frame frame--desktop login">
+
+  <aside class="login__marca">
+    <div class="login__logo marca">Korte</div>
+
+    <div class="login__mensagem">
+      <h1>Agenda, atendimentos e assinaturas da barbearia em um só lugar.</h1>
+      <p>Os horários da equipe, os atendimentos do dia e os planos dos clientes no mesmo painel, no computador ou no celular.</p>
+
+      <div class="previa" aria-hidden="true">
+        <div class="previa__cab">
+          <span class="previa__dia">Hoje, sexta-feira</span>
+          <span class="previa__barbeiro"><span class="avatar avatar--xs">DS</span>Diego Santana</span>
+        </div>
+        <div class="previa__linha">
+          <span class="previa__hora">09:30</span>
+          <span><span class="previa__cliente">Gabriel Rocha</span><br><span class="previa__servico">Corte</span></span>
+          <span class="badge badge--faltou">Faltou</span>
+        </div>
+        <div class="previa__linha">
+          <span class="previa__hora">14:00</span>
+          <span><span class="previa__cliente">Pedro Henrique Costa</span><br><span class="previa__servico">Corte</span></span>
+          <span class="badge badge--concluido">Concluído</span>
+        </div>
+        <div class="previa__linha">
+          <span class="previa__hora">15:00</span>
+          <span><span class="previa__cliente">Lucas Almeida</span><br><span class="previa__servico">Corte · Clube Corte</span></span>
+          <span class="badge badge--agendado">Agendado</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="login__rodape">
+      <span>© 2026 Korte</span>
+      <a href="#">Termos de uso</a>
+      <a href="#">Privacidade</a>
+    </div>
+  </aside>
+
+  <main class="login__lado">
+    <div class="login__topo">Ainda não usa o Korte? <a href="#" class="forte">Criar conta</a></div>
+
+    <div class="login__quadro">
+      <h2 class="login__titulo">Entrar</h2>
+      <p class="login__sub">Acesse o painel da sua barbearia.</p>
+
+      <form class="login__form" action="06-agenda-geral.html">
+        <div class="campo">
+          <label class="campo__rotulo" for="email">E-mail</label>
+          <div class="input-grupo">
+            <span class="input-grupo__icone"><i data-lucide="mail"></i></span>
+            <input class="input input--lg" id="email" type="email" autocomplete="email" value="rafael@barbeariavilarica.com.br" placeholder="seu@email.com.br">
+          </div>
+        </div>
+
+        <div class="campo">
+          <div class="campo__linha">
+            <label class="campo__rotulo" for="senha">Senha</label>
+            <a href="#" class="link-btn">Esqueci minha senha</a>
+          </div>
+          <div class="input-grupo">
+            <span class="input-grupo__icone"><i data-lucide="lock"></i></span>
+            <input class="input input--lg com-acao is-foco" id="senha" type="password" autocomplete="current-password" value="exemplo2026" placeholder="Sua senha">
+            <button type="button" class="btn btn--fantasma btn--icone input-grupo__acao olho" aria-label="Mostrar senha"><i data-lucide="eye"></i></button>
+          </div>
+        </div>
+
+        <label class="check"><input type="checkbox" checked> Manter conectado neste computador</label>
+
+        <button class="btn btn--primario btn--lg btn--bloco" type="submit">Entrar</button>
+      </form>
+
+      <div class="login__divisor"></div>
+      <p class="login__criar">Primeiro acesso de barbeiro? Use o link do convite que chegou no seu e-mail.</p>
+    </div>
+
+    <p class="login__cliente"><i data-lucide="calendar" class="ic-16"></i>É cliente e quer marcar um horário? Use o link de agendamento da sua barbearia.</p>
+  </main>
+
+</div>
+<script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>

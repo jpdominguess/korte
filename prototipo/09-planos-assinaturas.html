@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Planos e assinaturas · Korte</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/korte.css">
+<style>
+  .planos { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 20px; }
+  .plano { padding: 16px 24px; }
+  .plano__topo { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+  .plano__nome { display: flex; align-items: center; gap: 10px; font-size: var(--t-20); font-weight: 700; line-height: 1.3; }
+  .plano__desc { font-size: var(--t-14); color: var(--texto-2); margin-top: 2px; }
+  .plano__preco { text-align: right; line-height: 1.2; font-variant-numeric: tabular-nums; }
+  .plano__preco strong { font-size: var(--t-24); }
+  .plano__preco span { font-size: var(--t-14); color: var(--texto-2); }
+  .plano__dados { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--borda); }
+  .plano__dado span { display: block; font-size: var(--t-12); color: var(--texto-2); }
+  .plano__dado strong { display: block; font-size: var(--t-14); font-weight: 600; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .novo-plano { display: flex; flex-direction: column; justify-content: center; gap: 8px; padding: 20px 24px; border: 1px dashed var(--borda-controle); border-radius: var(--raio-card); background: transparent; color: var(--texto); text-decoration: none; }
+  .novo-plano__icone { width: 36px; height: 36px; border-radius: var(--raio-controle); background: var(--muted); display: grid; place-items: center; }
+  .novo-plano strong { font-size: var(--t-16); }
+  .novo-plano span { font-size: var(--t-14); color: var(--texto-2); }
+
+  .assinantes__barra { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 24px; border-bottom: 1px solid var(--borda); }
+  .assinantes__barra .busca { width: 260px; }
+  .assinantes__barra .busca .input { height: 36px; font-size: var(--t-14); }
+  .contagem { margin-left: 6px; font-size: var(--t-12); color: var(--texto-3); font-variant-numeric: tabular-nums; }
+  .segmentado button.is-ativo .contagem { color: var(--texto-2); }
+
+  .assinantes td, .assinantes th { padding-left: 16px; padding-right: 16px; }
+  .assinantes td:first-child, .assinantes th:first-child { padding-left: 24px; }
+  .assinantes td:last-child, .assinantes th:last-child { padding-right: 24px; }
+  .assinantes tbody td { height: 48px; padding-top: 0; padding-bottom: 0; }
+  .cliente-cel { display: flex; align-items: center; gap: 10px; }
+  .cliente-cel strong { display: block; font-weight: 600; line-height: 1.3; }
+  .cliente-cel span.tel { display: block; font-size: var(--t-12); color: var(--texto-2); font-variant-numeric: tabular-nums; }
+  .validade strong { display: block; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.3; }
+  .validade span { font-size: var(--t-12); color: var(--texto-2); }
+  .validade span.alerta { color: var(--aviso); font-weight: 600; }
+  .usos { display: flex; align-items: center; gap: 10px; font-variant-numeric: tabular-nums; }
+  .usos__barra { display: flex; gap: 3px; }
+  .usos__barra i { width: 14px; height: 6px; border-radius: 3px; background: var(--destaque); display: block; }
+  .usos__barra i.vazio { background: var(--borda); }
+  .usos__texto { font-weight: 600; white-space: nowrap; }
+  .usos--zerado .usos__texto { color: var(--aviso); }
+  .sem-usos { color: var(--texto-3); }
+  .acoes-cel { display: flex; justify-content: flex-end; gap: 4px; }
+  .acoes-cel .btn--fantasma { color: var(--erro); }
+  .assinantes__rodape { display: flex; align-items: center; justify-content: space-between; padding: 10px 24px; border-top: 1px solid var(--borda); font-size: var(--t-14); color: var(--texto-2); }
+  .assinantes__rodape div { display: flex; gap: 8px; }
+</style>
+</head>
+<body>
+<div class="frame frame--desktop">
+<div class="app">
+
+  <aside class="sidebar">
+    <a class="sidebar__logo" href="index.html">Korte</a>
+    <p class="sidebar__grupo">Dia a dia</p>
+    <nav class="sidebar__nav">
+      <a class="nav-item" href="08-painel-dono.html"><i data-lucide="layout-dashboard"></i>Painel</a>
+      <a class="nav-item" href="06-agenda-geral.html"><i data-lucide="calendar"></i>Agenda</a>
+    </nav>
+    <p class="sidebar__grupo">Cadastros</p>
+    <nav class="sidebar__nav">
+      <a class="nav-item" href="#"><i data-lucide="users"></i>Barbeiros</a>
+      <a class="nav-item" href="#"><i data-lucide="scissors"></i>Serviços</a>
+      <a class="nav-item" href="#"><i data-lucide="clock"></i>Expedientes</a>
+      <a class="nav-item is-ativo" href="09-planos-assinaturas.html" aria-current="page"><i data-lucide="repeat"></i>Planos e assinaturas</a>
+    </nav>
+    <div class="sidebar__rodape">
+      <a class="nav-item" href="#"><i data-lucide="store"></i>Barbearia</a>
+    </div>
+  </aside>
+
+  <div class="principal">
+    <header class="topo">
+      <div class="topo__barbearia">
+        <span class="topo__logo-barbearia">VR</span>
+        <div><div class="topo__nome">Barbearia Vila Rica</div><div class="topo__local">Centro, Piracicaba/SP</div></div>
+      </div>
+      <div class="topo__acoes">
+        <button class="btn btn--fantasma btn--icone btn-notificacao" aria-label="Notificações"><i data-lucide="bell"></i></button>
+        <div class="topo__usuario">
+          <span class="avatar avatar--sm avatar--escuro">RM</span>
+          <div><div class="topo__usuario-nome">Rafael Moura</div><div class="topo__usuario-papel">Dono</div></div>
+          <i data-lucide="chevron-down" class="ic-16 texto-2"></i>
+        </div>
+      </div>
+    </header>
+
+    <main class="conteudo">
+      <div class="pagina-cab">
+        <div>
+          <h1 class="pagina-cab__titulo">Planos e assinaturas</h1>
+          <p class="pagina-cab__sub">24 assinaturas ativas · 18 ativações e renovações em outubro, somando R$ 1.782</p>
+        </div>
+        <div class="pagina-cab__acoes">
+          <button class="btn btn--secundario"><i data-lucide="plus"></i>Novo plano</button>
+          <button class="btn btn--primario"><i data-lucide="user-plus"></i>Ativar assinatura</button>
+        </div>
+      </div>
+
+      <div class="planos">
+        <section class="card plano">
+          <div class="plano__topo">
+            <div>
+              <h2 class="plano__nome">Clube Corte <span class="badge badge--sucesso">Ativo</span></h2>
+              <p class="plano__desc">Plano mensal com cortes inclusos. O cliente contrata e renova no balcão.</p>
+            </div>
+            <div class="plano__preco"><strong>R$ 99</strong><span> por 30 dias</span></div>
+          </div>
+          <div class="plano__dados">
+            <div class="plano__dado"><span>Serviço incluído</span><strong>Corte (R$ 45 avulso)</strong></div>
+            <div class="plano__dado"><span>Usos por ciclo</span><strong>4 a cada 30 dias</strong></div>
+            <div class="plano__dado"><span>Assinantes ativos</span><strong>24</strong></div>
+            <div class="plano__dado"><span>Ações</span><strong><a href="#" class="link-btn"><i data-lucide="pencil" class="ic-16"></i>Editar plano</a></strong></div>
+          </div>
+        </section>
+        <a class="novo-plano" href="#">
+          <span class="novo-plano__icone"><i data-lucide="plus"></i></span>
+          <strong>Criar outro plano</strong>
+          <span>Defina nome, preço, serviços incluídos e quantos usos o cliente tem a cada 30 dias.</span>
+        </a>
+      </div>
+
+      <section class="card">
+        <div class="assinantes__barra">
+          <div class="segmentado" role="group" aria-label="Filtrar por situação">
+            <button class="is-ativo" aria-pressed="true">Todas<span class="contagem">30</span></button>
+            <button aria-pressed="false">Ativas<span class="contagem">24</span></button>
+            <button aria-pressed="false">Expiradas<span class="contagem">4</span></button>
+            <button aria-pressed="false">Canceladas<span class="contagem">2</span></button>
+          </div>
+          <div class="input-grupo busca">
+            <span class="input-grupo__icone"><i data-lucide="search" class="ic-16"></i></span>
+            <input class="input" type="search" placeholder="Buscar assinante">
+          </div>
+        </div>
+        <table class="tabela assinantes">
+          <thead>
+            <tr><th>Cliente</th><th>Plano</th><th>Validade</th><th>Usos restantes</th><th>Situação</th><th class="dir">Ações</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><div class="cliente-cel"><span class="avatar avatar--sm">LA</span><div><strong>Lucas Almeida</strong><span class="tel">(19) 99734-2108</span></div></div></td>
+              <td>Clube Corte</td>
+              <td class="validade"><strong>até 01/11/2026</strong><span>faltam 16 dias</span></td>
+              <td><div class="usos"><span class="usos__barra"><i class="vazio"></i><i></i><i></i><i></i></span><span class="usos__texto">3 de 4</span></div></td>
+              <td><span class="badge badge--sucesso">Ativa</span></td>
+              <td><div class="acoes-cel"><button class="btn btn--secundario btn--sm">Renovar</button><button class="btn btn--fantasma btn--sm">Cancelar</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="cliente-cel"><span class="avatar avatar--sm">VB</span><div><strong>Vinícius Barros</strong><span class="tel">(19) 99610-3357</span></div></div></td>
+              <td>Clube Corte</td>
+              <td class="validade"><strong>até 14/11/2026</strong><span>renovada hoje</span></td>
+              <td><div class="usos"><span class="usos__barra"><i class="vazio"></i><i></i><i></i><i></i></span><span class="usos__texto">3 de 4</span></div></td>
+              <td><span class="badge badge--sucesso">Ativa</span></td>
+              <td><div class="acoes-cel"><button class="btn btn--secundario btn--sm">Renovar</button><button class="btn btn--fantasma btn--sm">Cancelar</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="cliente-cel"><span class="avatar avatar--sm">RV</span><div><strong>Renan Vieira</strong><span class="tel">(19) 98845-1290</span></div></div></td>
+              <td>Clube Corte</td>
+              <td class="validade"><strong>até 14/11/2026</strong><span>renovada hoje</span></td>
+              <td><div class="usos"><span class="usos__barra"><i class="vazio"></i><i></i><i></i><i></i></span><span class="usos__texto">3 de 4</span></div></td>
+              <td><span class="badge badge--sucesso">Ativa</span></td>
+              <td><div class="acoes-cel"><button class="btn btn--secundario btn--sm">Renovar</button><button class="btn btn--fantasma btn--sm">Cancelar</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="cliente-cel"><span class="avatar avatar--sm">HM</span><div><strong>Henrique Matos</strong><span class="tel">(19) 99127-8804</span></div></div></td>
+              <td>Clube Corte</td>
+              <td class="validade"><strong>até 06/11/2026</strong><span>faltam 21 dias</span></td>
+              <td><div class="usos"><span class="usos__barra"><i class="vazio"></i><i class="vazio"></i><i></i><i></i></span><span class="usos__texto">2 de 4</span></div></td>
+              <td><span class="badge badge--sucesso">Ativa</span></td>
+              <td><div class="acoes-cel"><button class="btn btn--secundario btn--sm">Renovar</button><button class="btn btn--fantasma btn--sm">Cancelar</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="cliente-cel"><span class="avatar avatar--sm">AR</span><div><strong>Arthur Ribeiro</strong><span class="tel">(19) 99402-6618</span></div></div></td>
+              <td>Clube Corte</td>
+              <td class="validade"><strong>até 20/10/2026</strong><span class="alerta">vence em 4 dias</span></td>
+              <td><div class="usos usos--zerado"><span class="usos__barra"><i class="vazio"></i><i class="vazio"></i><i class="vazio"></i><i class="vazio"></i></span><span class="usos__texto">0 de 4</span></div></td>
+              <td><span class="badge badge--sucesso">Ativa</span></td>
+              <td><div class="acoes-cel"><button class="btn btn--secundario btn--sm">Renovar</button><button class="btn btn--fantasma btn--sm">Cancelar</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="cliente-cel"><span class="avatar avatar--sm">GR</span><div><strong>Gabriel Rocha</strong><span class="tel">(19) 98761-0423</span></div></div></td>
+              <td>Clube Corte</td>
+              <td class="validade"><strong>venceu em 12/10/2026</strong><span>há 4 dias</span></td>
+              <td><span class="sem-usos">—</span></td>
+              <td><span class="badge badge--aviso">Expirada</span></td>
+              <td><div class="acoes-cel"><button class="btn btn--secundario btn--sm">Renovar</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="cliente-cel"><span class="avatar avatar--sm">MO</span><div><strong>Matheus Oliveira</strong><span class="tel">(19) 99288-5170</span></div></div></td>
+              <td>Clube Corte</td>
+              <td class="validade"><strong>cancelada em 30/09/2026</strong><span>pelo dono</span></td>
+              <td><span class="sem-usos">—</span></td>
+              <td><span class="badge badge--neutro">Cancelada</span></td>
+              <td><div class="acoes-cel"><button class="btn btn--secundario btn--sm">Ativar</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="assinantes__rodape">
+          <span>Mostrando 7 de 30 assinaturas</span>
+          <div><button class="btn btn--secundario btn--sm" disabled>Anterior</button><button class="btn btn--secundario btn--sm">Próxima</button></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+</div>
+</div>
+<script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>

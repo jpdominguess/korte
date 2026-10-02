@@ -1,0 +1,718 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guia de estilo · Korte</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/korte.css">
+<style>
+  html, body { background: var(--fundo); }
+  [hidden] { display: none !important; }
+  .sg { width: 1440px; margin: 0 auto; }
+  .sg-largura { width: 1200px; margin: 0 auto; }
+
+  /* Capa */
+  .sg-capa { background: var(--marinho); color: #fff; padding: 56px 0 48px; }
+  .sg-capa__topo { display: flex; align-items: flex-end; justify-content: space-between; gap: 48px; }
+  .sg-capa__logo { font-family: var(--fonte-marca); font-size: 64px; line-height: 1; }
+  .sg-capa__titulo { font-size: var(--t-40); font-weight: 600; line-height: 1.2; letter-spacing: -.02em; margin-top: 40px; }
+  .sg-capa__desc { margin-top: 12px; max-width: 640px; color: rgba(255, 255, 255, .72); }
+  .sg-capa__meta { text-align: right; font-size: var(--t-14); color: rgba(255, 255, 255, .6); line-height: 1.7; }
+  .sg-capa__meta strong { color: #fff; font-weight: 600; }
+  .sg-indice { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 40px; }
+  .sg-indice a { display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border-radius: var(--raio-pilula); border: 1px solid rgba(255, 255, 255, .16); color: rgba(255, 255, 255, .85); text-decoration: none; font-size: var(--t-14); font-weight: 600; }
+
+  .sg-mini { display: flex; align-items: center; justify-content: space-between; padding: 24px 0; border-bottom: 1px solid var(--borda); }
+  .sg-mini__logo { font-family: var(--fonte-marca); font-size: var(--t-24); line-height: 1; }
+  .sg-mini span { font-size: var(--t-14); color: var(--texto-2); }
+
+  /* Seções */
+  .sg-secao { padding: 56px 0; border-bottom: 1px solid var(--borda); }
+  .sg-secao:last-child { border-bottom: 0; }
+  .sg-cab { display: grid; grid-template-columns: 320px 1fr; gap: 48px; margin-bottom: 32px; align-items: baseline; }
+  .sg-cab__titulo { font-size: var(--t-32); font-weight: 700; letter-spacing: -.02em; line-height: 1.2; }
+  .sg-cab__desc { color: var(--texto-2); max-width: 720px; }
+  .sg-sub { font-size: var(--t-14); font-weight: 700; margin: 32px 0 12px; }
+  .sg-sub:first-child { margin-top: 0; }
+  .sg-legenda { font-size: var(--t-12); color: var(--texto-2); }
+
+  /* Logo */
+  .logos { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .logo-tile { height: 240px; border-radius: var(--raio-card); display: grid; place-items: center; position: relative; }
+  .logo-tile--escuro { background: var(--marinho); color: #fff; }
+  .logo-tile--claro { background: var(--fundo); color: var(--marinho); border: 1px solid var(--borda); }
+  .logo-tile__marca { font-family: var(--fonte-marca); font-size: 88px; line-height: 1; position: relative; }
+  .logo-tile__rotulo { position: absolute; left: 20px; bottom: 16px; font-size: var(--t-12); font-weight: 600; opacity: .7; }
+  .logo-regras { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: 24px; }
+  .logo-regra { display: flex; gap: 16px; align-items: center; }
+  .logo-regra__icone { width: 56px; height: 56px; border-radius: var(--raio-controle); display: grid; place-items: center; flex-shrink: 0; font-family: var(--fonte-marca); }
+  .logo-regra strong { display: block; font-size: var(--t-14); }
+  .logo-regra span { font-size: var(--t-14); color: var(--texto-2); }
+
+  /* Cores */
+  .cores { display: grid; grid-template-columns: repeat(5, 1fr); gap: 24px; }
+  .cor { border: 1px solid var(--borda); border-radius: var(--raio-card); overflow: hidden; background: var(--superficie); }
+  .cor__amostra { height: 88px; border-bottom: 1px solid var(--borda); }
+  .cor__info { padding: 12px 16px 16px; font-size: var(--t-14); line-height: 1.4; }
+  .cor__info strong { display: block; font-size: var(--t-14); }
+  .cor__hex { display: block; font-weight: 600; color: var(--texto-2); font-variant-numeric: tabular-nums; margin-top: 2px; }
+  .cor__uso { display: block; color: var(--texto-2); font-size: var(--t-12); margin-top: 8px; }
+  .cor__contraste { display: inline-block; margin-top: 8px; font-size: var(--t-12); font-weight: 600; }
+
+  .semanticas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+  .semantica { border: 1px solid var(--borda); border-radius: var(--raio-card); background: var(--superficie); padding: 16px; }
+  .semantica__par { display: flex; gap: 8px; margin-bottom: 12px; }
+  .semantica__par span { flex: 1; height: 48px; border-radius: var(--raio-controle); }
+  .semantica__nome { font-size: var(--t-14); font-weight: 700; }
+  .semantica__hex { font-size: var(--t-12); color: var(--texto-2); font-variant-numeric: tabular-nums; }
+  .semantica .aviso { margin-top: 12px; font-size: var(--t-14); }
+
+  .status-tabela { width: 100%; border-collapse: collapse; background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio-card); overflow: hidden; font-size: var(--t-14); }
+  .status-tabela th { text-align: left; font-size: var(--t-12); color: var(--texto-2); font-weight: 600; padding: 12px 20px; border-bottom: 1px solid var(--borda); background: var(--fundo); }
+  .status-tabela td { padding: 12px 20px; border-bottom: 1px solid var(--borda); }
+  .status-tabela tr:last-child td { border-bottom: 0; }
+  .status-tabela .hex { color: var(--texto-2); font-variant-numeric: tabular-nums; }
+  .status-tabela .bloco-ex { position: static; display: inline-flex; flex-direction: row; align-items: center; gap: 8px; height: 28px; width: 220px; padding: 0 8px; border-width: 1px; border-style: solid; border-radius: 6px; font-size: var(--t-12); }
+
+  /* Tipografia */
+  .fontes { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .fonte { border: 1px solid var(--borda); border-radius: var(--raio-card); background: var(--superficie); padding: 24px; }
+  .fonte__cab { display: flex; justify-content: space-between; align-items: baseline; font-size: var(--t-14); color: var(--texto-2); }
+  .fonte__cab strong { color: var(--texto); font-size: var(--t-16); }
+  .fonte__amostra { margin-top: 16px; line-height: 1.1; }
+  .fonte__alfabeto { margin-top: 16px; color: var(--texto-2); font-size: var(--t-16); letter-spacing: .02em; }
+  .pesos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 16px; }
+  .peso { font-size: var(--t-24); line-height: 1.2; }
+  .peso small { display: block; font-size: var(--t-12); font-weight: 500; color: var(--texto-2); margin-top: 4px; }
+
+  .escala { width: 100%; border-collapse: collapse; margin-top: 24px; background: var(--superficie); border: 1px solid var(--borda); }
+  .escala td, .escala th { padding: 14px 20px; border-bottom: 1px solid var(--borda); text-align: left; vertical-align: middle; }
+  .escala th { font-size: var(--t-12); color: var(--texto-2); font-weight: 600; background: var(--fundo); }
+  .escala td:not(:first-child) { font-size: var(--t-14); color: var(--texto-2); white-space: nowrap; }
+  .escala td:first-child { width: 560px; color: var(--texto); }
+  .escala .tam { font-weight: 700; color: var(--texto); font-variant-numeric: tabular-nums; }
+  .num-demo { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 24px; }
+  .num-demo div { border: 1px solid var(--borda); border-radius: var(--raio-card); background: var(--superficie); padding: 16px 24px; font-size: var(--t-14); color: var(--texto-2); }
+  .num-demo strong { display: block; width: 180px; text-align: right; font-size: var(--t-24); color: var(--texto); line-height: 1.4; }
+
+  /* Componentes */
+  .matriz { display: grid; grid-template-columns: 140px repeat(5, 1fr); gap: 16px 24px; align-items: center; background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio-card); padding: 24px; }
+  .matriz__th { font-size: var(--t-12); font-weight: 600; color: var(--texto-2); }
+  .matriz__linha { font-size: var(--t-14); font-weight: 700; }
+  .tamanhos { display: flex; align-items: flex-end; gap: 32px; background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio-card); padding: 24px; }
+  .tamanho { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+
+  .campos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio-card); padding: 24px; }
+  .campo__estado { font-size: var(--t-12); font-weight: 600; color: var(--texto-2); margin-bottom: 4px; }
+
+  .badges { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio-card); padding: 24px; }
+  .badges + .badges { margin-top: 16px; }
+  .badges__rotulo { width: 140px; font-size: var(--t-14); font-weight: 700; }
+
+  .cards-ex { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; align-items: start; }
+  .ex-ag { display: grid; grid-template-columns: 52px 1fr auto; align-items: center; column-gap: 12px; padding: 16px; }
+  .ex-ag__hora strong { display: block; font-size: var(--t-14); font-variant-numeric: tabular-nums; }
+  .ex-ag__hora span, .ex-ag__serv { font-size: var(--t-12); color: var(--texto-2); }
+  .ex-ag__cliente { font-weight: 600; line-height: 1.3; }
+  .ex-ag__acoes { grid-column: 2 / 4; display: flex; gap: 8px; margin-top: 12px; }
+  .ex-kpi { padding: 20px 24px; }
+  .ex-kpi__rotulo { display: flex; align-items: center; gap: 8px; font-size: var(--t-14); font-weight: 600; color: var(--texto-2); }
+  .ex-kpi__rotulo svg.lucide { width: 16px; height: 16px; }
+  .ex-kpi__valor { font-size: var(--t-32); font-weight: 700; letter-spacing: -.02em; line-height: 1.2; margin-top: 8px; font-variant-numeric: tabular-nums; }
+  .ex-kpi__rodape { margin-top: 8px; font-size: var(--t-12); color: var(--texto-2); display: flex; gap: 8px; align-items: center; }
+  .ex-kpi__rodape b { color: var(--sucesso); display: inline-flex; align-items: center; gap: 4px; }
+  .ex-kpi__rodape b svg.lucide { width: 14px; height: 14px; }
+  .ex-serv { padding: 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .ex-serv__nome { font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .ex-serv__meta { font-size: var(--t-14); color: var(--texto-2); display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+  .ex-serv__preco { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .ex-serv__preco s { display: block; font-size: var(--t-12); color: var(--texto-2); font-weight: 500; }
+  .anatomia { margin-top: 12px; font-size: var(--t-12); color: var(--texto-2); line-height: 1.6; }
+
+  /* Espaçamento */
+  .espacos { display: flex; align-items: flex-end; gap: 32px; background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio-card); padding: 32px 24px 24px; }
+  .espaco { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 96px; }
+  .espaco__bloco { background: #D9DCF0; border: 1px solid #B9BEE3; }
+  .espaco__valor { font-size: var(--t-14); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .espaco__uso { font-size: var(--t-12); color: var(--texto-2); text-align: center; line-height: 1.4; height: 34px; }
+  .formas-ex { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: 24px; }
+  .forma-ex { background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio-card); padding: 24px; display: flex; flex-direction: column; gap: 16px; align-items: flex-start; }
+  .forma-ex__amostra { width: 120px; height: 56px; background: var(--muted); border: 1px solid var(--borda-controle); }
+  .forma-ex strong { font-size: var(--t-14); display: block; }
+  .forma-ex span { font-size: var(--t-12); color: var(--texto-2); }
+
+  /* Ícones */
+  .icones { display: grid; grid-template-columns: repeat(10, 1fr); gap: 16px; }
+  .icone-tile { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 20px 8px 16px; background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio-card); text-align: center; }
+  .icone-tile__desenho { width: 48px; height: 48px; border-radius: var(--raio-controle); background: var(--muted); display: grid; place-items: center; color: var(--marinho); }
+  .icone-tile strong { font-size: var(--t-14); line-height: 1.2; }
+  .icone-tile span { font-size: var(--t-12); color: var(--texto-2); line-height: 1.2; }
+  .icone-tamanhos { display: flex; align-items: center; gap: 32px; margin-top: 24px; background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio-card); padding: 20px 24px; font-size: var(--t-14); color: var(--texto-2); }
+  .icone-tamanhos div { display: flex; align-items: center; gap: 10px; color: var(--texto); }
+  .icone-tamanhos .regra { margin-left: auto; color: var(--texto-2); }
+
+  /* Grid e layout */
+  .layouts { display: grid; grid-template-columns: 720px 1fr; gap: 48px; align-items: start; }
+  .esquema-desk { width: 720px; height: 450px; border-radius: 10px; overflow: hidden; display: grid; grid-template-columns: 120px 1fr; border: 1px solid var(--borda-controle); background: var(--fundo); }
+  .esq-side { background: var(--marinho); padding: 14px 10px; display: flex; flex-direction: column; gap: 6px; }
+  .esq-side__logo { font-family: var(--fonte-marca); color: #fff; font-size: 16px; padding: 0 6px 10px; }
+  .esq-side i { display: block; height: 14px; border-radius: 4px; background: rgba(255, 255, 255, .12); }
+  .esq-side i.ativo { background: var(--marinho-hover); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .16); }
+  .esq-main { display: flex; flex-direction: column; }
+  .esq-topo { height: 32px; background: var(--superficie); border-bottom: 1px solid var(--borda); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; }
+  .esq-topo i { display: block; width: 90px; height: 10px; border-radius: 3px; background: var(--muted); }
+  .esq-topo b { width: 16px; height: 16px; border-radius: 50%; background: var(--marinho); }
+  .esq-conteudo { flex: 1; position: relative; padding: 16px; }
+  .esq-colunas { position: absolute; inset: 16px; z-index: 1; pointer-events: none; display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px; }
+  .esq-colunas span { background: rgba(47, 58, 143, .10); border-left: 1px dashed rgba(47, 58, 143, .35); border-right: 1px dashed rgba(47, 58, 143, .35); }
+  .esq-blocos { position: relative; z-index: 0; display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px; }
+  .esq-blocos b { height: 54px; border-radius: 6px; background: var(--superficie); border: 1px solid var(--borda); }
+  .esq-blocos .g3 { grid-column: span 3; }
+  .esq-blocos .g7 { grid-column: span 7; height: 220px; }
+  .esq-blocos .g5 { grid-column: span 5; height: 220px; }
+  .esq-blocos .g12 { grid-column: span 12; height: 20px; background: transparent; border: 0; }
+  .esq-blocos .titulo { grid-column: span 4; height: 18px; background: var(--muted); border: 0; }
+  .esq-cota { position: absolute; font-size: 11px; font-weight: 700; color: var(--destaque); background: var(--superficie); padding: 1px 5px; border-radius: 4px; border: 1px solid #C9CEEF; white-space: nowrap; }
+
+  .notas-layout { display: flex; flex-direction: column; gap: 16px; }
+  .nota-layout { border-left: 0; padding: 16px 20px; background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio-card); }
+  .nota-layout strong { display: flex; align-items: center; gap: 8px; font-size: var(--t-14); }
+  .nota-layout ul { margin-top: 8px; display: flex; flex-direction: column; gap: 4px; font-size: var(--t-14); color: var(--texto-2); }
+  .nota-layout li::before { content: "–"; margin-right: 8px; color: var(--texto-3); }
+
+  .layouts-2 { display: grid; grid-template-columns: 195px 308px 1fr; gap: 48px; align-items: start; margin-top: 40px; }
+  .esquema-cel { width: 195px; height: 422px; border-radius: 22px; overflow: hidden; position: relative; border: 1px solid var(--borda-controle); background: var(--fundo); }
+  .esq-status { height: 22px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; font-size: 9px; font-weight: 700; background: var(--superficie); }
+  .esq-cab { height: 34px; background: var(--superficie); border-bottom: 1px solid var(--borda); padding: 10px 8px; }
+  .esq-cab i { display: block; width: 70px; height: 12px; border-radius: 3px; background: var(--muted); }
+  .esq-cel-conteudo { position: absolute; top: 56px; left: 0; right: 0; bottom: 42px; padding: 8px; }
+  .esq-cel-conteudo .esq-colunas { inset: 8px; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .esq-cel-conteudo .esq-lista { position: relative; z-index: 0; display: flex; flex-direction: column; gap: 6px; }
+  .esq-lista b { height: 30px; border-radius: 6px; background: var(--superficie); border: 1px solid var(--borda); }
+  .esq-nav { position: absolute; left: 0; right: 0; bottom: 0; height: 42px; background: var(--superficie); border-top: 1px solid var(--borda); display: grid; grid-template-columns: repeat(4, 1fr); align-items: center; justify-items: center; padding-bottom: 8px; color: var(--texto-2); }
+  .esq-nav svg.lucide { width: 12px; height: 12px; }
+  .esq-nav .ativo { color: var(--marinho); }
+  .esquema-tab { width: 308px; height: 410px; border-radius: 14px; overflow: hidden; position: relative; border: 1px solid var(--borda-controle); background: var(--fundo); }
+  .esquema-tab .esq-cel-conteudo { top: 40px; padding: 10px; }
+  .esquema-tab .esq-colunas { inset: 10px; grid-template-columns: repeat(8, 1fr); gap: 10px; }
+  .esq-legenda { margin-top: 12px; font-size: var(--t-12); color: var(--texto-2); line-height: 1.5; }
+  .esq-legenda strong { display: block; font-size: var(--t-14); color: var(--texto); }
+
+  .breakpoints { width: 100%; border-collapse: collapse; background: var(--superficie); border: 1px solid var(--borda); font-size: var(--t-14); }
+  .breakpoints th { text-align: left; font-size: var(--t-12); color: var(--texto-2); font-weight: 600; padding: 10px 16px; background: var(--fundo); border-bottom: 1px solid var(--borda); }
+  .breakpoints td { padding: 12px 16px; border-bottom: 1px solid var(--borda); font-variant-numeric: tabular-nums; }
+  .breakpoints tr:last-child td { border-bottom: 0; }
+  .breakpoints td:first-child { font-weight: 700; white-space: nowrap; }
+</style>
+</head>
+<body>
+<div class="sg">
+
+  <!-- cabeçalho curto das partes 2 e 3 (usado nas capturas) -->
+  <div class="sg-largura sg-mini" data-parte="2 3">
+    <span class="sg-mini__logo">Korte</span>
+    <span>Guia de estilo · versão 1.0 · outubro de 2026</span>
+  </div>
+
+  <header class="sg-capa" data-parte="1">
+    <div class="sg-largura">
+      <div class="sg-capa__topo">
+        <div class="sg-capa__logo">Korte</div>
+        <div class="sg-capa__meta"><strong>Guia de estilo, versão 1.0</strong><br>Outubro de 2026<br>Projeto de Software · Web 2</div>
+      </div>
+      <h1 class="sg-capa__titulo">Guia de estilo da interface</h1>
+      <p class="sg-capa__desc">Cores, tipografia, componentes e grid usados no painel da barbearia, na página pública e no fluxo de agendamento. Os valores abaixo são os mesmos de <code>css/korte.css</code>.</p>
+      <nav class="sg-indice" aria-label="Seções">
+        <a href="#logo">Logo</a><a href="#cores">Cores</a><a href="#tipografia">Tipografia</a><a href="#botoes">Botões</a><a href="#campos">Campos</a><a href="#badges">Badges</a><a href="#cards">Cards</a><a href="#espacamento">Espaçamento</a><a href="#icones">Ícones</a><a href="#grid">Grid e layout</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- 1. Logo -->
+  <section class="sg-secao" id="logo" data-parte="1">
+    <div class="sg-largura">
+      <div class="sg-cab">
+        <h2 class="sg-cab__titulo">Logo</h2>
+        <p class="sg-cab__desc">O logotipo é a palavra Korte em DM Serif Display. Usamos duas versões: branca sobre o marinho (sidebar, login, capa da página pública) e marinho sobre o fundo claro.</p>
+      </div>
+      <div class="logos">
+        <div class="logo-tile logo-tile--escuro"><span class="logo-tile__marca">Korte</span><span class="logo-tile__rotulo">Sobre marinho #050929</span></div>
+        <div class="logo-tile logo-tile--claro"><span class="logo-tile__marca">Korte</span><span class="logo-tile__rotulo">Sobre off-white #F8F8F7</span></div>
+      </div>
+      <div class="logo-regras">
+        <div class="logo-regra"><span class="logo-regra__icone" style="background: var(--marinho); color: #fff; font-size: 32px;">K</span><div><strong>Ícone do app</strong><span>K sobre marinho, cantos de 12 px. Favicon e atalho no celular.</span></div></div>
+        <div class="logo-regra"><span class="logo-regra__icone" style="border: 1px dashed var(--borda-controle); color: var(--marinho); font-size: 22px;">Ko</span><div><strong>Área de proteção</strong><span>Espaço livre igual à altura do K em volta do logo.</span></div></div>
+        <div class="logo-regra"><span class="logo-regra__icone" style="background: var(--muted); color: var(--marinho); font-size: 15px;">Korte</span><div><strong>Tamanho mínimo</strong><span>20 px de altura na tela. Abaixo disso, usar só o K.</span></div></div>
+        <div class="logo-regra"><span class="logo-regra__icone" style="background: var(--muted); color: var(--texto-2);"><i data-lucide="ban"></i></span><div><strong>Não fazer</strong><span>Sem sombra, contorno, gradiente ou outra fonte.</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Cores -->
+  <section class="sg-secao" id="cores" data-parte="1">
+    <div class="sg-largura">
+      <div class="sg-cab">
+        <h2 class="sg-cab__titulo">Cores</h2>
+        <p class="sg-cab__desc">Paleta contida: neutros quentes de fundo, o marinho como cor da marca e um azul de destaque para links, foco e seleção. A cor de estado aparece só quando informa algo.</p>
+      </div>
+      <h3 class="sg-sub">Base</h3>
+      <div class="cores">
+        <div class="cor"><div class="cor__amostra" style="background:#050929"></div><div class="cor__info"><strong>Marinho</strong><span class="cor__hex">#050929</span><span class="cor__uso">Cor primária, textos principais, sidebar e botão primário</span><span class="cor__contraste">19,5:1 sobre branco</span></div></div>
+        <div class="cor"><div class="cor__amostra" style="background:#141A45"></div><div class="cor__info"><strong>Marinho hover</strong><span class="cor__hex">#141A45</span><span class="cor__uso">Hover do botão primário e item ativo da sidebar</span><span class="cor__contraste">16,6:1 sobre branco</span></div></div>
+        <div class="cor"><div class="cor__amostra" style="background:#2F3A8F"></div><div class="cor__info"><strong>Destaque</strong><span class="cor__hex">#2F3A8F</span><span class="cor__uso">Links, anel de foco, seleção e barras de gráfico</span><span class="cor__contraste">9,9:1 sobre branco</span></div></div>
+        <div class="cor"><div class="cor__amostra" style="background:#5A5E78"></div><div class="cor__info"><strong>Texto secundário</strong><span class="cor__hex">#5A5E78</span><span class="cor__uso">Descrições, rótulos de apoio e metadados</span><span class="cor__contraste">6,4:1 sobre branco</span></div></div>
+        <div class="cor"><div class="cor__amostra" style="background:#8A8DA3"></div><div class="cor__info"><strong>Texto terciário</strong><span class="cor__hex">#8A8DA3</span><span class="cor__uso">Placeholder e itens indisponíveis. Não usar em texto essencial</span><span class="cor__contraste">3,3:1 sobre branco</span></div></div>
+        <div class="cor"><div class="cor__amostra" style="background:#F8F8F7"></div><div class="cor__info"><strong>Fundo</strong><span class="cor__hex">#F8F8F7</span><span class="cor__uso">Fundo da aplicação e da página pública</span></div></div>
+        <div class="cor"><div class="cor__amostra" style="background:#FFFFFF"></div><div class="cor__info"><strong>Superfície</strong><span class="cor__hex">#FFFFFF</span><span class="cor__uso">Cards, modais, campos e barras fixas</span></div></div>
+        <div class="cor"><div class="cor__amostra" style="background:#F0F0EE"></div><div class="cor__info"><strong>Neutro de apoio</strong><span class="cor__hex">#F0F0EE</span><span class="cor__uso">Hover de botões fantasma, fundos de ícone e bloqueios</span></div></div>
+        <div class="cor"><div class="cor__amostra" style="background:#E5E5E2"></div><div class="cor__info"><strong>Borda</strong><span class="cor__hex">#E5E5E2</span><span class="cor__uso">Contorno de cards e divisórias de lista</span></div></div>
+        <div class="cor"><div class="cor__amostra" style="background:#D6D6D2"></div><div class="cor__info"><strong>Borda de controle</strong><span class="cor__hex">#D6D6D2</span><span class="cor__uso">Campos, botão secundário e chips</span></div></div>
+      </div>
+
+      <h3 class="sg-sub">Cores de estado</h3>
+      <div class="semanticas">
+        <div class="semantica">
+          <div class="semantica__par"><span style="background:#1F7A4D"></span><span style="background:#E7F4EC; box-shadow: inset 0 0 0 1px #D2E8DA"></span></div>
+          <div class="semantica__nome">Sucesso</div><div class="semantica__hex">#1F7A4D · fundo #E7F4EC</div>
+          <div class="aviso aviso--sucesso"><i data-lucide="circle-check"></i>Pagamento registrado.</div>
+        </div>
+        <div class="semantica">
+          <div class="semantica__par"><span style="background:#9A6200"></span><span style="background:#FDF3E1; box-shadow: inset 0 0 0 1px #F2E2C2"></span></div>
+          <div class="semantica__nome">Aviso</div><div class="semantica__hex">#9A6200 · fundo #FDF3E1</div>
+          <div class="aviso aviso--aviso"><i data-lucide="triangle-alert"></i>Assinatura vence em 4 dias.</div>
+        </div>
+        <div class="semantica">
+          <div class="semantica__par"><span style="background:#B42318"></span><span style="background:#FDECEA; box-shadow: inset 0 0 0 1px #F6D6D2"></span></div>
+          <div class="semantica__nome">Erro</div><div class="semantica__hex">#B42318 · fundo #FDECEA</div>
+          <div class="aviso aviso--erro"><i data-lucide="circle-alert"></i>Horário já ocupado.</div>
+        </div>
+        <div class="semantica">
+          <div class="semantica__par"><span style="background:#2F3A8F"></span><span style="background:#ECEEF9; box-shadow: inset 0 0 0 1px #D9DCF0"></span></div>
+          <div class="semantica__nome">Informação</div><div class="semantica__hex">#2F3A8F · fundo #ECEEF9</div>
+          <div class="aviso"><i data-lucide="info"></i>Cancelamento até 2&nbsp;h antes.</div>
+        </div>
+      </div>
+
+      <h3 class="sg-sub">Status do agendamento</h3>
+      <table class="status-tabela">
+        <thead><tr><th>Status</th><th>Quando aparece</th><th>Cores (fundo · texto)</th><th>Na agenda geral</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge badge--agendado">Agendado</span></td><td>Horário marcado, aguardando o atendimento</td><td class="hex">#ECEEF9 · #2F3A8F</td><td><span class="bloco-ex bloco--agendado"><i data-lucide="clock" class="ic-16"></i><b style="color:var(--texto)">15:00</b> Lucas Almeida</span></td></tr>
+          <tr><td><span class="badge badge--concluido">Concluído</span></td><td>Atendimento feito e valor registrado (R$ 0,00 se coberto pelo clube)</td><td class="hex">#E7F4EC · #1F7A4D</td><td><span class="bloco-ex bloco--concluido"><i data-lucide="check" class="ic-16"></i><b style="color:var(--texto)">14:00</b> Pedro Henrique Costa</span></td></tr>
+          <tr><td><span class="badge badge--cancelado">Cancelado</span></td><td>Cancelado pelo cliente (até 2 h antes) ou pela barbearia</td><td class="hex">#F0F0EE · #5A5E78</td><td><span class="bloco-ex bloco--cancelado"><i data-lucide="x" class="ic-16"></i><b>11:00</b> <s>Bruno Carvalho</s></span></td></tr>
+          <tr><td><span class="badge badge--faltou">Faltou</span></td><td>Cliente não veio; marcado depois de 15 min de tolerância</td><td class="hex">#FDECEA · #B42318</td><td><span class="bloco-ex bloco--faltou"><i data-lucide="user-x" class="ic-16"></i><b style="color:var(--texto)">09:30</b> Gabriel Rocha</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 3. Tipografia -->
+  <section class="sg-secao" id="tipografia" data-parte="2">
+    <div class="sg-largura">
+      <div class="sg-cab">
+        <h2 class="sg-cab__titulo">Tipografia</h2>
+        <p class="sg-cab__desc">Duas famílias do Google Fonts. A DM Serif Display dá personalidade ao logo e aos títulos da página pública; a Manrope cuida de toda a interface. Valores em dinheiro e horários usam algarismos tabulares para alinhar em colunas.</p>
+      </div>
+      <div class="fontes">
+        <div class="fonte">
+          <div class="fonte__cab"><strong>DM Serif Display</strong><span>Regular 400 · logo e títulos da página pública</span></div>
+          <div class="fonte__amostra marca" style="font-size: 56px;">Barbearia Vila Rica</div>
+          <div class="fonte__alfabeto marca" style="font-size: 20px;">Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Ll Mm Nn Oo Pp Qq Rr Ss Tt Uu Vv Ww Xx Yy Zz 0123456789</div>
+        </div>
+        <div class="fonte">
+          <div class="fonte__cab"><strong>Manrope</strong><span>400, 500, 600 e 700 · interface</span></div>
+          <div class="pesos">
+            <div class="peso" style="font-weight:400">Agenda<small>Regular 400 · corpo</small></div>
+            <div class="peso" style="font-weight:500">Agenda<small>Medium 500 · apoio</small></div>
+            <div class="peso" style="font-weight:600">Agenda<small>Semibold 600 · rótulos e botões</small></div>
+            <div class="peso" style="font-weight:700">Agenda<small>Bold 700 · títulos e valores</small></div>
+          </div>
+          <div class="fonte__alfabeto">Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Ll Mm Nn Oo Pp Qq Rr Ss Tt Uu Vv Ww Xx Yy Zz 0123456789</div>
+        </div>
+      </div>
+
+      <table class="escala">
+        <thead><tr><th>Amostra</th><th>Tamanho / linha</th><th>Peso</th><th>Uso</th></tr></thead>
+        <tbody>
+          <tr><td><span class="marca" style="font-size:40px; line-height:48px">Barbearia Vila Rica</span></td><td><span class="tam">40</span> / 48 px</td><td>DM Serif 400</td><td>Título da página pública</td></tr>
+          <tr><td><span style="font-size:32px; line-height:40px; font-weight:700; letter-spacing:-.02em" class="num">R$ 16.873</span></td><td><span class="tam">32</span> / 40 px</td><td>Bold 700</td><td>Indicadores e título do login</td></tr>
+          <tr><td><span style="font-size:24px; line-height:32px; font-weight:700">Agenda</span></td><td><span class="tam">24</span> / 32 px</td><td>Bold 700</td><td>Título de página do painel</td></tr>
+          <tr><td><span style="font-size:20px; line-height:28px; font-weight:700">Concluir atendimento</span></td><td><span class="tam">20</span> / 28 px</td><td>Bold 700</td><td>Título de modal e de seção</td></tr>
+          <tr><td><span style="font-size:16px; line-height:24px">Corte com Diego Santana, 30 min</span></td><td><span class="tam">16</span> / 24 px</td><td>Regular 400 e Semibold 600</td><td>Corpo de texto e campos</td></tr>
+          <tr><td><span style="font-size:14px; line-height:21px">9 agendamentos · 4 concluídos</span></td><td><span class="tam">14</span> / 21 px</td><td>Regular 400 a Bold 700</td><td>Tabelas densas, rótulos e botões</td></tr>
+          <tr><td><span style="font-size:12px; line-height:18px; font-weight:600">Agendado · 15:12</span></td><td><span class="tam">12</span> / 18 px</td><td>Semibold 600</td><td>Badges, legendas e eixos de gráfico</td></tr>
+        </tbody>
+      </table>
+
+      <div class="num-demo">
+        <div><strong style="font-variant-numeric: tabular-nums">R$ 1.111,00<br>R$ 865,00</strong>Algarismos tabulares: os valores alinham na coluna</div>
+        <div><strong style="font-variant-numeric: proportional-nums">R$ 1.111,00<br>R$ 865,00</strong>Algarismos proporcionais: evitar em valores e horários</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Botões -->
+  <section class="sg-secao" id="botoes" data-parte="2">
+    <div class="sg-largura">
+      <div class="sg-cab">
+        <h2 class="sg-cab__titulo">Botões</h2>
+        <p class="sg-cab__desc">Um botão primário por tela ou modal. O texto diz a ação que vai acontecer ("Concluir atendimento", "Ativar assinatura"). Raio de 8 px, ícone de 16 px à esquerda quando ajuda a reconhecer a ação.</p>
+      </div>
+      <div class="matriz">
+        <span></span><span class="matriz__th">Normal</span><span class="matriz__th">Hover</span><span class="matriz__th">Foco</span><span class="matriz__th">Desabilitado</span><span class="matriz__th">Carregando</span>
+
+        <span class="matriz__linha">Primário</span>
+        <span><button class="btn btn--primario">Salvar</button></span>
+        <span><button class="btn btn--primario is-hover">Salvar</button></span>
+        <span><button class="btn btn--primario is-foco">Salvar</button></span>
+        <span><button class="btn btn--primario" disabled>Salvar</button></span>
+        <span><button class="btn btn--primario is-carregando"><i data-lucide="loader-circle"></i>Salvando</button></span>
+
+        <span class="matriz__linha">Secundário</span>
+        <span><button class="btn btn--secundario">Editar</button></span>
+        <span><button class="btn btn--secundario is-hover">Editar</button></span>
+        <span><button class="btn btn--secundario is-foco">Editar</button></span>
+        <span><button class="btn btn--secundario" disabled>Editar</button></span>
+        <span><button class="btn btn--secundario is-carregando"><i data-lucide="loader-circle"></i>Carregando</button></span>
+
+        <span class="matriz__linha">Fantasma</span>
+        <span><button class="btn btn--fantasma">Ver histórico</button></span>
+        <span><button class="btn btn--fantasma is-hover">Ver histórico</button></span>
+        <span><button class="btn btn--fantasma is-foco">Ver histórico</button></span>
+        <span><button class="btn btn--fantasma" disabled>Ver histórico</button></span>
+        <span><button class="btn btn--fantasma is-carregando"><i data-lucide="loader-circle"></i>Carregando</button></span>
+
+        <span class="matriz__linha">Perigo</span>
+        <span><button class="btn btn--perigo">Cancelar horário</button></span>
+        <span><button class="btn btn--perigo is-hover">Cancelar horário</button></span>
+        <span><button class="btn btn--perigo is-foco">Cancelar horário</button></span>
+        <span><button class="btn btn--perigo" disabled>Cancelar horário</button></span>
+        <span><button class="btn btn--perigo is-carregando"><i data-lucide="loader-circle"></i>Cancelando</button></span>
+      </div>
+
+      <h3 class="sg-sub">Tamanhos</h3>
+      <div class="tamanhos">
+        <div class="tamanho"><button class="btn btn--primario btn--sm"><i data-lucide="check"></i>Concluir</button><span class="sg-legenda">Pequeno · 36 px · ações em listas</span></div>
+        <div class="tamanho"><button class="btn btn--primario"><i data-lucide="calendar-plus"></i>Novo agendamento</button><span class="sg-legenda">Médio · 40 px · padrão do painel</span></div>
+        <div class="tamanho"><button class="btn btn--primario btn--lg">Agendar horário</button><span class="sg-legenda">Grande · 48 px · CTA no celular e login</span></div>
+        <div class="tamanho"><button class="btn btn--secundario btn--icone" aria-label="Mais ações"><i data-lucide="ellipsis"></i></button><span class="sg-legenda">Só ícone · 40 × 40</span></div>
+        <div class="tamanho"><button class="link-btn">Esqueci minha senha</button><span class="sg-legenda">Link de texto · destaque #2F3A8F</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Campos -->
+  <section class="sg-secao" id="campos" data-parte="2">
+    <div class="sg-largura">
+      <div class="sg-cab">
+        <h2 class="sg-cab__titulo">Campos</h2>
+        <p class="sg-cab__desc">Rótulo sempre visível acima do campo, texto de 16 px (evita zoom automático no celular) e mensagem de erro que diz como resolver.</p>
+      </div>
+      <div class="campos">
+        <div class="campo">
+          <span class="campo__estado">Normal</span>
+          <label class="campo__rotulo" for="c1">Nome do cliente</label>
+          <input class="input" id="c1" placeholder="Ex.: Lucas Almeida">
+          <span class="campo__ajuda">Como vai aparecer na agenda</span>
+        </div>
+        <div class="campo">
+          <span class="campo__estado">Foco</span>
+          <label class="campo__rotulo" for="c2">Celular</label>
+          <input class="input is-foco" id="c2" value="(19) 99734-2108">
+          <span class="campo__ajuda">Usado no link de WhatsApp</span>
+        </div>
+        <div class="campo">
+          <span class="campo__estado">Erro</span>
+          <label class="campo__rotulo" for="c3">E-mail</label>
+          <input class="input is-erro" id="c3" value="lucas.almeida@">
+          <span class="campo__erro"><i data-lucide="circle-alert" class="ic-16"></i>Falta o domínio, como nome@email.com</span>
+        </div>
+        <div class="campo">
+          <span class="campo__estado">Desabilitado</span>
+          <label class="campo__rotulo" for="c4">Barbearia</label>
+          <input class="input" id="c4" value="Barbearia Vila Rica" disabled>
+          <span class="campo__ajuda">Só o dono altera os dados da barbearia</span>
+        </div>
+        <div class="campo">
+          <label class="campo__rotulo" for="c5">Serviço</label>
+          <select class="input select" id="c5"><option>Corte · 30 min · R$ 45</option></select>
+        </div>
+        <div class="campo">
+          <label class="campo__rotulo" for="c6">Buscar</label>
+          <div class="input-grupo"><span class="input-grupo__icone"><i data-lucide="search" class="ic-16"></i></span><input class="input" id="c6" placeholder="Buscar cliente"></div>
+        </div>
+        <div class="campo">
+          <label class="campo__rotulo" for="c7">Preço do plano</label>
+          <div class="input-grupo"><span class="input-grupo__prefixo">R$</span><input class="input num" id="c7" value="99,00" style="font-weight:700"></div>
+        </div>
+        <div class="campo" style="justify-content: flex-end;">
+          <label class="check"><input type="checkbox" checked> Manter conectado</label>
+          <label class="check"><input type="checkbox" checked> Usar o Clube Corte</label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Badges -->
+  <section class="sg-secao" id="badges" data-parte="2">
+    <div class="sg-largura">
+      <div class="sg-cab">
+        <h2 class="sg-cab__titulo">Badges</h2>
+        <p class="sg-cab__desc">Pílulas de 24 px de altura e raio 999 px, fundo claro com texto escuro da mesma cor. Servem para status e contagens curtas, nunca como botão.</p>
+      </div>
+      <div class="badges">
+        <span class="badges__rotulo">Agendamento</span>
+        <span class="badge badge--agendado">Agendado</span>
+        <span class="badge badge--concluido">Concluído</span>
+        <span class="badge badge--cancelado">Cancelado</span>
+        <span class="badge badge--faltou">Faltou</span>
+      </div>
+      <div class="badges">
+        <span class="badges__rotulo">Assinatura</span>
+        <span class="badge badge--sucesso">Ativa</span>
+        <span class="badge badge--aviso">Expirada</span>
+        <span class="badge badge--neutro">Cancelada</span>
+      </div>
+      <div class="badges">
+        <span class="badges__rotulo">Outros usos</span>
+        <span class="badge badge--concluido badge--ponto">Aberto agora</span>
+        <span class="badge badge--marinho">Clube Corte</span>
+        <span class="badge badge--sucesso">Plano ativo</span>
+        <span class="badge badge--neutro">Serviço inativo</span>
+        <span class="badge badge--contorno">Assinante</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. Cards -->
+  <section class="sg-secao" id="cards" data-parte="3">
+    <div class="sg-largura">
+      <div class="sg-cab">
+        <h2 class="sg-cab__titulo">Cards</h2>
+        <p class="sg-cab__desc">Fundo branco, borda de 1 px #E5E5E2 e raio de 12 px, sem sombra. Padding de 16 px no celular e 24 px no desktop.</p>
+      </div>
+      <div class="cards-ex">
+        <div>
+          <div class="card ex-ag">
+            <div class="ex-ag__hora"><strong>15:00</strong><span>30 min</span></div>
+            <div><div class="ex-ag__cliente">Lucas Almeida</div><div class="ex-ag__serv">Corte · Clube Corte</div></div>
+            <span class="badge badge--agendado">Agendado</span>
+            <div class="ex-ag__acoes"><button class="btn btn--primario btn--sm"><i data-lucide="check"></i>Concluir</button><button class="btn btn--secundario btn--sm"><i data-lucide="user-x"></i>Marcar falta</button></div>
+          </div>
+          <p class="anatomia">Item da agenda: horário e duração, cliente e serviço, status e ações (concluir, marcar falta, cancelar).</p>
+        </div>
+        <div>
+          <div class="card ex-kpi">
+            <div class="ex-kpi__rotulo"><i data-lucide="banknote"></i>Faturamento registrado</div>
+            <div class="ex-kpi__valor">R$ 16.873</div>
+            <div class="ex-kpi__rodape">R$ 15.091 em atendimentos + R$ 1.782 em assinaturas</div>
+          </div>
+          <p class="anatomia">Indicador: rótulo com ícone, valor em 32 px e a composição do número.</p>
+        </div>
+        <div>
+          <div class="card ex-serv" style="border-color: var(--marinho);">
+            <div>
+              <div class="ex-serv__nome">Clube Corte <span class="badge badge--marinho">Assinatura</span></div>
+              <div class="ex-serv__meta"><i data-lucide="repeat" class="ic-16"></i>4 cortes a cada 30 dias</div>
+            </div>
+            <div class="ex-serv__preco">R$ 99<s style="text-decoration:none">por mês</s></div>
+          </div>
+          <p class="anatomia">Plano na página pública: nome, usos por ciclo e preço, com borda marinho.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. Espaçamento -->
+  <section class="sg-secao" id="espacamento" data-parte="3">
+    <div class="sg-largura">
+      <div class="sg-cab">
+        <h2 class="sg-cab__titulo">Espaçamento e forma</h2>
+        <p class="sg-cab__desc">Base de 4 px. Grupos relacionados ficam próximos (8 a 12 px) e blocos diferentes ficam separados (24 px ou mais). Há mais espaço acima de um título do que abaixo dele.</p>
+      </div>
+      <div class="espacos">
+        <div class="espaco"><span class="espaco__bloco" style="width:4px;height:4px"></span><span class="espaco__valor">4</span><span class="espaco__uso">Ícone e texto</span></div>
+        <div class="espaco"><span class="espaco__bloco" style="width:8px;height:8px"></span><span class="espaco__valor">8</span><span class="espaco__uso">Entre botões</span></div>
+        <div class="espaco"><span class="espaco__bloco" style="width:12px;height:12px"></span><span class="espaco__valor">12</span><span class="espaco__uso">Itens de um grupo</span></div>
+        <div class="espaco"><span class="espaco__bloco" style="width:16px;height:16px"></span><span class="espaco__valor">16</span><span class="espaco__uso">Margem no celular</span></div>
+        <div class="espaco"><span class="espaco__bloco" style="width:24px;height:24px"></span><span class="espaco__valor">24</span><span class="espaco__uso">Padding de card, gutter</span></div>
+        <div class="espaco"><span class="espaco__bloco" style="width:32px;height:32px"></span><span class="espaco__valor">32</span><span class="espaco__uso">Margem no desktop</span></div>
+        <div class="espaco"><span class="espaco__bloco" style="width:48px;height:48px"></span><span class="espaco__valor">48</span><span class="espaco__uso">Entre seções</span></div>
+        <div class="espaco"><span class="espaco__bloco" style="width:64px;height:64px"></span><span class="espaco__valor">64</span><span class="espaco__uso">Respiro de página</span></div>
+      </div>
+      <div class="formas-ex">
+        <div class="forma-ex"><span class="forma-ex__amostra" style="border-radius:8px"></span><div><strong>Raio 8 px</strong><span>Botões, campos, chips de horário</span></div></div>
+        <div class="forma-ex"><span class="forma-ex__amostra" style="border-radius:12px; background: var(--superficie); border-color: var(--borda);"></span><div><strong>Raio 12 px</strong><span>Cards, modais e chips de dia</span></div></div>
+        <div class="forma-ex"><span class="forma-ex__amostra" style="border-radius:999px; height: 32px;"></span><div><strong>Raio 999 px</strong><span>Badges e avatares</span></div></div>
+        <div class="forma-ex"><span class="forma-ex__amostra" style="border-radius:12px; background: var(--superficie); border: 0; box-shadow: var(--sombra-modal);"></span><div><strong>Sombra</strong><span>Só em modais. Cards usam apenas borda</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. Ícones -->
+  <section class="sg-secao" id="icones" data-parte="3">
+    <div class="sg-largura">
+      <div class="sg-cab">
+        <h2 class="sg-cab__titulo">Ícones</h2>
+        <p class="sg-cab__desc">Biblioteca Lucide, traço de 2 px e cantos arredondados. Tamanho padrão de 20 px; 16 px quando o ícone acompanha texto pequeno ou fica dentro de botão médio. Ícone sozinho sempre tem nome acessível.</p>
+      </div>
+      <div class="icones">
+        <div class="icone-tile"><span class="icone-tile__desenho"><i data-lucide="layout-dashboard"></i></span><strong>Painel</strong><span>layout-dashboard</span></div>
+        <div class="icone-tile"><span class="icone-tile__desenho"><i data-lucide="calendar"></i></span><strong>Agenda</strong><span>calendar</span></div>
+        <div class="icone-tile"><span class="icone-tile__desenho"><i data-lucide="users"></i></span><strong>Barbeiros</strong><span>users</span></div>
+        <div class="icone-tile"><span class="icone-tile__desenho"><i data-lucide="scissors"></i></span><strong>Serviços</strong><span>scissors</span></div>
+        <div class="icone-tile"><span class="icone-tile__desenho"><i data-lucide="clock"></i></span><strong>Expedientes</strong><span>clock</span></div>
+        <div class="icone-tile"><span class="icone-tile__desenho"><i data-lucide="repeat"></i></span><strong>Planos</strong><span>repeat</span></div>
+        <div class="icone-tile"><span class="icone-tile__desenho"><i data-lucide="store"></i></span><strong>Barbearia</strong><span>store</span></div>
+        <div class="icone-tile"><span class="icone-tile__desenho"><i data-lucide="history"></i></span><strong>Histórico</strong><span>history</span></div>
+        <div class="icone-tile"><span class="icone-tile__desenho"><i data-lucide="message-circle"></i></span><strong>WhatsApp</strong><span>message-circle</span></div>
+        <div class="icone-tile"><span class="icone-tile__desenho"><i data-lucide="qr-code"></i></span><strong>PIX</strong><span>qr-code</span></div>
+      </div>
+      <div class="icone-tamanhos">
+        <div><i data-lucide="calendar" class="ic-16"></i>16 px</div>
+        <div><i data-lucide="calendar"></i>20 px</div>
+        <div><i data-lucide="calendar" class="ic-24"></i>24 px</div>
+        <span class="regra">Cor herdada do texto: marinho no painel, #5A5E78 em itens inativos, branco sobre a sidebar.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. Grid e layout -->
+  <section class="sg-secao" id="grid" data-parte="3">
+    <div class="sg-largura">
+      <div class="sg-cab">
+        <h2 class="sg-cab__titulo">Grid e layout</h2>
+        <p class="sg-cab__desc">Três grids, um para cada faixa de tela. No desktop o painel tem sidebar fixa de 240 px; abaixo de 1024 px a sidebar some e a navegação vai para uma barra inferior com quatro itens.</p>
+      </div>
+
+      <div class="layouts">
+        <div>
+          <div class="esquema-desk" aria-hidden="true">
+            <div class="esq-side">
+              <span class="esq-side__logo">Korte</span>
+              <i class="ativo"></i><i></i><i style="margin-top:8px"></i><i></i><i></i><i></i>
+            </div>
+            <div class="esq-main">
+              <div class="esq-topo"><i></i><b></b></div>
+              <div class="esq-conteudo">
+                <div class="esq-colunas"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                <div class="esq-blocos">
+                  <b class="titulo"></b><b class="g12" style="height: 0"></b>
+                  <b class="g3"></b><b class="g3"></b><b class="g3"></b><b class="g3"></b>
+                  <b class="g7"></b><b class="g5"></b>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="esq-legenda" style="margin-top: 12px;"><strong>Desktop · 1440 × 900 (escala 50%)</strong>Faixas azuis = 12 colunas do conteúdo.</p>
+        </div>
+        <div class="notas-layout">
+          <div class="nota-layout"><strong><i data-lucide="monitor" class="ic-16"></i>Painel interno no desktop</strong>
+            <ul>
+              <li>Sidebar marinho de 240 px com o logo e a navegação</li>
+              <li>Topo de 64 px com a barbearia, notificações e usuário</li>
+              <li>Conteúdo em 12 colunas, gutter de 24 px e margem de 32 px</li>
+              <li>Largura máxima do conteúdo: 1200 px</li>
+            </ul>
+          </div>
+          <div class="nota-layout"><strong><i data-lucide="smartphone" class="ic-16"></i>Celular</strong>
+            <ul>
+              <li>4 colunas, margem e gutter de 16 px</li>
+              <li>Barra inferior do barbeiro: Agenda, Novo, Histórico e Perfil</li>
+              <li>Página pública e agendamento com botão principal fixo no rodapé (48 px)</li>
+            </ul>
+          </div>
+          <div class="nota-layout"><strong><i data-lucide="tablet" class="ic-16"></i>Tablet</strong>
+            <ul>
+              <li>8 colunas, margem e gutter de 24 px</li>
+              <li>Mesma barra inferior do celular</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="layouts-2">
+        <div>
+          <div class="esquema-cel" aria-hidden="true">
+            <div class="esq-status"><span>9:41</span><span>●●●</span></div>
+            <div class="esq-cab"><i></i></div>
+            <div class="esq-cel-conteudo">
+              <div class="esq-colunas"><span></span><span></span><span></span><span></span></div>
+              <div class="esq-lista"><b></b><b></b><b></b><b></b><b style="height: 52px"></b><b></b><b></b></div>
+            </div>
+            <div class="esq-nav">
+              <span class="ativo"><i data-lucide="calendar"></i></span>
+              <span><i data-lucide="calendar-plus"></i></span>
+              <span><i data-lucide="history"></i></span>
+              <span><i data-lucide="circle-user"></i></span>
+            </div>
+          </div>
+          <p class="esq-legenda"><strong>Celular · 390 × 844</strong>Escala 50%, 4 colunas.</p>
+        </div>
+        <div>
+          <div class="esquema-tab" aria-hidden="true">
+            <div class="esq-status" style="height: 18px;"><span>9:41</span><span>●●●</span></div>
+            <div class="esq-cab" style="height: 22px; padding: 5px 10px;"><i style="height: 10px"></i></div>
+            <div class="esq-cel-conteudo">
+              <div class="esq-colunas"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+              <div class="esq-lista"><b></b><b></b><b></b><b></b><b style="height: 60px"></b><b></b><b></b></div>
+            </div>
+            <div class="esq-nav">
+              <span class="ativo"><i data-lucide="calendar"></i></span>
+              <span><i data-lucide="calendar-plus"></i></span>
+              <span><i data-lucide="history"></i></span>
+              <span><i data-lucide="circle-user"></i></span>
+            </div>
+          </div>
+          <p class="esq-legenda"><strong>Tablet · 768 × 1024</strong>Escala 40%, 8 colunas.</p>
+        </div>
+        <div>
+          <h3 class="sg-sub" style="margin-top: 0;">Pontos de quebra</h3>
+          <table class="breakpoints">
+            <thead><tr><th>Largura</th><th>Colunas</th><th>Margem</th><th>Gutter</th><th>Navegação</th></tr></thead>
+            <tbody>
+              <tr><td>até 639 px</td><td>4</td><td>16 px</td><td>16 px</td><td>Barra inferior</td></tr>
+              <tr><td>640 px</td><td>4</td><td>24 px</td><td>16 px</td><td>Barra inferior</td></tr>
+              <tr><td>768 px</td><td>8</td><td>24 px</td><td>24 px</td><td>Barra inferior</td></tr>
+              <tr><td>1024 px</td><td>12</td><td>32 px</td><td>24 px</td><td>Sidebar de 240 px</td></tr>
+              <tr><td>1280 px</td><td>12</td><td>32 px</td><td>24 px</td><td>Sidebar, conteúdo até 1200 px</td></tr>
+            </tbody>
+          </table>
+          <h3 class="sg-sub">Três modelos de tela</h3>
+          <table class="breakpoints">
+            <tbody>
+              <tr><td>Painel interno</td><td>Sidebar + topo no desktop, barra inferior no celular. Telas de painel, agenda e assinaturas.</td></tr>
+              <tr><td>Página pública</td><td>Capa marinho com o nome da barbearia, serviços, clube de assinatura, barbeiros e "Agendar horário" fixo no rodapé.</td></tr>
+              <tr><td>Agendamento</td><td>Quatro etapas com barra de progresso: Serviço, Barbeiro, Horário e Confirmar.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+<script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+<script>
+  lucide.createIcons();
+
+  // ?parte=1, 2 ou 3 mostra só aquele trecho (usado para exportar as capturas)
+  (function () {
+    var parte = new URLSearchParams(location.search).get('parte');
+    document.querySelectorAll('[data-parte]').forEach(function (el) {
+      var partes = el.getAttribute('data-parte').split(' ');
+      var mostrar = parte ? partes.indexOf(parte) !== -1 : !el.classList.contains('sg-mini');
+      el.hidden = !mostrar;
+    });
+    window.addEventListener('load', function () {
+      document.fonts.ready.then(function () {
+        document.documentElement.setAttribute('data-altura', document.documentElement.scrollHeight);
+      });
+    });
+  })();
+</script>
+</body>
+</html>

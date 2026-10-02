@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Escolher horário · Barbearia Vila Rica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/korte.css">
+<style>
+  .topo-fluxo { background: var(--superficie); border-bottom: 1px solid var(--borda); }
+  .topo-fluxo__barra { display: grid; grid-template-columns: 40px 1fr 40px; align-items: center; padding: 0 8px; height: 52px; }
+  .topo-fluxo__titulo { text-align: center; line-height: 1.25; }
+  .topo-fluxo__titulo strong { display: block; font-size: var(--t-16); }
+  .topo-fluxo__titulo span { font-size: var(--t-12); color: var(--texto-2); }
+  .topo-fluxo .etapas { padding: 4px 16px 14px; }
+
+  .corpo { padding: 16px 16px 0; }
+
+  .resumo { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio-card); }
+  .resumo__info { flex: 1; min-width: 0; }
+  .resumo__servico { font-weight: 700; line-height: 1.3; }
+  .resumo__meta { font-size: var(--t-14); color: var(--texto-2); line-height: 1.4; }
+  .resumo__preco { text-align: right; font-variant-numeric: tabular-nums; }
+  .resumo__preco strong { display: block; }
+  .resumo__preco a { font-size: var(--t-12); font-weight: 600; text-decoration: none; }
+
+  .bloco-titulo { display: flex; align-items: baseline; justify-content: space-between; margin: 20px 0 10px; }
+  .bloco-titulo h2 { font-size: var(--t-16); font-weight: 700; }
+  .bloco-titulo span { font-size: var(--t-14); color: var(--texto-2); }
+
+  .dias { display: flex; gap: 8px; margin-right: -16px; overflow: hidden; }
+  .chip-dia__hoje { font-size: 10px; font-weight: 700; line-height: 1; margin-top: 1px; }
+
+  .periodo { margin-top: 12px; }
+  .periodo:first-of-type { margin-top: 0; }
+  .periodo__nome { font-size: var(--t-12); font-weight: 600; color: var(--texto-2); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+  .horas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+
+  .barra-acao__linha { display: flex; align-items: center; gap: 12px; }
+  .escolha { flex: 1; line-height: 1.3; }
+  .escolha strong { display: block; font-size: var(--t-16); font-variant-numeric: tabular-nums; }
+  .escolha span { font-size: var(--t-12); color: var(--texto-2); font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+<div class="frame frame--celular">
+
+  <header class="topo-fluxo">
+    <div class="status-bar">
+      <span>9:41</span>
+      <span class="status-bar__icones">
+        <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor" aria-hidden="true"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor" aria-hidden="true"><path d="M8 2.2c2.3 0 4.4.9 6 2.4l1.2-1.3A10.4 10.4 0 0 0 8 .4C5.2.4 2.7 1.5.8 3.3L2 4.6a8.6 8.6 0 0 1 6-2.4Zm0 3.6c1.3 0 2.5.5 3.4 1.3l1.2-1.3A6.7 6.7 0 0 0 8 4c-1.8 0-3.4.7-4.6 1.8l1.2 1.3c.9-.8 2.1-1.3 3.4-1.3Zm0 3.6c-.6 0-1.1.2-1.5.6L8 11.6l1.5-1.6c-.4-.4-.9-.6-1.5-.6Z"/></svg>
+        <svg width="27" height="13" viewBox="0 0 27 13" fill="none" aria-hidden="true"><rect x=".5" y=".5" width="23" height="12" rx="3.5" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="17" height="9" rx="2" fill="currentColor"/><path d="M25 4.5v4c.8-.3 1.3-1.1 1.3-2s-.5-1.7-1.3-2Z" fill="currentColor" opacity=".45"/></svg>
+      </span>
+    </div>
+    <div class="topo-fluxo__barra">
+      <a class="btn btn--fantasma btn--icone" href="02-pagina-publica.html" aria-label="Voltar"><i data-lucide="chevron-left"></i></a>
+      <div class="topo-fluxo__titulo"><strong>Escolha o horário</strong><span>Barbearia Vila Rica</span></div>
+      <a class="btn btn--fantasma btn--icone" href="02-pagina-publica.html" aria-label="Sair do agendamento"><i data-lucide="x"></i></a>
+    </div>
+    <ol class="etapas" aria-label="Etapas do agendamento">
+      <li class="etapa is-feita"><span class="etapa__barra"></span><span class="etapa__rotulo"><i data-lucide="check"></i>Serviço</span></li>
+      <li class="etapa is-feita"><span class="etapa__barra"></span><span class="etapa__rotulo"><i data-lucide="check"></i>Barbeiro</span></li>
+      <li class="etapa is-atual" aria-current="step"><span class="etapa__barra"></span><span class="etapa__rotulo">3. Horário</span></li>
+      <li class="etapa"><span class="etapa__barra"></span><span class="etapa__rotulo">4. Confirmar</span></li>
+    </ol>
+  </header>
+
+  <main class="corpo">
+    <div class="resumo">
+      <span class="avatar">DS</span>
+      <div class="resumo__info">
+        <div class="resumo__servico">Corte</div>
+        <div class="resumo__meta">com Diego Santana · <span class="num">30 min</span></div>
+      </div>
+      <div class="resumo__preco">
+        <strong>R$ 45</strong>
+        <a href="#">Alterar</a>
+      </div>
+    </div>
+
+    <div class="bloco-titulo"><h2>Dia</h2><span>Outubro de 2026</span></div>
+    <div class="dias">
+      <button class="chip-dia is-selecionado" aria-pressed="true"><span class="chip-dia__semana">sex</span><span class="chip-dia__numero">16</span></button>
+      <button class="chip-dia"><span class="chip-dia__semana">sáb</span><span class="chip-dia__numero">17</span></button>
+      <button class="chip-dia"><span class="chip-dia__semana">ter</span><span class="chip-dia__numero">20</span></button>
+      <button class="chip-dia"><span class="chip-dia__semana">qua</span><span class="chip-dia__numero">21</span></button>
+      <button class="chip-dia"><span class="chip-dia__semana">qui</span><span class="chip-dia__numero">22</span></button>
+      <button class="chip-dia"><span class="chip-dia__semana">sex</span><span class="chip-dia__numero">23</span></button>
+    </div>
+
+    <div class="bloco-titulo"><h2>Horários livres</h2><span>hoje, sex 16/10</span></div>
+
+    <div class="periodo">
+      <div class="periodo__nome">Manhã</div>
+      <div class="horas">
+        <button class="chip-hora" disabled>10:00</button>
+        <button class="chip-hora" disabled>10:30</button>
+        <button class="chip-hora">11:00</button>
+        <button class="chip-hora" disabled>11:30</button>
+      </div>
+    </div>
+    <div class="periodo">
+      <div class="periodo__nome">Tarde</div>
+      <div class="horas">
+        <button class="chip-hora">12:00</button>
+        <button class="chip-hora" disabled>12:30</button>
+        <button class="chip-hora" disabled>13:00</button>
+        <button class="chip-hora">13:30</button>
+        <button class="chip-hora" disabled>14:00</button>
+        <button class="chip-hora">14:30</button>
+        <button class="chip-hora is-selecionado" aria-pressed="true">15:00</button>
+        <button class="chip-hora">15:30</button>
+        <button class="chip-hora" disabled>16:00</button>
+        <button class="chip-hora">16:30</button>
+        <button class="chip-hora">17:00</button>
+        <button class="chip-hora" disabled>17:30</button>
+      </div>
+    </div>
+    <div class="periodo">
+      <div class="periodo__nome">Noite</div>
+      <div class="horas">
+        <button class="chip-hora">18:00</button>
+        <button class="chip-hora">18:30</button>
+      </div>
+    </div>
+  </main>
+
+  <div class="barra-acao">
+    <div class="barra-acao__linha">
+      <div class="escolha">
+        <strong>Sex, 16/10 às 15:00</strong>
+        <span>Termina por volta das 15:30</span>
+      </div>
+      <a class="btn btn--primario btn--lg" href="04-agendamento-confirmado.html">Continuar<i data-lucide="chevron-right"></i></a>
+    </div>
+  </div>
+  <div class="indicador-home"></div>
+
+</div>
+<script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>

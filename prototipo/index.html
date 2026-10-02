@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Protótipo de telas · Korte</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/korte.css">
+<style>
+  html, body { background: var(--fundo); }
+  .pagina { max-width: 1200px; margin: 0 auto; padding: 48px 32px 64px; }
+  .cab { display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; padding-bottom: 32px; border-bottom: 1px solid var(--borda); }
+  .cab__logo { font-family: var(--fonte-marca); font-size: 48px; line-height: 1; }
+  .cab h1 { font-size: var(--t-24); font-weight: 700; margin-top: 16px; }
+  .cab p { color: var(--texto-2); margin-top: 4px; max-width: 640px; }
+  .grupo { margin-top: 48px; }
+  .grupo h2 { font-size: var(--t-20); font-weight: 700; }
+  .grupo > p { font-size: var(--t-14); color: var(--texto-2); margin-top: 4px; }
+  .telas { display: flex; flex-wrap: wrap; gap: 24px; margin-top: 20px; }
+  .tela { display: block; width: 260px; text-decoration: none; color: inherit; }
+  .tela--desktop { width: 364px; }
+  .tela__img { display: block; width: 100%; border-radius: var(--raio-card); border: 1px solid var(--borda); background: var(--superficie); overflow: hidden; }
+  .tela__img img { display: block; width: 100%; height: auto; }
+  .tela--celular .tela__img { height: 400px; }
+  .tela--celular .tela__img img { height: 100%; object-fit: cover; object-position: top; }
+  .tela:hover .tela__img { border-color: var(--borda-controle); }
+  .tela__nome { display: flex; align-items: baseline; gap: 8px; margin-top: 10px; font-weight: 700; font-size: var(--t-14); }
+  .tela__nome span { color: var(--texto-3); font-variant-numeric: tabular-nums; }
+  .tela__desc { font-size: var(--t-12); color: var(--texto-2); margin-top: 2px; }
+  .guia { display: flex; align-items: center; gap: 24px; margin-top: 20px; padding: 20px 24px; background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio-card); text-decoration: none; color: inherit; }
+  .guia:hover { border-color: var(--borda-controle); }
+  .guia__amostra { display: flex; gap: 6px; }
+  .guia__amostra i { width: 28px; height: 28px; border-radius: 6px; display: block; }
+  .guia strong { display: block; }
+  .guia span { font-size: var(--t-14); color: var(--texto-2); }
+  .guia svg.lucide { margin-left: auto; color: var(--texto-2); }
+</style>
+</head>
+<body>
+<main class="pagina">
+  <header class="cab">
+    <div>
+      <div class="cab__logo">Korte</div>
+      <h1>Protótipo de telas</h1>
+      <p>Plataforma de gestão para barbearias. Dados de exemplo da Barbearia Vila Rica, em Piracicaba/SP, na sexta-feira, 16/10/2026.</p>
+    </div>
+    <p class="t-14 texto-2">Celular 390 × 844 · Desktop 1440 × 900</p>
+  </header>
+
+  <section class="grupo">
+    <h2>Guia de estilo</h2>
+    <a class="guia" href="style-guide.html">
+      <span class="guia__amostra"><i style="background:#050929"></i><i style="background:#2F3A8F"></i><i style="background:#5A5E78"></i><i style="background:#F8F8F7; box-shadow: inset 0 0 0 1px #E5E5E2"></i><i style="background:#1F7A4D"></i><i style="background:#9A6200"></i><i style="background:#B42318"></i></span>
+      <div><strong>Cores, tipografia, componentes e grid</strong><span>Logo, paleta, status do agendamento, botões, campos, badges, cards, espaçamento, ícones e layout</span></div>
+      <i data-lucide="chevron-right"></i>
+    </a>
+  </section>
+
+  <section class="grupo">
+    <h2>Cliente</h2>
+    <p>Página pública da barbearia e fluxo de agendamento, no celular.</p>
+    <div class="telas">
+      <a class="tela tela--celular" href="02-pagina-publica.html"><span class="tela__img"><img src="telas/02-pagina-publica.png" alt="Página pública da Barbearia Vila Rica"></span><span class="tela__nome"><span>02</span>Página pública</span><span class="tela__desc">Serviços, clube de assinatura e barbeiros</span></a>
+      <a class="tela tela--celular" href="03-agendar-horario.html"><span class="tela__img"><img src="telas/03-agendar-horario.png" alt="Etapa de escolha do horário"></span><span class="tela__nome"><span>03</span>Agendar horário</span><span class="tela__desc">Etapa 3 de 4: dia e horário livre</span></a>
+      <a class="tela tela--celular" href="04-agendamento-confirmado.html"><span class="tela__img"><img src="telas/04-agendamento-confirmado.png" alt="Agendamento confirmado"></span><span class="tela__nome"><span>04</span>Agendamento confirmado</span><span class="tela__desc">Resumo, usos do clube e cancelamento</span></a>
+    </div>
+  </section>
+
+  <section class="grupo">
+    <h2>Barbeiro</h2>
+    <p>Agenda do dia no celular, com as ações do atendimento.</p>
+    <div class="telas">
+      <a class="tela tela--celular" href="05-agenda-barbeiro.html"><span class="tela__img"><img src="telas/05-agenda-barbeiro.png" alt="Agenda do dia do Diego Santana"></span><span class="tela__nome"><span>05</span>Agenda do barbeiro</span><span class="tela__desc">Diego Santana: concluir, marcar falta ou cancelar</span></a>
+    </div>
+  </section>
+
+  <section class="grupo">
+    <h2>Painel da barbearia</h2>
+    <p>Acesso do dono no computador.</p>
+    <div class="telas">
+      <a class="tela tela--desktop" href="01-login.html"><span class="tela__img"><img src="telas/01-login.png" alt="Tela de login"></span><span class="tela__nome"><span>01</span>Login</span><span class="tela__desc">Entrar com e-mail e senha</span></a>
+      <a class="tela tela--desktop" href="06-agenda-geral.html"><span class="tela__img"><img src="telas/06-agenda-geral.png" alt="Agenda geral com quatro barbeiros"></span><span class="tela__nome"><span>06</span>Agenda geral</span><span class="tela__desc">Uma coluna por barbeiro, das 9h às 19h</span></a>
+      <a class="tela tela--desktop" href="07-concluir-atendimento.html"><span class="tela__img"><img src="telas/07-concluir-atendimento.png" alt="Concluir atendimento"></span><span class="tela__nome"><span>07</span>Concluir atendimento</span><span class="tela__desc">Cliente assinante, valor final e pagamento</span></a>
+      <a class="tela tela--desktop" href="08-painel-dono.html"><span class="tela__img"><img src="telas/08-painel-dono.png" alt="Painel do dono"></span><span class="tela__nome"><span>08</span>Painel do dono</span><span class="tela__desc">Faturamento, atendimentos e distribuição por barbeiro</span></a>
+      <a class="tela tela--desktop" href="09-planos-assinaturas.html"><span class="tela__img"><img src="telas/09-planos-assinaturas.png" alt="Planos e assinaturas"></span><span class="tela__nome"><span>09</span>Planos e assinaturas</span><span class="tela__desc">Clube Corte e tabela de assinantes</span></a>
+    </div>
+  </section>
+</main>
+<script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>
