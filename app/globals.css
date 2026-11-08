@@ -1,0 +1,86 @@
+@import "tailwindcss";
+
+@source not "../prototipo";
+@source not "../docs";
+@source not "../estudo";
+@source not "../apresentacao";
+
+@theme {
+  --color-marinho: #050929;
+  --color-marinho-hover: #141a45;
+  --color-marinho-claro: #e8e9f0;
+  --color-fundo: #f8f8f7;
+  --color-superficie: #ffffff;
+  --color-texto: #050929;
+  --color-texto-2: #5a5e78;
+  --color-texto-3: #8a8da3;
+  --color-borda: #e5e5e2;
+  --color-borda-controle: #d6d6d2;
+  --color-muted: #f0f0ee;
+  --color-destaque: #2f3a8f;
+  --color-sucesso: #1f7a4d;
+  --color-sucesso-bg: #e7f4ec;
+  --color-aviso: #9a6200;
+  --color-aviso-bg: #fdf3e1;
+  --color-erro: #b42318;
+  --color-erro-escuro: #941c13;
+  --color-erro-bg: #fdecea;
+  --color-info: #2f3a8f;
+  --color-info-bg: #eceef9;
+
+  --font-ui: var(--font-manrope), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-marca: var(--font-dm-serif), Georgia, serif;
+
+  --radius-controle: 8px;
+  --radius-card: 12px;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-fundo font-ui text-texto antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  a {
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  input,
+  textarea {
+    caret-color: var(--color-destaque);
+  }
+
+  ::selection {
+    background: #d5d8ee;
+    color: var(--color-marinho);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-destaque);
+    outline-offset: 2px;
+  }
+
+  input[type="checkbox"],
+  input[type="radio"] {
+    accent-color: var(--color-marinho);
+  }
+}
+
+@utility num {
+  font-variant-numeric: tabular-nums;
+}
+
+@utility hachurado {
+  background-color: var(--color-fundo);
+  background-image: repeating-linear-gradient(135deg, var(--color-muted) 0 6px, transparent 6px 12px);
+}

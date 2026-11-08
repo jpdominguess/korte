@@ -16,3 +16,10 @@ coverage/
 # Sistema
 .DS_Store
 Thumbs.db
+
+# Next.js e TypeScript
+next-env.d.ts
+*.tsbuildinfo
+
+# Arquivos locais
+/prototipo.zip
