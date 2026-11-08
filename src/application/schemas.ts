@@ -57,10 +57,22 @@ export const agendaQuerySchema = z.object({
   barbeiro: z.uuid().optional(),
 });
 
-export const onlineAppointmentSchema = z.object({
+export const appointmentSchema = z.object({
   serviceId: z.uuid("Escolha um serviço."),
   barberProfileId: z.uuid("Escolha um barbeiro."),
   startsAt: z.coerce.date("Escolha um horário."),
+  clientId: z.uuid().nullish(),
+  walkInName: optionalText,
+  walkInPhone: optionalText,
+});
+
+const localDateTime = z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/, "Informe data e hora.");
+
+export const blockSchema = z.object({
+  barberProfileId: z.uuid("Escolha um barbeiro."),
+  startsAt: localDateTime,
+  endsAt: localDateTime,
+  reason: optionalText,
 });
 
 export const barbershopSchema = z.object({

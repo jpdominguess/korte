@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { CalendarPlus } from "lucide-react";
 import { formatLongDate } from "@/domain/shared/format";
 import { localToInstant } from "@/domain/shared/time";
 import { useCases } from "@/infrastructure/container";
 import { AgendaList } from "~/_components/agenda-list";
 import { AgendaToolbar, readAgendaParams } from "~/_components/agenda-toolbar";
 import { AgendaWeek } from "~/_components/agenda-week";
-import { Card, EmptyState, PageHeader } from "~/_components/ui";
+import { Card, EmptyState, LinkButton, PageHeader } from "~/_components/ui";
 import { requireSession } from "~/_lib/session";
 import { AgendaGrid } from "./agenda-grid";
 
@@ -44,13 +45,22 @@ export default async function AgendaGeralPage({
         title="Agenda"
         subtitle={`${view === "dia" ? formatLongDate(localToInstant(date, 12 * 60)) : "Semana"} · ${counts.total} agendamentos · ${counts.done} concluídos · ${counts.scheduled} agendados`}
         actions={
-          <AgendaToolbar
-            basePath="/painel/agenda"
-            date={date}
-            view={view}
-            allowWeek={!!selected}
-            extraQuery={selected ? `&barbeiro=${selected.id}` : ""}
-          />
+          <>
+            <AgendaToolbar
+              basePath="/painel/agenda"
+              date={date}
+              view={view}
+              allowWeek={!!selected}
+              extraQuery={selected ? `&barbeiro=${selected.id}` : ""}
+            />
+            <LinkButton href="/agenda/bloqueios" variant="secondary" size="sm">
+              Bloqueios
+            </LinkButton>
+            <LinkButton href="/agenda/novo" size="sm">
+              <CalendarPlus />
+              Novo agendamento
+            </LinkButton>
+          </>
         }
       />
 

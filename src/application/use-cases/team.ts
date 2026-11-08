@@ -11,6 +11,17 @@ export class ListBarbers {
   }
 }
 
+/** Barbeiros cuja agenda o usuário pode operar. */
+export class GetManagedBarbers {
+  constructor(private readonly barbers: BarberRepository) {}
+
+  async execute(actor: User) {
+    actor.assertStaff();
+    const all = await this.barbers.list();
+    return actor.isOwner() ? all : all.filter((barber) => barber.id === actor.barberProfileId);
+  }
+}
+
 export interface NewBarber {
   name: string;
   email: string;

@@ -2,6 +2,7 @@ import { Ban } from "lucide-react";
 import type { AppointmentDTO, BlockDTO } from "@/application/dto";
 import type { AppointmentStatus } from "@/domain/entities/appointment";
 import { formatTime } from "@/domain/shared/format";
+import { AppointmentActions } from "./appointment-actions";
 import { Badge, type Tone } from "./ui";
 
 export const statusInfo: Record<AppointmentStatus, { label: string; tone: Tone }> = {
@@ -66,6 +67,7 @@ function AppointmentRow({ appointment: a, now, showBarber }: { appointment: Appo
         </p>
       </div>
       <Badge tone={info.tone}>{info.label}</Badge>
+      {a.status === "AGENDADO" && <AppointmentActions appointmentId={a.id} />}
     </li>
   );
 }

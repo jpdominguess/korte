@@ -1,4 +1,4 @@
-import { agendaQuerySchema, onlineAppointmentSchema } from "@/application/schemas";
+import { agendaQuerySchema, appointmentSchema } from "@/application/schemas";
 import { addDays, localToInstant } from "@/domain/shared/time";
 import { useCases } from "@/infrastructure/container";
 import { handler, loggedIn, readBody } from "../_lib/handler";
@@ -15,6 +15,6 @@ export const GET = handler(async ({ request, user }) => {
 
 export const POST = handler(async ({ request, user }) => {
   const actor = loggedIn(user);
-  const input = await readBody(request, onlineAppointmentSchema);
+  const input = await readBody(request, appointmentSchema);
   return { id: await useCases.createAppointment.execute(actor, input) };
 });

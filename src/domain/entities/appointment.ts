@@ -1,3 +1,6 @@
+import { DomainError, forbidden } from "../shared/errors";
+import type { User } from "./user";
+
 export type AppointmentStatus = "AGENDADO" | "CONCLUIDO" | "CANCELADO" | "FALTOU";
 
 export interface AppointmentProps {
@@ -11,6 +14,8 @@ export interface AppointmentProps {
   endsAt: Date;
   status: AppointmentStatus;
 }
+
+const CLIENT_CANCEL_WINDOW_MS = 2 * 60 * 60 * 1000;
 
 export class Appointment {
   readonly id: string;
@@ -33,5 +38,27 @@ export class Appointment {
 
   get status(): AppointmentStatus {
     return this.currentStatus;
+  }
+
+  /** RN05: o cliente cancela até 2 horas antes do horário marcado. */
+  static clientCanCancel(startsAt: Date, now: Date): boolean {
+    return startsAt.getTime() - now.getTime() >= CLIENT_CANCEL_WINDOW_MS;
+  }
+
+  cancel(by: User, now: Date): void {
+    this.assertScheduled();
+    if (by.isClient()) {
+      if (this.clientId !== by.id) throw forbidden();
+      if (!Appointment.clientCanCancel(this.startsAt, now)) {
+        throw new DomainError("O cancelamento pelo site é permitido até 2 horas antes do horário.");
+      }
+    } else if (!by.canManage(this)) {
+      throw forbidden();
+    }
+    this.currentStatus = "CANCELADO";
+  }
+
+  private assertScheduled(): void {
+    if (this.currentStatus !== "AGENDADO") throw new DomainError("Este agendamento já foi encerrado.", "conflict");
   }
 }
