@@ -20,6 +20,17 @@ import {
 import { CreateScheduleBlock, DeleteScheduleBlock } from "@/application/use-cases/blocks";
 import { CreateAppointment, GetAvailableSlots } from "@/application/use-cases/booking";
 import { GetPublicPage } from "@/application/use-cases/public-page";
+import {
+  ActivateSubscription,
+  CancelSubscription,
+  CreatePlan,
+  GetClientSubscription,
+  GetSubscriptionCoverage,
+  ListPlans,
+  ListSubscriptions,
+  RenewSubscription,
+  UpdatePlan,
+} from "@/application/use-cases/subscriptions";
 import { GetWorkSchedule, SetWorkSchedule } from "@/application/use-cases/work-schedule";
 import { BetterAuthAccountService } from "./auth/better-auth-account-service";
 import { emailSender } from "./email";
@@ -31,7 +42,9 @@ import { PrismaBarbershopRepository } from "./repositories/prisma-barbershop-rep
 import { PrismaClientRepository } from "./repositories/prisma-client-repository";
 import { PrismaScheduleBlockRepository } from "./repositories/prisma-schedule-block-repository";
 import { PrismaWorkScheduleRepository } from "./repositories/prisma-work-schedule-repository";
+import { PrismaPlanRepository } from "./repositories/prisma-plan-repository";
 import { PrismaServiceRepository } from "./repositories/prisma-service-repository";
+import { PrismaSubscriptionRepository } from "./repositories/prisma-subscription-repository";
 import { PrismaUnitOfWork } from "./prisma/prisma-unit-of-work";
 
 const barbershops = new PrismaBarbershopRepository(prisma);
@@ -41,6 +54,8 @@ const workSchedules = new PrismaWorkScheduleRepository(prisma);
 const blocks = new PrismaScheduleBlockRepository(prisma);
 const appointments = new PrismaAppointmentRepository(prisma);
 const clients = new PrismaClientRepository(prisma);
+const plans = new PrismaPlanRepository(prisma);
+const subscriptions = new PrismaSubscriptionRepository(prisma);
 const accounts = new BetterAuthAccountService();
 const availableSlots = new GetAvailableSlots(services, barbers, workSchedules, blocks, appointments);
 const unitOfWork = new PrismaUnitOfWork(prisma);
@@ -59,12 +74,21 @@ export const useCases = {
   createBarber: new CreateBarber(barbers, accounts),
   updateBarber: new UpdateBarber(barbers),
   enableOwnerBarberProfile: new EnableOwnerBarberProfile(barbers),
-  getPublicPage: new GetPublicPage(barbershops, services, barbers, workSchedules),
+  getPublicPage: new GetPublicPage(barbershops, services, barbers, workSchedules, plans),
+  listPlans: new ListPlans(plans),
+  createPlan: new CreatePlan(plans),
+  updatePlan: new UpdatePlan(plans),
+  listSubscriptions: new ListSubscriptions(subscriptions),
+  activateSubscription: new ActivateSubscription(clients, plans, unitOfWork),
+  renewSubscription: new RenewSubscription(plans, unitOfWork),
+  cancelSubscription: new CancelSubscription(subscriptions),
+  getClientSubscription: new GetClientSubscription(subscriptions, plans),
+  getSubscriptionCoverage: new GetSubscriptionCoverage(subscriptions, plans),
   getWorkSchedule: new GetWorkSchedule(workSchedules),
   setWorkSchedule: new SetWorkSchedule(barbers, workSchedules),
   getAvailableSlots: availableSlots,
   createAppointment: new CreateAppointment(services, clients, availableSlots, appointments, events),
-  completeAppointment: new CompleteAppointment(unitOfWork),
+  completeAppointment: new CompleteAppointment(unitOfWork, plans),
   markNoShow: new MarkNoShow(appointments),
   cancelAppointment: new CancelAppointment(appointments),
   listClients: new ListClients(clients),

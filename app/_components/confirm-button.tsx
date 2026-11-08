@@ -8,11 +8,13 @@ import { useSubmit } from "~/_lib/use-submit";
 export function ConfirmButton({
   url,
   method = "POST",
+  body,
   label,
   confirmLabel,
 }: {
   url: string;
   method?: string;
+  body?: unknown;
   label: string;
   confirmLabel: string;
 }) {
@@ -34,7 +36,7 @@ export function ConfirmButton({
         size="sm"
         disabled={pending}
         onClick={async () => {
-          if (await submit(url, method, undefined)) setConfirming(false);
+          if (await submit(url, method, body)) setConfirming(false);
         }}
       >
         {pending ? "Aguarde..." : confirmLabel}

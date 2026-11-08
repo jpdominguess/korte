@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 export default async function PublicPage() {
   const [page, session] = await Promise.all([useCases.getPublicPage.execute(), getSession()]);
-  const { barbershop: shop, services, barbers, openingHours, openNow } = page;
+  const { barbershop: shop, services, barbers, plans, openingHours, openNow } = page;
 
   if (!shop) return <EmptyState title="Barbearia não configurada" text="Rode o seed do banco para criá-la." />;
 
@@ -77,6 +77,28 @@ export default async function PublicPage() {
         </section>
 
         <div className="flex flex-col gap-6">
+          {plans.length > 0 && (
+            <section>
+              <h2 className="mb-3 font-marca text-2xl">Clube de assinatura</h2>
+              <ul className="flex flex-col gap-2">
+                {plans.map((plan) => (
+                  <li key={plan.id} className="flex items-center justify-between gap-3 rounded-card border border-marinho bg-superficie px-4 py-3.5">
+                    <div className="min-w-0">
+                      <p className="leading-tight font-bold">{plan.name}</p>
+                      <p className="mt-0.5 text-xs text-texto-2">
+                        {plan.usesPerCycle} {plan.usesPerCycle === 1 ? "uso" : "usos"} a cada 30 dias · {plan.serviceNames.join(", ")} · contratação no balcão
+                      </p>
+                    </div>
+                    <p className="num shrink-0 text-right leading-tight">
+                      <strong className="block text-xl">{formatBRL(plan.price)}</strong>
+                      <span className="text-xs text-texto-2">por mês</span>
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
           <section>
             <h2 className="mb-3 font-marca text-2xl">Barbeiros</h2>
             {barbers.length === 0 ? (

@@ -4,8 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Check, ChevronLeft, ChevronRight, LoaderCircle, X } from "lucide-react";
-import type { PublicBarberDTO, ServiceDTO } from "@/application/dto";
-import { formatBRL, formatLongDate, formatTime } from "@/domain/shared/format";
+import type { ClientSubscriptionDTO, PublicBarberDTO, ServiceDTO } from "@/application/dto";
+import { formatBRL, formatLocalDate, formatLongDate, formatTime } from "@/domain/shared/format";
 import { addDays, localToInstant, minutesOfDay, weekdayOf } from "@/domain/shared/time";
 import { Avatar, Button, FormError, Notice, buttonClass } from "~/_components/ui";
 import { apiRequest } from "~/_lib/use-submit";
@@ -25,9 +25,10 @@ interface Props {
   services: ServiceDTO[];
   barbers: PublicBarberDTO[];
   today: string;
+  subscription: ClientSubscriptionDTO | null;
 }
 
-export function BookingFlow({ shopName, services, barbers, today }: Props) {
+export function BookingFlow({ shopName, services, barbers, today, subscription }: Props) {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [serviceId, setServiceId] = useState<string | null>(null);
@@ -101,6 +102,7 @@ export function BookingFlow({ shopName, services, barbers, today }: Props) {
     }
   }
 
+  const covered = !!service && !!subscription?.coveredServiceIds.includes(service.id);
   const slotEnd = slot && service ? new Date(new Date(slot).getTime() + service.durationMin * 60_000) : null;
 
   return (
@@ -264,7 +266,18 @@ export function BookingFlow({ shopName, services, barbers, today }: Props) {
               </div>
               <div className="flex items-center justify-between gap-4 py-3">
                 <dt className="text-texto-2">Valor</dt>
-                <dd className="num font-semibold">{formatBRL(service.price)}</dd>
+                <dd className="num text-right font-semibold">
+                  {covered && subscription ? (
+                    <>
+                      {formatBRL(0)} <s className="font-normal text-texto-2">{formatBRL(service.price)}</s>
+                      <small className="block font-medium text-texto-2">
+                        {subscription.planName} · restam {subscription.remainingUses} de {subscription.totalUses} até {formatLocalDate(subscription.cycleEnd)}
+                      </small>
+                    </>
+                  ) : (
+                    formatBRL(service.price)
+                  )}
+                </dd>
               </div>
             </dl>
           </section>
@@ -272,7 +285,10 @@ export function BookingFlow({ shopName, services, barbers, today }: Props) {
         {step === 4 && (
           <div className="mt-4 flex flex-col gap-3">
             <FormError message={error} />
-            <Notice tone="neutral">Dá para cancelar pelo site até 2 horas antes do horário marcado. O pagamento é feito na barbearia.</Notice>
+            <Notice tone="neutral">
+              Dá para cancelar pelo site até 2 horas antes do horário marcado.{" "}
+              {covered ? "O uso só é descontado do plano quando o atendimento for concluído." : "O pagamento é feito na barbearia."}
+            </Notice>
           </div>
         )}
       </main>

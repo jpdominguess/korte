@@ -1,5 +1,6 @@
 import type { AppointmentStatus } from "@/domain/entities/appointment";
 import type { PaymentMethod } from "@/domain/entities/payment";
+import type { SubscriptionSituation } from "@/domain/entities/subscription";
 import type { WorkInterval } from "@/domain/entities/work-schedule";
 
 export interface BarbershopDTO {
@@ -42,10 +43,51 @@ export interface PublicBarberDTO {
   workdays: number[];
 }
 
+export interface PlanDTO {
+  id: string;
+  name: string;
+  price: number;
+  usesPerCycle: number;
+  active: boolean;
+  serviceIds: string[];
+  serviceNames: string[];
+  activeSubscribers: number;
+}
+
+export interface SubscriptionDTO {
+  id: string;
+  clientId: string;
+  clientName: string;
+  clientPhone: string | null;
+  planId: string;
+  planName: string;
+  planPrice: number;
+  cycleStart: string;
+  cycleEnd: string;
+  totalUses: number;
+  usedUses: number;
+  remainingUses: number;
+  canceledAt: Date | null;
+  situation: SubscriptionSituation;
+}
+
+export interface ClientSubscriptionDTO extends SubscriptionDTO {
+  coveredServiceIds: string[];
+}
+
+export interface SubscriptionCoverageDTO {
+  planName: string;
+  remainingUses: number;
+  totalUses: number;
+  cycleEnd: string;
+  covered: boolean;
+}
+
 export interface PublicPageDTO {
   barbershop: BarbershopDTO | null;
   services: ServiceDTO[];
   barbers: PublicBarberDTO[];
+  plans: PlanDTO[];
   openingHours: string | null;
   openNow: boolean;
 }
@@ -67,6 +109,7 @@ export interface AppointmentDTO {
   status: AppointmentStatus;
   paidAmount: number | null;
   paymentMethod: PaymentMethod | null;
+  coveredBySubscription: boolean;
 }
 
 export interface ClientOptionDTO {

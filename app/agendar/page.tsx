@@ -7,8 +7,8 @@ import { BookingFlow } from "./booking-flow";
 export const metadata: Metadata = { title: "Agendar horário" };
 
 export default async function AgendarPage() {
-  await requireSession(["CLIENT"], "/agendar");
-  const page = await useCases.getPublicPage.execute();
+  const { user } = await requireSession(["CLIENT"], "/agendar");
+  const [page, subscription] = await Promise.all([useCases.getPublicPage.execute(), useCases.getClientSubscription.execute(user)]);
 
   return (
     <BookingFlow
@@ -16,6 +16,7 @@ export default async function AgendarPage() {
       services={page.services.filter((service) => service.barberIds.length > 0)}
       barbers={page.barbers}
       today={toLocalDate(new Date())}
+      subscription={subscription?.situation === "ATIVA" && subscription.remainingUses > 0 ? subscription : null}
     />
   );
 }

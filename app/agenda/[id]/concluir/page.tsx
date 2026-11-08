@@ -17,6 +17,7 @@ export default async function ConcluirPage({ params }: { params: Promise<{ id: s
     if (error instanceof DomainError) notFound();
     throw error;
   });
+  const coverage = a.status === "AGENDADO" ? await useCases.getSubscriptionCoverage.execute(user, a) : null;
   const backHref = user.isOwner() ? `/painel/agenda?barbeiro=${a.barberProfileId}` : "/agenda";
 
   return (
@@ -46,7 +47,7 @@ export default async function ConcluirPage({ params }: { params: Promise<{ id: s
 
         <div>
           {a.status === "AGENDADO" ? (
-            <CompleteForm appointmentId={a.id} price={a.servicePrice} backHref={backHref} />
+            <CompleteForm appointmentId={a.id} price={a.servicePrice} backHref={backHref} coverage={coverage} />
           ) : (
             <div className="flex flex-col items-start gap-3">
               <Notice tone="neutral">Este agendamento já foi encerrado.</Notice>

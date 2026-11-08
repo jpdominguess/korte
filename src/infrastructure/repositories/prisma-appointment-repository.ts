@@ -10,6 +10,7 @@ const include = {
   service: true,
   client: true,
   payment: true,
+  usage: true,
   barberProfile: { include: { user: true } },
 } satisfies Prisma.AppointmentInclude;
 
@@ -33,6 +34,7 @@ function toDTO(row: Row): AppointmentDTO {
     status: row.status as AppointmentStatus,
     paidAmount: row.payment?.amount.toNumber() ?? null,
     paymentMethod: (row.payment?.method as PaymentMethod | undefined) ?? null,
+    coveredBySubscription: row.usage !== null,
   };
 }
 

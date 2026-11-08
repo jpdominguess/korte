@@ -63,6 +63,13 @@ async function seedTeamAndCatalog(ownerId: string) {
   }
 
   await createAccount("Lucas Almeida", "cliente@korte.test", "(19) 99734-2108", "CLIENT");
+
+  if ((await db.plan.count()) === 0) {
+    const corte = await db.service.findFirstOrThrow({ where: { name: "Corte" } });
+    await db.plan.create({
+      data: { name: "Clube Corte", price: 99, usesPerCycle: 4, services: { create: { serviceId: corte.id } } },
+    });
+  }
 }
 
 async function main() {

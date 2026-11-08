@@ -1,8 +1,16 @@
-import { forbidden, notFound } from "@/domain/shared/errors";
+import { DomainError, forbidden, notFound } from "@/domain/shared/errors";
+import { toLocalDate } from "@/domain/shared/time";
 import { Payment, type PaymentMethod } from "@/domain/entities/payment";
 import type { User } from "@/domain/entities/user";
 import type { AgendaDTO } from "../dto";
-import type { AppointmentRepository, ClientRepository, ScheduleBlockRepository, UnitOfWork, WorkScheduleRepository } from "../ports";
+import type {
+  AppointmentRepository,
+  ClientRepository,
+  PlanRepository,
+  ScheduleBlockRepository,
+  UnitOfWork,
+  WorkScheduleRepository,
+} from "../ports";
 
 export class GetAgenda {
   constructor(
@@ -74,21 +82,40 @@ export class MarkNoShow {
 }
 
 export interface CompleteAppointmentInput {
-  amount: number;
-  method: PaymentMethod;
+  useSubscription: boolean;
+  amount?: number;
+  method?: PaymentMethod;
 }
 
 export class CompleteAppointment {
-  constructor(private readonly unitOfWork: UnitOfWork) {}
+  constructor(
+    private readonly unitOfWork: UnitOfWork,
+    private readonly plans: PlanRepository,
+  ) {}
 
-  /** Status e pagamento são gravados juntos, na mesma transação. */
+  /** Situação, pagamento e consumo da assinatura são gravados juntos, na mesma transação. */
   async execute(actor: User, id: string, input: CompleteAppointmentInput, now = new Date()) {
     actor.assertStaff();
-    await this.unitOfWork.run(async ({ appointments, payments }) => {
+    await this.unitOfWork.run(async ({ appointments, payments, subscriptions }) => {
       const appointment = await appointments.findById(id);
       if (!appointment) throw notFound("Agendamento");
       actor.assertCanManage(appointment);
 
+      if (input.useSubscription) {
+        const today = toLocalDate(now);
+        const subscription = appointment.clientId && (await subscriptions.findActiveByClient(appointment.clientId, today));
+        if (!subscription) throw new DomainError("Este cliente não tem assinatura ativa.");
+        const plan = await this.plans.findById(subscription.planId);
+        if (!plan?.covers(appointment.serviceId)) throw new DomainError("O plano do cliente não cobre este serviço.");
+
+        appointment.completeWithSubscription(subscription, today);
+        await appointments.saveStatus(appointment);
+        await subscriptions.registerUse(subscription.id, appointment.id, now);
+        return;
+      }
+
+      if (input.amount === undefined) throw new DomainError("Informe o valor.");
+      if (!input.method) throw new DomainError("Escolha a forma de pagamento.");
       appointment.complete();
       await appointments.saveStatus(appointment);
       await payments.create({

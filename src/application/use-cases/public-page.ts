@@ -1,7 +1,7 @@
 import type { WorkInterval } from "@/domain/entities/work-schedule";
 import { minutesOfDay, toLocalDate, weekdayOf } from "@/domain/shared/time";
 import type { PublicPageDTO } from "../dto";
-import type { BarberRepository, BarbershopRepository, ServiceRepository, WorkScheduleRepository } from "../ports";
+import type { BarberRepository, BarbershopRepository, PlanRepository, ServiceRepository, WorkScheduleRepository } from "../ports";
 
 const WEEKDAYS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
@@ -31,14 +31,16 @@ export class GetPublicPage {
     private readonly services: ServiceRepository,
     private readonly barbers: BarberRepository,
     private readonly workSchedules: WorkScheduleRepository,
+    private readonly plans: PlanRepository,
   ) {}
 
   async execute(now = new Date()): Promise<PublicPageDTO> {
-    const [barbershop, services, barbers, intervals] = await Promise.all([
+    const [barbershop, services, barbers, intervals, plans] = await Promise.all([
       this.barbershops.get(),
       this.services.list({ onlyActive: true }),
       this.barbers.list({ onlyActive: true }),
       this.workSchedules.listAll(),
+      this.plans.list({ onlyActive: true }),
     ]);
 
     const activeIds = new Set(barbers.map((barber) => barber.id));
@@ -58,6 +60,7 @@ export class GetPublicPage {
         serviceIds: barber.serviceIds,
         workdays: [...new Set(activeIntervals.filter((i) => i.barberProfileId === barber.id).map((i) => i.weekday))],
       })),
+      plans,
       openingHours: describeOpeningHours(activeIntervals),
       openNow: activeIntervals.some((i) => i.weekday === weekday && i.startMin <= minute && minute < i.endMin),
     };
