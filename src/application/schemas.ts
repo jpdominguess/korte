@@ -66,6 +66,13 @@ export const appointmentSchema = z.object({
   walkInPhone: optionalText,
 });
 
+export const paymentMethodSchema = z.enum(["CASH", "PIX", "DEBIT", "CREDIT"], "Escolha a forma de pagamento.");
+
+export const completeSchema = z.object({
+  amount: z.coerce.number("Informe o valor.").min(0, "O valor não pode ser negativo."),
+  method: paymentMethodSchema,
+});
+
 const localDateTime = z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/, "Informe data e hora.");
 
 export const blockSchema = z.object({

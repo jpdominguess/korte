@@ -1,5 +1,6 @@
 import type { AppointmentDTO, BarberDTO, BarbershopDTO, BlockDTO, ClientOptionDTO, ServiceDTO } from "./dto";
 import type { Appointment } from "@/domain/entities/appointment";
+import type { Payment } from "@/domain/entities/payment";
 import type { WorkInterval } from "@/domain/entities/work-schedule";
 import type { TimeRange } from "@/domain/services/availability-calculator";
 import type { Role } from "@/domain/entities/user";
@@ -86,6 +87,26 @@ export interface AppointmentRepository {
   listBusyRanges(barberProfileId: string, from: Date, to: Date): Promise<TimeRange[]>;
   /** Grava o agendamento; lança conflito se o banco detectar sobreposição. */
   create(data: NewAppointment): Promise<string>;
+}
+
+export interface NewPayment {
+  appointmentId: string | null;
+  subscriptionId: string | null;
+  payment: Payment;
+}
+
+export interface PaymentRepository {
+  create(data: NewPayment): Promise<void>;
+}
+
+export interface TransactionRepositories {
+  appointments: AppointmentRepository;
+  payments: PaymentRepository;
+}
+
+/** Executa a operação em uma única transação do banco. */
+export interface UnitOfWork {
+  run<T>(work: (repositories: TransactionRepositories) => Promise<T>): Promise<T>;
 }
 
 export interface NewAccount {

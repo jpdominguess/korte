@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Ban } from "lucide-react";
 import type { AgendaDTO, BarberDTO } from "@/application/dto";
 import type { AppointmentStatus } from "@/domain/entities/appointment";
@@ -105,15 +106,22 @@ export function AgendaGrid({ agenda, barbers, date, now }: { agenda: AgendaDTO; 
                   .map((a) => {
                     const start = minutesOfDay(a.startsAt);
                     const blockHeight = Math.max(px(a.durationMin) - 2, 20);
-                    return (
-                      <div
-                        key={a.id}
-                        title={`${formatTime(a.startsAt)} ${a.clientName} · ${a.serviceName}`}
-                        className={`absolute inset-x-1 z-1 flex flex-col justify-center overflow-hidden rounded-md border px-2 text-xs leading-tight ${blockStyle[a.status]}`}
-                        style={{ top: px(start - first) + 1, height: blockHeight }}
-                      >
+                    const content = (
+                      <>
                         <p className={`truncate font-bold ${a.status === "CANCELADO" ? "font-semibold line-through" : "text-texto"}`}>{a.clientName}</p>
                         {blockHeight >= 32 && <p className="num truncate">{formatTime(a.startsAt)} · {a.serviceName}</p>}
+                      </>
+                    );
+                    const className = `absolute inset-x-1 z-1 flex flex-col justify-center overflow-hidden rounded-md border px-2 text-xs leading-tight no-underline ${blockStyle[a.status]}`;
+                    const style = { top: px(start - first) + 1, height: blockHeight };
+                    const title = `${formatTime(a.startsAt)} ${a.clientName} · ${a.serviceName}`;
+                    return a.status === "AGENDADO" ? (
+                      <Link key={a.id} href={`/agenda/${a.id}/concluir`} title={title} className={`${className} hover:brightness-95`} style={style}>
+                        {content}
+                      </Link>
+                    ) : (
+                      <div key={a.id} title={title} className={className} style={style}>
+                        {content}
                       </div>
                     );
                   })}

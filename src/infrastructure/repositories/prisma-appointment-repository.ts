@@ -1,12 +1,15 @@
-import type { Prisma, PrismaClient } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 import type { AppointmentDTO } from "@/application/dto";
 import type { AppointmentRepository, NewAppointment, PeriodFilter } from "@/application/ports";
 import { Appointment, type AppointmentStatus } from "@/domain/entities/appointment";
+import type { PaymentMethod } from "@/domain/entities/payment";
 import { DomainError } from "@/domain/shared/errors";
+import type { Database } from "../prisma/client";
 
 const include = {
   service: true,
   client: true,
+  payment: true,
   barberProfile: { include: { user: true } },
 } satisfies Prisma.AppointmentInclude;
 
@@ -28,11 +31,13 @@ function toDTO(row: Row): AppointmentDTO {
     startsAt: row.startsAt,
     endsAt: row.endsAt,
     status: row.status as AppointmentStatus,
+    paidAmount: row.payment?.amount.toNumber() ?? null,
+    paymentMethod: (row.payment?.method as PaymentMethod | undefined) ?? null,
   };
 }
 
 export class PrismaAppointmentRepository implements AppointmentRepository {
-  constructor(private readonly db: PrismaClient) {}
+  constructor(private readonly db: Database) {}
 
   async findById(id: string) {
     const row = await this.db.appointment.findUnique({ where: { id } });

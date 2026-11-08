@@ -67,7 +67,7 @@ function AppointmentRow({ appointment: a, now, showBarber }: { appointment: Appo
         </p>
       </div>
       <Badge tone={info.tone}>{info.label}</Badge>
-      {a.status === "AGENDADO" && <AppointmentActions appointmentId={a.id} />}
+      {a.status === "AGENDADO" && <AppointmentActions appointmentId={a.id} started={a.startsAt <= now} />}
     </li>
   );
 }
