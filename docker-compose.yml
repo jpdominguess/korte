@@ -1,0 +1,20 @@
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: korte_db
+    environment:
+      POSTGRES_USER: korte
+      POSTGRES_PASSWORD: korte
+      POSTGRES_DB: korte
+    ports:
+      - "127.0.0.1:${DB_PORT:-5433}:5432"
+    volumes:
+      - korte_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U korte -d korte"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  korte_db:

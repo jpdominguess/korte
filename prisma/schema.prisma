@@ -1,0 +1,256 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id            String   @id @default(uuid()) @db.Uuid
+  name          String
+  email         String   @unique
+  emailVerified Boolean  @default(false) @map("email_verified")
+  image         String?
+  phone         String?
+  role          String   @default("CLIENT")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  sessions      Session[]
+  accounts      Account[]
+  barbershop    Barbershop?
+  barberProfile BarberProfile?
+  appointments  Appointment[]
+  subscriptions Subscription[]
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  userId    String   @map("user_id") @db.Uuid
+  token     String   @unique
+  expiresAt DateTime @map("expires_at") @db.Timestamptz(3)
+  ipAddress String?  @map("ip_address")
+  userAgent String?  @map("user_agent")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  userId                String    @map("user_id") @db.Uuid
+  accountId             String    @map("account_id")
+  providerId            String    @map("provider_id")
+  accessToken           String?   @map("access_token")
+  refreshToken          String?   @map("refresh_token")
+  idToken               String?   @map("id_token")
+  accessTokenExpiresAt  DateTime? @map("access_token_expires_at") @db.Timestamptz(3)
+  refreshTokenExpiresAt DateTime? @map("refresh_token_expires_at") @db.Timestamptz(3)
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt             DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime @map("expires_at") @db.Timestamptz(3)
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+model Barbershop {
+  id       String  @id @default(uuid()) @db.Uuid
+  ownerId  String  @unique @map("owner_id") @db.Uuid
+  name     String
+  cep      String?
+  street   String?
+  number   String?
+  city     String?
+  phone    String?
+  whatsapp String?
+  logoUrl  String? @map("logo_url")
+
+  owner User @relation(fields: [ownerId], references: [id])
+
+  @@map("barbershop")
+}
+
+model BarberProfile {
+  id     String  @id @default(uuid()) @db.Uuid
+  userId String  @unique @map("user_id") @db.Uuid
+  active Boolean @default(true)
+
+  user          User            @relation(fields: [userId], references: [id])
+  services      BarberService[]
+  workSchedules WorkSchedule[]
+  blocks        ScheduleBlock[]
+  appointments  Appointment[]
+
+  @@map("barber_profile")
+}
+
+model Service {
+  id          String  @id @default(uuid()) @db.Uuid
+  name        String
+  description String?
+  durationMin Int     @map("duration_min")
+  price       Decimal @db.Decimal(10, 2)
+  active      Boolean @default(true)
+
+  barbers      BarberService[]
+  plans        PlanService[]
+  appointments Appointment[]
+
+  @@map("service")
+}
+
+model BarberService {
+  barberProfileId String @map("barber_profile_id") @db.Uuid
+  serviceId       String @map("service_id") @db.Uuid
+
+  barberProfile BarberProfile @relation(fields: [barberProfileId], references: [id], onDelete: Cascade)
+  service       Service       @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@id([barberProfileId, serviceId])
+  @@map("barber_service")
+}
+
+model WorkSchedule {
+  id              String   @id @default(uuid()) @db.Uuid
+  barberProfileId String   @map("barber_profile_id") @db.Uuid
+  weekday         Int
+  startTime       DateTime @map("start_time") @db.Time(0)
+  endTime         DateTime @map("end_time") @db.Time(0)
+
+  barberProfile BarberProfile @relation(fields: [barberProfileId], references: [id], onDelete: Cascade)
+
+  @@index([barberProfileId, weekday])
+  @@map("work_schedule")
+}
+
+model ScheduleBlock {
+  id              String   @id @default(uuid()) @db.Uuid
+  barberProfileId String   @map("barber_profile_id") @db.Uuid
+  startsAt        DateTime @map("starts_at") @db.Timestamptz(3)
+  endsAt          DateTime @map("ends_at") @db.Timestamptz(3)
+  reason          String?
+
+  barberProfile BarberProfile @relation(fields: [barberProfileId], references: [id], onDelete: Cascade)
+
+  @@index([barberProfileId, startsAt])
+  @@map("schedule_block")
+}
+
+model Appointment {
+  id              String   @id @default(uuid()) @db.Uuid
+  barberProfileId String   @map("barber_profile_id") @db.Uuid
+  serviceId       String   @map("service_id") @db.Uuid
+  clientId        String?  @map("client_id") @db.Uuid
+  walkInName      String?  @map("walk_in_name")
+  walkInPhone     String?  @map("walk_in_phone")
+  startsAt        DateTime @map("starts_at") @db.Timestamptz(3)
+  endsAt          DateTime @map("ends_at") @db.Timestamptz(3)
+  status          String   @default("AGENDADO")
+
+  barberProfile BarberProfile      @relation(fields: [barberProfileId], references: [id])
+  service       Service            @relation(fields: [serviceId], references: [id])
+  client        User?              @relation(fields: [clientId], references: [id])
+  payment       Payment?
+  usage         SubscriptionUsage?
+
+  @@index([barberProfileId, startsAt])
+  @@index([clientId])
+  @@index([startsAt])
+  @@map("appointment")
+}
+
+model Payment {
+  id             String   @id @default(uuid()) @db.Uuid
+  appointmentId  String?  @unique @map("appointment_id") @db.Uuid
+  subscriptionId String?  @map("subscription_id") @db.Uuid
+  amount         Decimal  @db.Decimal(10, 2)
+  method         String
+  origin         String
+  paidAt         DateTime @default(now()) @map("paid_at") @db.Timestamptz(3)
+
+  appointment  Appointment?  @relation(fields: [appointmentId], references: [id])
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id])
+
+  @@index([paidAt])
+  @@map("payment")
+}
+
+model Plan {
+  id           String  @id @default(uuid()) @db.Uuid
+  name         String
+  price        Decimal @db.Decimal(10, 2)
+  usesPerCycle Int     @map("uses_per_cycle")
+  active       Boolean @default(true)
+
+  services      PlanService[]
+  subscriptions Subscription[]
+
+  @@map("plan")
+}
+
+model PlanService {
+  planId    String @map("plan_id") @db.Uuid
+  serviceId String @map("service_id") @db.Uuid
+
+  plan    Plan    @relation(fields: [planId], references: [id], onDelete: Cascade)
+  service Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@id([planId, serviceId])
+  @@map("plan_service")
+}
+
+model Subscription {
+  id         String    @id @default(uuid()) @db.Uuid
+  clientId   String    @map("client_id") @db.Uuid
+  planId     String    @map("plan_id") @db.Uuid
+  cycleStart DateTime  @map("cycle_start") @db.Date
+  cycleEnd   DateTime  @map("cycle_end") @db.Date
+  totalUses  Int       @map("total_uses")
+  usedUses   Int       @default(0) @map("used_uses")
+  canceledAt DateTime? @map("canceled_at") @db.Timestamptz(3)
+
+  client   User                @relation(fields: [clientId], references: [id])
+  plan     Plan                @relation(fields: [planId], references: [id])
+  payments Payment[]
+  usages   SubscriptionUsage[]
+
+  @@index([clientId])
+  @@map("subscription")
+}
+
+model SubscriptionUsage {
+  id             String   @id @default(uuid()) @db.Uuid
+  subscriptionId String   @map("subscription_id") @db.Uuid
+  appointmentId  String   @unique @map("appointment_id") @db.Uuid
+  usedAt         DateTime @default(now()) @map("used_at") @db.Timestamptz(3)
+
+  subscription Subscription @relation(fields: [subscriptionId], references: [id])
+  appointment  Appointment  @relation(fields: [appointmentId], references: [id])
+
+  @@map("subscription_usage")
+}
