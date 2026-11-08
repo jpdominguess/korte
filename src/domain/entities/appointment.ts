@@ -1,4 +1,5 @@
 import { DomainError, forbidden } from "../shared/errors";
+import type { Subscription } from "./subscription";
 import type { User } from "./user";
 
 export type AppointmentStatus = "AGENDADO" | "CONCLUIDO" | "CANCELADO" | "FALTOU";
@@ -60,6 +61,14 @@ export class Appointment {
 
   complete(): void {
     this.assertScheduled();
+    this.currentStatus = "CONCLUIDO";
+  }
+
+  /** RN07: serviço coberto sai por R$ 0,00 e consome um uso da assinatura. */
+  completeWithSubscription(subscription: Subscription, today: string): void {
+    this.assertScheduled();
+    if (subscription.clientId !== this.clientId) throw new DomainError("A assinatura não é deste cliente.");
+    subscription.consumeUse(today);
     this.currentStatus = "CONCLUIDO";
   }
 

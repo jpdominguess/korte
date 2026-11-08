@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { CalendarPlus } from "lucide-react";
 import { Appointment } from "@/domain/entities/appointment";
-import { formatShortDate, formatTime } from "@/domain/shared/format";
+import { formatLocalDate, formatShortDate, formatTime } from "@/domain/shared/format";
 import { useCases } from "@/infrastructure/container";
 import { statusInfo } from "~/_components/agenda-list";
 import { ConfirmButton } from "~/_components/confirm-button";
@@ -13,7 +13,7 @@ export const metadata: Metadata = { title: "Minha conta" };
 export default async function MinhaContaPage() {
   const { user, name } = await requireSession(["CLIENT"]);
   const now = new Date();
-  const appointments = await useCases.listClientAppointments.execute(user);
+  const [appointments, subscription] = await Promise.all([useCases.listClientAppointments.execute(user), useCases.getClientSubscription.execute(user)]);
 
   const upcoming = appointments.filter((a) => a.status === "AGENDADO" && a.endsAt > now).reverse();
   const history = appointments.filter((a) => a.status !== "AGENDADO" || a.endsAt <= now);
@@ -30,6 +30,34 @@ export default async function MinhaContaPage() {
           </LinkButton>
         }
       />
+
+      {subscription && (
+        <Card className="mb-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 p-4">
+          <div className="min-w-0">
+            <p className="text-xs text-texto-2">Minha assinatura</p>
+            <p className="flex flex-wrap items-center gap-2 font-bold">
+              {subscription.planName}
+              <Badge tone={subscription.situation === "ATIVA" ? "success" : subscription.situation === "EXPIRADA" ? "warning" : "neutral"}>
+                {subscription.situation === "ATIVA" ? "Ativa" : subscription.situation === "EXPIRADA" ? "Expirada" : "Cancelada"}
+              </Badge>
+            </p>
+          </div>
+          {subscription.situation !== "CANCELADA" && (
+            <dl className="num flex gap-6 text-sm">
+              <div>
+                <dt className="text-xs text-texto-2">Validade</dt>
+                <dd className="font-semibold">{formatLocalDate(subscription.cycleEnd)}</dd>
+              </div>
+              <div>
+                <dt className="text-xs text-texto-2">Usos restantes</dt>
+                <dd className="font-semibold">
+                  {subscription.situation === "ATIVA" ? `${subscription.remainingUses} de ${subscription.totalUses}` : "—"}
+                </dd>
+              </div>
+            </dl>
+          )}
+        </Card>
+      )}
 
       <h2 className="mb-2 font-bold">Próximos agendamentos</h2>
       <Card className="mb-6">

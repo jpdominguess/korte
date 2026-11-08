@@ -1,4 +1,6 @@
-import type { AppointmentDTO, BarberDTO, BarbershopDTO, BlockDTO, ClientOptionDTO, ServiceDTO } from "./dto";
+import type { AppointmentDTO, BarberDTO, BarbershopDTO, BlockDTO, ClientOptionDTO, PlanDTO, ServiceDTO } from "./dto";
+import type { Plan } from "@/domain/entities/plan";
+import type { Subscription, SubscriptionProps } from "@/domain/entities/subscription";
 import type { Appointment } from "@/domain/entities/appointment";
 import type { Payment } from "@/domain/entities/payment";
 import type { WorkInterval } from "@/domain/entities/work-schedule";
@@ -99,9 +101,37 @@ export interface PaymentRepository {
   create(data: NewPayment): Promise<void>;
 }
 
+export interface PlanRepository {
+  list(filter?: { onlyActive?: boolean }): Promise<PlanDTO[]>;
+  findById(id: string): Promise<Plan | null>;
+  create(plan: Plan): Promise<string>;
+  update(id: string, plan: Plan): Promise<void>;
+}
+
+export interface SubscriptionRow extends SubscriptionProps {
+  clientName: string;
+  clientPhone: string | null;
+  planName: string;
+  planPrice: number;
+}
+
+export type NewSubscription = Omit<SubscriptionProps, "id" | "canceledAt">;
+
+export interface SubscriptionRepository {
+  list(): Promise<SubscriptionRow[]>;
+  findById(id: string): Promise<Subscription | null>;
+  findActiveByClient(clientId: string, today: string): Promise<Subscription | null>;
+  findLatestRowByClient(clientId: string): Promise<SubscriptionRow | null>;
+  create(data: NewSubscription): Promise<string>;
+  save(subscription: Subscription): Promise<void>;
+  /** Incrementa o uso de forma atômica e registra qual atendimento o consumiu. */
+  registerUse(subscriptionId: string, appointmentId: string, usedAt: Date): Promise<void>;
+}
+
 export interface TransactionRepositories {
   appointments: AppointmentRepository;
   payments: PaymentRepository;
+  subscriptions: SubscriptionRepository;
 }
 
 /** Executa a operação em uma única transação do banco. */

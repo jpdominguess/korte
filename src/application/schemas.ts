@@ -68,10 +68,33 @@ export const appointmentSchema = z.object({
 
 export const paymentMethodSchema = z.enum(["CASH", "PIX", "DEBIT", "CREDIT"], "Escolha a forma de pagamento.");
 
+const amount = z.coerce.number("Informe o valor.").min(0, "O valor não pode ser negativo.");
+
 export const completeSchema = z.object({
-  amount: z.coerce.number("Informe o valor.").min(0, "O valor não pode ser negativo."),
+  useSubscription: z.boolean().default(false),
+  amount: amount.optional(),
+  method: paymentMethodSchema.optional(),
+});
+
+export const planSchema = z.object({
+  name: z.string().trim().min(1, "Informe o nome do plano.").max(80),
+  price: z.coerce.number().min(0, "O preço não pode ser negativo."),
+  usesPerCycle: z.coerce.number().int("Informe um número inteiro de usos.").positive("Informe quantos usos o plano dá por ciclo."),
+  active: z.boolean().default(true),
+  serviceIds: z.array(z.uuid()).min(1, "Escolha ao menos um serviço incluído."),
+});
+
+export const activateSubscriptionSchema = z.object({
+  clientId: z.uuid("Escolha o cliente."),
+  planId: z.uuid("Escolha o plano."),
+  amount,
   method: paymentMethodSchema,
 });
+
+export const subscriptionActionSchema = z.discriminatedUnion("action", [
+  z.object({ action: z.literal("renovar"), amount, method: paymentMethodSchema }),
+  z.object({ action: z.literal("cancelar") }),
+]);
 
 const localDateTime = z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/, "Informe data e hora.");
 

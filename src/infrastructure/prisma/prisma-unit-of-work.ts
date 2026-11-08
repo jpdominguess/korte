@@ -2,6 +2,7 @@ import type { PrismaClient } from "@prisma/client";
 import type { TransactionRepositories, UnitOfWork } from "@/application/ports";
 import { PrismaAppointmentRepository } from "../repositories/prisma-appointment-repository";
 import { PrismaPaymentRepository } from "../repositories/prisma-payment-repository";
+import { PrismaSubscriptionRepository } from "../repositories/prisma-subscription-repository";
 
 export class PrismaUnitOfWork implements UnitOfWork {
   constructor(private readonly db: PrismaClient) {}
@@ -11,6 +12,7 @@ export class PrismaUnitOfWork implements UnitOfWork {
       work({
         appointments: new PrismaAppointmentRepository(tx),
         payments: new PrismaPaymentRepository(tx),
+        subscriptions: new PrismaSubscriptionRepository(tx),
       }),
     );
   }
