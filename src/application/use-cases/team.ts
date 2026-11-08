@@ -11,14 +11,6 @@ export class ListBarbers {
   }
 }
 
-export class ListActiveBarbers {
-  constructor(private readonly barbers: BarberRepository) {}
-
-  execute() {
-    return this.barbers.list({ onlyActive: true });
-  }
-}
-
 export interface NewBarber {
   name: string;
   email: string;

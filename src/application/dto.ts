@@ -1,3 +1,6 @@
+import type { AppointmentStatus } from "@/domain/entities/appointment";
+import type { WorkInterval } from "@/domain/entities/work-schedule";
+
 export interface BarbershopDTO {
   id: string;
   name: string;
@@ -29,4 +32,50 @@ export interface BarberDTO {
   active: boolean;
   isOwner: boolean;
   serviceIds: string[];
+}
+
+export interface PublicBarberDTO {
+  id: string;
+  name: string;
+  serviceIds: string[];
+  workdays: number[];
+}
+
+export interface PublicPageDTO {
+  barbershop: BarbershopDTO | null;
+  services: ServiceDTO[];
+  barbers: PublicBarberDTO[];
+  openingHours: string | null;
+  openNow: boolean;
+}
+
+export interface AppointmentDTO {
+  id: string;
+  barberProfileId: string;
+  barberName: string;
+  serviceId: string;
+  serviceName: string;
+  servicePrice: number;
+  durationMin: number;
+  clientId: string | null;
+  clientName: string;
+  clientPhone: string | null;
+  clientEmail: string | null;
+  startsAt: Date;
+  endsAt: Date;
+  status: AppointmentStatus;
+}
+
+export interface BlockDTO {
+  id: string;
+  barberProfileId: string;
+  startsAt: Date;
+  endsAt: Date;
+  reason: string | null;
+}
+
+export interface AgendaDTO {
+  appointments: AppointmentDTO[];
+  blocks: BlockDTO[];
+  workIntervals: Array<WorkInterval & { barberProfileId: string }>;
 }

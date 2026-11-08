@@ -35,6 +35,34 @@ export const updateBarberSchema = z.object({
   serviceIds: uuids,
 });
 
+const time = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Informe o horário no formato 00:00.");
+
+export const workScheduleSchema = z.object({
+  intervals: z
+    .array(z.object({ weekday: z.number().int().min(0).max(6), start: time, end: time }))
+    .max(28),
+});
+
+const localDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Data inválida.");
+
+export const slotsQuerySchema = z.object({
+  servico: z.uuid("Serviço inválido."),
+  barbeiro: z.uuid("Barbeiro inválido."),
+  data: localDate,
+});
+
+export const agendaQuerySchema = z.object({
+  data: localDate,
+  dias: z.coerce.number().int().min(1).max(31).default(1),
+  barbeiro: z.uuid().optional(),
+});
+
+export const onlineAppointmentSchema = z.object({
+  serviceId: z.uuid("Escolha um serviço."),
+  barberProfileId: z.uuid("Escolha um barbeiro."),
+  startsAt: z.coerce.date("Escolha um horário."),
+});
+
 export const barbershopSchema = z.object({
   name: z.string().trim().min(2, "Informe o nome da barbearia.").max(80),
   cep: optionalText,
