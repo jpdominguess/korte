@@ -39,6 +39,18 @@ export function formatLocalDate(date: string): string {
   return `${day}/${month}/${year}`;
 }
 
+/** Nome do mês (YYYY-MM) por extenso, ex.: "Novembro de 2026". */
+export function formatMonth(month: string): string {
+  const text = new Intl.DateTimeFormat("pt-BR", { timeZone: "UTC", month: "long", year: "numeric" }).format(new Date(`${month}-15T12:00:00Z`));
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+/** Link wa.me a partir do número cadastrado; números sem DDI recebem o 55 do Brasil. */
+export function whatsappLink(phone: string): string {
+  const digits = phone.replace(/\D/g, "");
+  return `https://wa.me/${digits.length <= 11 ? `55${digits}` : digits}`;
+}
+
 export function initials(name: string): string {
   const parts = name.trim().split(/\s+/);
   const first = parts[0]?.[0] ?? "";

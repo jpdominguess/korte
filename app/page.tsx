@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { CalendarPlus } from "lucide-react";
-import { formatBRL } from "@/domain/shared/format";
+import { CalendarPlus, MessageCircle } from "lucide-react";
+import { formatBRL, whatsappLink } from "@/domain/shared/format";
 import { useCases } from "@/infrastructure/container";
-import { Avatar, Badge, EmptyState, LinkButton } from "~/_components/ui";
+import { Avatar, Badge, EmptyState, LinkButton, buttonClass } from "~/_components/ui";
 import { getSession } from "~/_lib/session";
 
 export const dynamic = "force-dynamic";
@@ -44,6 +44,12 @@ export default async function PublicPage() {
               </div>
             </div>
             <div className="hidden shrink-0 gap-2 lg:flex">
+              {shop.whatsapp && (
+                <a href={whatsappLink(shop.whatsapp)} target="_blank" rel="noreferrer" className={buttonClass("ghost", "lg", "text-white hover:bg-marinho-hover")}>
+                  <MessageCircle />
+                  WhatsApp
+                </a>
+              )}
               <LinkButton href="/agendar" variant="secondary" size="lg">
                 <CalendarPlus />
                 Agendar horário
@@ -119,6 +125,12 @@ export default async function PublicPage() {
 
       <div className="fixed inset-x-0 bottom-0 z-20 border-t border-borda bg-superficie px-4 pt-3 pb-[max(12px,env(safe-area-inset-bottom))] lg:hidden">
         <div className="flex gap-2">
+          {shop.whatsapp && (
+            <a href={whatsappLink(shop.whatsapp)} target="_blank" rel="noreferrer" className={buttonClass("secondary", "lg", "px-4")}>
+              <MessageCircle />
+              WhatsApp
+            </a>
+          )}
           <LinkButton href="/agendar" size="lg" className="flex-1">
             Agendar horário
           </LinkButton>

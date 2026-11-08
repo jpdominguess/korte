@@ -3,12 +3,25 @@
 import { useState, useTransition } from "react";
 import type { BarbershopDTO } from "@/application/dto";
 import { Button, Card, Field, FormError, Input, Notice } from "~/_components/ui";
-import { salvarBarbearia } from "./actions";
+import { buscarCep, salvarBarbearia } from "./actions";
 
 export function BarbershopForm({ shop }: { shop: BarbershopDTO }) {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const [street, setStreet] = useState(shop.street ?? "");
+  const [city, setCity] = useState(shop.city ?? "");
+  const [cepHint, setCepHint] = useState<string | undefined>();
+
+  function lookupCep(value: string) {
+    if (value.replace(/\D/g, "").length !== 8) return;
+    startTransition(async () => {
+      const result = await buscarCep(value);
+      setCepHint(result.error);
+      if (result.street) setStreet(result.street);
+      if (result.city) setCity(result.city);
+    });
+  }
 
   function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -29,11 +42,11 @@ export function BarbershopForm({ shop }: { shop: BarbershopDTO }) {
           <Input id="name" name="name" required defaultValue={shop.name} />
         </Field>
         <div className="grid gap-4 sm:grid-cols-[160px_minmax(0,1fr)]">
-          <Field label="CEP" htmlFor="cep">
-            <Input id="cep" name="cep" inputMode="numeric" defaultValue={shop.cep ?? ""} />
+          <Field label="CEP" htmlFor="cep" hint={cepHint}>
+            <Input id="cep" name="cep" inputMode="numeric" defaultValue={shop.cep ?? ""} onBlur={(e) => lookupCep(e.target.value)} />
           </Field>
           <Field label="Rua" htmlFor="street">
-            <Input id="street" name="street" defaultValue={shop.street ?? ""} />
+            <Input id="street" name="street" value={street} onChange={(e) => setStreet(e.target.value)} />
           </Field>
         </div>
         <div className="grid gap-4 sm:grid-cols-[160px_minmax(0,1fr)]">
@@ -41,7 +54,7 @@ export function BarbershopForm({ shop }: { shop: BarbershopDTO }) {
             <Input id="number" name="number" defaultValue={shop.number ?? ""} />
           </Field>
           <Field label="Cidade" htmlFor="city">
-            <Input id="city" name="city" defaultValue={shop.city ?? ""} />
+            <Input id="city" name="city" value={city} onChange={(e) => setCity(e.target.value)} />
           </Field>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">

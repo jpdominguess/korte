@@ -53,6 +53,21 @@ export function addDays(date: string, days: number): string {
   return d.toISOString().slice(0, 10);
 }
 
+export function currentMonth(now: Date): string {
+  return toLocalDate(now).slice(0, 7);
+}
+
+/** Soma meses a um mês no formato YYYY-MM. */
+export function addMonths(month: string, count: number): string {
+  const [year, monthNumber] = month.split("-").map(Number);
+  const d = new Date(Date.UTC(year, monthNumber - 1 + count, 1));
+  return d.toISOString().slice(0, 7);
+}
+
+export function lastDayOfMonth(month: string): string {
+  return addDays(`${addMonths(month, 1)}-01`, -1);
+}
+
 export function isLocalDate(value: string | undefined | null): value is string {
   return !!value && /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(`${value}T12:00:00Z`));
 }

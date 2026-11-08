@@ -87,7 +87,7 @@ export interface PublicPageDTO {
   barbershop: BarbershopDTO | null;
   services: ServiceDTO[];
   barbers: PublicBarberDTO[];
-  plans: PlanDTO[];
+  plans: Array<Omit<PlanDTO, "activeSubscribers">>;
   openingHours: string | null;
   openNow: boolean;
 }
@@ -110,6 +110,19 @@ export interface AppointmentDTO {
   paidAmount: number | null;
   paymentMethod: PaymentMethod | null;
   coveredBySubscription: boolean;
+}
+
+export interface OwnerDashboardDTO {
+  month: string;
+  periodEnd: string;
+  revenue: { total: number; appointments: number; subscriptions: number };
+  completed: { total: number; paid: number; covered: number };
+  subscriptions: { active: number; paymentsInMonth: number };
+  daily: Array<{ date: string; amount: number }>;
+  chartTotal: number;
+  averagePerOpenDay: number;
+  bestDay: { date: string; amount: number } | null;
+  barbers: Array<{ id: string; name: string; completed: number; share: number; revenue: number }>;
 }
 
 export interface ClientOptionDTO {

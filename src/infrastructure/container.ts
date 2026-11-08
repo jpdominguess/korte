@@ -1,4 +1,5 @@
-import { GetBarbershop, UpdateBarbershop } from "@/application/use-cases/barbershop";
+import { GetBarbershop, LookupAddress, UpdateBarbershop } from "@/application/use-cases/barbershop";
+import { GetOwnerDashboard } from "@/application/use-cases/dashboard";
 import { CreateService, ListServices, UpdateService } from "@/application/use-cases/catalog";
 import {
   CreateBarber,
@@ -32,6 +33,7 @@ import {
   UpdatePlan,
 } from "@/application/use-cases/subscriptions";
 import { GetWorkSchedule, SetWorkSchedule } from "@/application/use-cases/work-schedule";
+import { ViaCepAdapter } from "./address/viacep-adapter";
 import { BetterAuthAccountService } from "./auth/better-auth-account-service";
 import { emailSender } from "./email";
 import { AfterResponseEventPublisher } from "./events/after-response-event-publisher";
@@ -42,6 +44,7 @@ import { PrismaBarbershopRepository } from "./repositories/prisma-barbershop-rep
 import { PrismaClientRepository } from "./repositories/prisma-client-repository";
 import { PrismaScheduleBlockRepository } from "./repositories/prisma-schedule-block-repository";
 import { PrismaWorkScheduleRepository } from "./repositories/prisma-work-schedule-repository";
+import { PrismaDashboardRepository } from "./repositories/prisma-dashboard-repository";
 import { PrismaPlanRepository } from "./repositories/prisma-plan-repository";
 import { PrismaServiceRepository } from "./repositories/prisma-service-repository";
 import { PrismaSubscriptionRepository } from "./repositories/prisma-subscription-repository";
@@ -65,6 +68,8 @@ events.subscribe("AppointmentCreated", (event) => sendConfirmation.handle(event)
 
 export const useCases = {
   getBarbershop: new GetBarbershop(barbershops),
+  lookupAddress: new LookupAddress(new ViaCepAdapter()),
+  getOwnerDashboard: new GetOwnerDashboard(new PrismaDashboardRepository(prisma)),
   updateBarbershop: new UpdateBarbershop(barbershops),
   listServices: new ListServices(services),
   createService: new CreateService(services),

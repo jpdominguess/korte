@@ -1,4 +1,4 @@
-import { Ban } from "lucide-react";
+import { Ban, ChevronDown } from "lucide-react";
 import type { AppointmentDTO, BlockDTO } from "@/application/dto";
 import type { AppointmentStatus } from "@/domain/entities/appointment";
 import { formatTime } from "@/domain/shared/format";
@@ -51,10 +51,12 @@ export function AgendaList({
 
 function AppointmentRow({ appointment: a, now, showBarber }: { appointment: AppointmentDTO; now: Date; showBarber: boolean }) {
   const happeningNow = a.status === "AGENDADO" && a.startsAt <= now && now < a.endsAt;
+  const started = a.startsAt <= now;
   const info = statusInfo[a.status];
+  const rowClass = "grid min-h-14 grid-cols-[52px_minmax(0,1fr)_auto] items-center gap-x-3 px-4 py-2";
 
-  return (
-    <li className={`grid grid-cols-[52px_minmax(0,1fr)_auto] items-center gap-x-3 border-b border-borda px-4 py-2 last:border-b-0 ${happeningNow ? "bg-info-bg" : ""}`}>
+  const row = (
+    <>
       <div className="num leading-tight">
         <p className={`text-sm font-bold ${a.status === "AGENDADO" ? "" : "text-texto-2"}`}>{formatTime(a.startsAt)}</p>
         <p className="text-xs text-texto-2">{a.durationMin} min</p>
@@ -66,8 +68,23 @@ function AppointmentRow({ appointment: a, now, showBarber }: { appointment: Appo
           {showBarber && ` · ${a.barberName}`}
         </p>
       </div>
-      <Badge tone={info.tone}>{info.label}</Badge>
-      {a.status === "AGENDADO" && <AppointmentActions appointmentId={a.id} started={a.startsAt <= now} />}
+      <span className="flex items-center gap-1.5">
+        <Badge tone={info.tone}>{info.label}</Badge>
+        {a.status === "AGENDADO" && <ChevronDown className="size-4 text-texto-2 transition-transform group-open:rotate-180" aria-hidden="true" />}
+      </span>
+    </>
+  );
+
+  return (
+    <li className={`border-b border-borda last:border-b-0 ${happeningNow ? "bg-info-bg" : ""}`}>
+      {a.status === "AGENDADO" ? (
+        <details className="group" open={started}>
+          <summary className={`${rowClass} cursor-pointer list-none hover:bg-muted [&::-webkit-details-marker]:hidden`}>{row}</summary>
+          <AppointmentActions appointmentId={a.id} started={started} />
+        </details>
+      ) : (
+        <div className={rowClass}>{row}</div>
+      )}
     </li>
   );
 }

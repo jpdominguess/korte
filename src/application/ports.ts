@@ -2,7 +2,7 @@ import type { AppointmentDTO, BarberDTO, BarbershopDTO, BlockDTO, ClientOptionDT
 import type { Plan } from "@/domain/entities/plan";
 import type { Subscription, SubscriptionProps } from "@/domain/entities/subscription";
 import type { Appointment } from "@/domain/entities/appointment";
-import type { Payment } from "@/domain/entities/payment";
+import type { Payment, PaymentOrigin } from "@/domain/entities/payment";
 import type { WorkInterval } from "@/domain/entities/work-schedule";
 import type { TimeRange } from "@/domain/services/availability-calculator";
 import type { Role } from "@/domain/entities/user";
@@ -137,6 +137,21 @@ export interface TransactionRepositories {
 /** Executa a operação em uma única transação do banco. */
 export interface UnitOfWork {
   run<T>(work: (repositories: TransactionRepositories) => Promise<T>): Promise<T>;
+}
+
+export interface DashboardRepository {
+  listPayments(from: Date, to: Date): Promise<Array<{ amount: number; origin: PaymentOrigin; paidAt: Date; barberProfileId: string | null }>>;
+  listCompleted(from: Date, to: Date): Promise<Array<{ barberProfileId: string; barberName: string; covered: boolean }>>;
+  countActiveSubscriptions(today: string): Promise<number>;
+}
+
+export interface Address {
+  street: string;
+  city: string;
+}
+
+export interface AddressLookup {
+  findByCep(cep: string): Promise<Address | null>;
 }
 
 export interface NewAccount {
