@@ -58,6 +58,18 @@ export class Appointment {
     this.currentStatus = "CANCELADO";
   }
 
+  complete(): void {
+    this.assertScheduled();
+    this.currentStatus = "CONCLUIDO";
+  }
+
+  /** RN04: a falta só pode ser registrada depois do horário marcado. */
+  markNoShow(now: Date): void {
+    this.assertScheduled();
+    if (now < this.startsAt) throw new DomainError("A falta só pode ser registrada depois do horário do atendimento.");
+    this.currentStatus = "FALTOU";
+  }
+
   private assertScheduled(): void {
     if (this.currentStatus !== "AGENDADO") throw new DomainError("Este agendamento já foi encerrado.", "conflict");
   }

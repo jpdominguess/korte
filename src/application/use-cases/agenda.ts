@@ -1,7 +1,8 @@
 import { forbidden, notFound } from "@/domain/shared/errors";
+import { Payment, type PaymentMethod } from "@/domain/entities/payment";
 import type { User } from "@/domain/entities/user";
 import type { AgendaDTO } from "../dto";
-import type { AppointmentRepository, ClientRepository, ScheduleBlockRepository, WorkScheduleRepository } from "../ports";
+import type { AppointmentRepository, ClientRepository, ScheduleBlockRepository, UnitOfWork, WorkScheduleRepository } from "../ports";
 
 export class GetAgenda {
   constructor(
@@ -56,6 +57,46 @@ export class CancelAppointment {
     if (!appointment) throw notFound("Agendamento");
     appointment.cancel(actor, now);
     await this.appointments.saveStatus(appointment);
+  }
+}
+
+export class MarkNoShow {
+  constructor(private readonly appointments: AppointmentRepository) {}
+
+  async execute(actor: User, id: string, now = new Date()) {
+    actor.assertStaff();
+    const appointment = await this.appointments.findById(id);
+    if (!appointment) throw notFound("Agendamento");
+    actor.assertCanManage(appointment);
+    appointment.markNoShow(now);
+    await this.appointments.saveStatus(appointment);
+  }
+}
+
+export interface CompleteAppointmentInput {
+  amount: number;
+  method: PaymentMethod;
+}
+
+export class CompleteAppointment {
+  constructor(private readonly unitOfWork: UnitOfWork) {}
+
+  /** Status e pagamento são gravados juntos, na mesma transação. */
+  async execute(actor: User, id: string, input: CompleteAppointmentInput, now = new Date()) {
+    actor.assertStaff();
+    await this.unitOfWork.run(async ({ appointments, payments }) => {
+      const appointment = await appointments.findById(id);
+      if (!appointment) throw notFound("Agendamento");
+      actor.assertCanManage(appointment);
+
+      appointment.complete();
+      await appointments.saveStatus(appointment);
+      await payments.create({
+        appointmentId: id,
+        subscriptionId: null,
+        payment: new Payment(input.amount, input.method, "APPOINTMENT", now),
+      });
+    });
   }
 }
 

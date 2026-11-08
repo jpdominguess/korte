@@ -11,6 +11,7 @@ import type {
   ServiceRepository,
   WorkScheduleRepository,
 } from "../ports";
+import type { EventPublisher } from "../events";
 
 const slotTaken = () => new DomainError("Esse horário acabou de ser ocupado. Escolha outro.", "conflict");
 
@@ -66,6 +67,7 @@ export class CreateAppointment {
     private readonly clients: ClientRepository,
     private readonly availableSlots: GetAvailableSlots,
     private readonly appointments: AppointmentRepository,
+    private readonly events: EventPublisher,
   ) {}
 
   async execute(actor: User, input: CreateAppointmentInput) {
@@ -81,13 +83,15 @@ export class CreateAppointment {
     });
     if (!slots.some((slot) => slot.getTime() === input.startsAt.getTime())) throw slotTaken();
 
-    return this.appointments.create({
+    const appointmentId = await this.appointments.create({
       barberProfileId: input.barberProfileId,
       serviceId: input.serviceId,
       ...customer,
       startsAt: input.startsAt,
       endsAt: new Date(input.startsAt.getTime() + service.durationMin * 60_000),
     });
+    this.events.publish({ type: "AppointmentCreated", appointmentId });
+    return appointmentId;
   }
 
   /** Cliente agenda para si; dono e barbeiro registram cliente cadastrado ou avulso (RF13). */

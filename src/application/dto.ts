@@ -1,4 +1,5 @@
 import type { AppointmentStatus } from "@/domain/entities/appointment";
+import type { PaymentMethod } from "@/domain/entities/payment";
 import type { WorkInterval } from "@/domain/entities/work-schedule";
 
 export interface BarbershopDTO {
@@ -64,6 +65,8 @@ export interface AppointmentDTO {
   startsAt: Date;
   endsAt: Date;
   status: AppointmentStatus;
+  paidAmount: number | null;
+  paymentMethod: PaymentMethod | null;
 }
 
 export interface ClientOptionDTO {
