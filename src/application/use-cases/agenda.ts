@@ -1,7 +1,7 @@
 import { forbidden, notFound } from "@/domain/shared/errors";
 import type { User } from "@/domain/entities/user";
 import type { AgendaDTO } from "../dto";
-import type { AppointmentRepository, ScheduleBlockRepository, WorkScheduleRepository } from "../ports";
+import type { AppointmentRepository, ClientRepository, ScheduleBlockRepository, WorkScheduleRepository } from "../ports";
 
 export class GetAgenda {
   constructor(
@@ -27,6 +27,35 @@ export class GetAgenda {
       blocks,
       workIntervals: barberProfileId ? allIntervals.filter((i) => i.barberProfileId === barberProfileId) : allIntervals,
     };
+  }
+}
+
+export class ListClients {
+  constructor(private readonly clients: ClientRepository) {}
+
+  execute(actor: User) {
+    actor.assertStaff();
+    return this.clients.list();
+  }
+}
+
+export class ListClientAppointments {
+  constructor(private readonly appointments: AppointmentRepository) {}
+
+  execute(actor: User) {
+    actor.assertClient();
+    return this.appointments.listByClient(actor.id);
+  }
+}
+
+export class CancelAppointment {
+  constructor(private readonly appointments: AppointmentRepository) {}
+
+  async execute(actor: User, id: string, now = new Date()) {
+    const appointment = await this.appointments.findById(id);
+    if (!appointment) throw notFound("Agendamento");
+    appointment.cancel(actor, now);
+    await this.appointments.saveStatus(appointment);
   }
 }
 

@@ -1,7 +1,7 @@
 import type { Prisma, PrismaClient } from "@prisma/client";
 import type { AppointmentDTO } from "@/application/dto";
 import type { AppointmentRepository, NewAppointment, PeriodFilter } from "@/application/ports";
-import type { AppointmentStatus } from "@/domain/entities/appointment";
+import { Appointment, type AppointmentStatus } from "@/domain/entities/appointment";
 import { DomainError } from "@/domain/shared/errors";
 
 const include = {
@@ -33,6 +33,24 @@ function toDTO(row: Row): AppointmentDTO {
 
 export class PrismaAppointmentRepository implements AppointmentRepository {
   constructor(private readonly db: PrismaClient) {}
+
+  async findById(id: string) {
+    const row = await this.db.appointment.findUnique({ where: { id } });
+    return row && new Appointment({ ...row, status: row.status as AppointmentStatus });
+  }
+
+  async listByClient(clientId: string) {
+    const rows = await this.db.appointment.findMany({ where: { clientId }, include, orderBy: { startsAt: "desc" } });
+    return rows.map(toDTO);
+  }
+
+  async saveStatus(appointment: Appointment) {
+    const { count } = await this.db.appointment.updateMany({
+      where: { id: appointment.id, status: "AGENDADO" },
+      data: { status: appointment.status },
+    });
+    if (count === 0) throw new DomainError("Este agendamento já foi atualizado.", "conflict");
+  }
 
   async findDetails(id: string) {
     const row = await this.db.appointment.findUnique({ where: { id }, include });

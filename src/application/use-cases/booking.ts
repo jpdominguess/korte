@@ -1,9 +1,16 @@
 import { BarberProfile } from "@/domain/entities/barber-profile";
 import type { User } from "@/domain/entities/user";
 import { AvailabilityCalculator } from "@/domain/services/availability-calculator";
-import { DomainError } from "@/domain/shared/errors";
+import { DomainError, notFound } from "@/domain/shared/errors";
 import { addDays, localToInstant, toLocalDate } from "@/domain/shared/time";
-import type { AppointmentRepository, BarberRepository, ScheduleBlockRepository, ServiceRepository, WorkScheduleRepository } from "../ports";
+import type {
+  AppointmentRepository,
+  BarberRepository,
+  ClientRepository,
+  ScheduleBlockRepository,
+  ServiceRepository,
+  WorkScheduleRepository,
+} from "../ports";
 
 const slotTaken = () => new DomainError("Esse horário acabou de ser ocupado. Escolha outro.", "conflict");
 
@@ -48,17 +55,21 @@ export interface CreateAppointmentInput {
   serviceId: string;
   barberProfileId: string;
   startsAt: Date;
+  clientId?: string | null;
+  walkInName?: string | null;
+  walkInPhone?: string | null;
 }
 
 export class CreateAppointment {
   constructor(
     private readonly services: ServiceRepository,
+    private readonly clients: ClientRepository,
     private readonly availableSlots: GetAvailableSlots,
     private readonly appointments: AppointmentRepository,
   ) {}
 
   async execute(actor: User, input: CreateAppointmentInput) {
-    actor.assertClient();
+    const customer = await this.resolveCustomer(actor, input);
 
     const service = await this.services.findById(input.serviceId);
     if (!service?.active) throw new DomainError("Serviço indisponível.");
@@ -73,11 +84,22 @@ export class CreateAppointment {
     return this.appointments.create({
       barberProfileId: input.barberProfileId,
       serviceId: input.serviceId,
-      clientId: actor.id,
-      walkInName: null,
-      walkInPhone: null,
+      ...customer,
       startsAt: input.startsAt,
       endsAt: new Date(input.startsAt.getTime() + service.durationMin * 60_000),
     });
+  }
+
+  /** Cliente agenda para si; dono e barbeiro registram cliente cadastrado ou avulso (RF13). */
+  private async resolveCustomer(actor: User, input: CreateAppointmentInput) {
+    if (actor.isClient()) return { clientId: actor.id, walkInName: null, walkInPhone: null };
+
+    actor.assertCanManage({ barberProfileId: input.barberProfileId });
+    if (input.clientId) {
+      if (!(await this.clients.findById(input.clientId))) throw notFound("Cliente");
+      return { clientId: input.clientId, walkInName: null, walkInPhone: null };
+    }
+    if (!input.walkInName || !input.walkInPhone) throw new DomainError("Informe o nome e o telefone do cliente.");
+    return { clientId: null, walkInName: input.walkInName, walkInPhone: input.walkInPhone };
   }
 }

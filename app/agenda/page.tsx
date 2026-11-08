@@ -6,7 +6,7 @@ import { useCases } from "@/infrastructure/container";
 import { AgendaList } from "~/_components/agenda-list";
 import { AgendaToolbar, readAgendaParams } from "~/_components/agenda-toolbar";
 import { AgendaWeek } from "~/_components/agenda-week";
-import { Card, EmptyState, PageHeader } from "~/_components/ui";
+import { Card, EmptyState, LinkButton, PageHeader } from "~/_components/ui";
 import { requireSession } from "~/_lib/session";
 
 export const metadata: Metadata = { title: "Minha agenda" };
@@ -25,7 +25,14 @@ export default async function MinhaAgendaPage({ searchParams }: { searchParams: 
       <PageHeader
         title="Minha agenda"
         subtitle={`${view === "dia" ? formatLongDate(localToInstant(date, 12 * 60)) : "Semana"} · ${appointments.length} ${appointments.length === 1 ? "agendamento" : "agendamentos"} · ${done} ${done === 1 ? "concluído" : "concluídos"}`}
-        actions={<AgendaToolbar basePath="/agenda" date={date} view={view} />}
+        actions={
+          <>
+            <AgendaToolbar basePath="/agenda" date={date} view={view} />
+            <LinkButton href="/agenda/bloqueios" variant="secondary" size="sm">
+              Bloqueios
+            </LinkButton>
+          </>
+        }
       />
       {view === "semana" ? (
         <AgendaWeek start={start} appointments={appointments} blocks={blocks} now={now} />

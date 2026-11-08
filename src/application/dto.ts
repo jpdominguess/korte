@@ -66,6 +66,12 @@ export interface AppointmentDTO {
   status: AppointmentStatus;
 }
 
+export interface ClientOptionDTO {
+  id: string;
+  name: string;
+  phone: string | null;
+}
+
 export interface BlockDTO {
   id: string;
   barberProfileId: string;

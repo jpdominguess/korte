@@ -1,4 +1,5 @@
-import type { AppointmentDTO, BarberDTO, BarbershopDTO, BlockDTO, ServiceDTO } from "./dto";
+import type { AppointmentDTO, BarberDTO, BarbershopDTO, BlockDTO, ClientOptionDTO, ServiceDTO } from "./dto";
+import type { Appointment } from "@/domain/entities/appointment";
 import type { WorkInterval } from "@/domain/entities/work-schedule";
 import type { TimeRange } from "@/domain/services/availability-calculator";
 import type { Role } from "@/domain/entities/user";
@@ -46,8 +47,23 @@ export interface PeriodFilter {
   barberProfileId?: string;
 }
 
+export interface NewScheduleBlock {
+  barberProfileId: string;
+  startsAt: Date;
+  endsAt: Date;
+  reason: string | null;
+}
+
 export interface ScheduleBlockRepository {
   list(filter: PeriodFilter): Promise<BlockDTO[]>;
+  findById(id: string): Promise<BlockDTO | null>;
+  create(data: NewScheduleBlock): Promise<string>;
+  delete(id: string): Promise<void>;
+}
+
+export interface ClientRepository {
+  list(): Promise<ClientOptionDTO[]>;
+  findById(id: string): Promise<ClientOptionDTO | null>;
 }
 
 export interface NewAppointment {
@@ -61,7 +77,11 @@ export interface NewAppointment {
 }
 
 export interface AppointmentRepository {
+  findById(id: string): Promise<Appointment | null>;
   findDetails(id: string): Promise<AppointmentDTO | null>;
+  listByClient(clientId: string): Promise<AppointmentDTO[]>;
+  /** Grava a mudança de situação; lança conflito se o agendamento já tiver sido encerrado. */
+  saveStatus(appointment: Appointment): Promise<void>;
   list(filter: PeriodFilter): Promise<AppointmentDTO[]>;
   listBusyRanges(barberProfileId: string, from: Date, to: Date): Promise<TimeRange[]>;
   /** Grava o agendamento; lança conflito se o banco detectar sobreposição. */
