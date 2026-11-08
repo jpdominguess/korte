@@ -134,7 +134,7 @@ export default async function PlanosPage({ searchParams }: { searchParams: Promi
 function SubscriptionRow({ subscription: s }: { subscription: SubscriptionDTO }) {
   const info = situationInfo[s.situation];
   return (
-    <li className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-borda px-4 py-3 last:border-b-0 lg:px-6">
+    <li className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-borda px-4 py-3 last:border-b-0 lg:grid lg:grid-cols-[minmax(0,1fr)_128px_72px_84px_230px] lg:px-6">
       <div className="flex min-w-48 flex-1 items-center gap-3">
         <Avatar name={s.clientName} size="sm" />
         <div className="min-w-0 leading-tight">
@@ -147,8 +147,10 @@ function SubscriptionRow({ subscription: s }: { subscription: SubscriptionDTO })
         <span className="text-xs text-texto-2">{s.planName}</span>
       </p>
       <p className="num w-20 text-sm">{s.situation === "ATIVA" ? `${s.remainingUses} de ${s.totalUses}` : "—"}</p>
-      <Badge tone={info.tone}>{info.label}</Badge>
-      <div className="flex flex-wrap items-center gap-2">
+      <div>
+        <Badge tone={info.tone}>{info.label}</Badge>
+      </div>
+      <div className="flex flex-wrap items-center gap-2 lg:justify-end">
         {s.situation !== "CANCELADA" && <RenewButton subscriptionId={s.id} price={s.planPrice} />}
         {s.situation === "ATIVA" && (
           <ConfirmButton url={`/api/assinaturas/${s.id}`} method="PUT" body={{ action: "cancelar" }} label="Cancelar" confirmLabel="Confirmar cancelamento" />

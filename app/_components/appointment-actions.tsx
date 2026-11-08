@@ -4,7 +4,7 @@ import { LinkButton } from "./ui";
 
 export function AppointmentActions({ appointmentId, started }: { appointmentId: string; started: boolean }) {
   return (
-    <div className="col-span-3 mt-2 flex flex-wrap items-center gap-2">
+    <div className="flex flex-wrap items-center gap-2 px-4 pb-3 pl-[80px]">
       <LinkButton href={`/agenda/${appointmentId}/concluir`} size="sm">
         <Check />
         Concluir

@@ -60,7 +60,7 @@ export class GetPublicPage {
         serviceIds: barber.serviceIds,
         workdays: [...new Set(activeIntervals.filter((i) => i.barberProfileId === barber.id).map((i) => i.weekday))],
       })),
-      plans,
+      plans: plans.map(({ id, name, price, usesPerCycle, active, serviceIds, serviceNames }) => ({ id, name, price, usesPerCycle, active, serviceIds, serviceNames })),
       openingHours: describeOpeningHours(activeIntervals),
       openNow: activeIntervals.some((i) => i.weekday === weekday && i.startMin <= minute && minute < i.endMin),
     };

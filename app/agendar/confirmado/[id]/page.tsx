@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Check } from "lucide-react";
+import { Calendar, Check, MessageCircle } from "lucide-react";
 import { DomainError } from "@/domain/shared/errors";
-import { formatBRL, formatLongDate, formatTime } from "@/domain/shared/format";
+import { formatBRL, formatLocalDate, formatLongDate, formatTime, whatsappLink } from "@/domain/shared/format";
 import { useCases } from "@/infrastructure/container";
-import { Avatar, LinkButton } from "~/_components/ui";
+import { Avatar, LinkButton, buttonClass } from "~/_components/ui";
 import { requireSession } from "~/_lib/session";
 
 export const metadata: Metadata = { title: "Horário marcado" };
@@ -12,14 +12,16 @@ export const metadata: Metadata = { title: "Horário marcado" };
 export default async function ConfirmadoPage({ params }: { params: Promise<{ id: string }> }) {
   const { user, name } = await requireSession(["CLIENT"]);
   const { id } = await params;
-  const [shop, appointment] = await Promise.all([
+  const [shop, subscription, appointment] = await Promise.all([
     useCases.getBarbershop.execute(),
+    useCases.getClientSubscription.execute(user),
     useCases.getAppointmentDetails.execute(user, id).catch((error) => {
       if (error instanceof DomainError) notFound();
       throw error;
     }),
   ]);
   const location = shop && [shop.street, shop.number].filter(Boolean).join(", ");
+  const covered = subscription?.situation === "ATIVA" && subscription.remainingUses > 0 && subscription.coveredServiceIds.includes(appointment.serviceId);
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-md flex-col justify-center px-4 py-10">
@@ -58,15 +60,33 @@ export default async function ConfirmadoPage({ params }: { params: Promise<{ id:
           )}
           <div className="flex items-center justify-between gap-4 py-3">
             <dt className="text-texto-2">Valor</dt>
-            <dd className="num font-semibold">{formatBRL(appointment.servicePrice)}</dd>
+            <dd className="num text-right font-semibold">
+              {covered ? (
+                <>
+                  {formatBRL(0)} <s className="font-normal text-texto-2">{formatBRL(appointment.servicePrice)}</s>
+                  <small className="block font-medium text-texto-2">
+                    {subscription.planName} · restam {subscription.remainingUses} de {subscription.totalUses} até {formatLocalDate(subscription.cycleEnd)}
+                  </small>
+                </>
+              ) : (
+                formatBRL(appointment.servicePrice)
+              )}
+            </dd>
           </div>
         </dl>
       </section>
 
       <div className="mt-6 flex flex-col gap-2">
-        <LinkButton href="/" size="lg">
-          Voltar para a barbearia
+        <LinkButton href="/minha-conta" size="lg">
+          <Calendar />
+          Ver meus agendamentos
         </LinkButton>
+        {shop?.whatsapp && (
+          <a href={whatsappLink(shop.whatsapp)} target="_blank" rel="noreferrer" className={buttonClass("secondary", "lg")}>
+            <MessageCircle />
+            Falar no WhatsApp
+          </a>
+        )}
       </div>
     </main>
   );

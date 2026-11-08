@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { addDays, localToInstant, toLocalDate, weekdayOf } from "../src/domain/shared/time";
 import { auth } from "../src/infrastructure/auth/auth";
 
 const db = new PrismaClient();
@@ -72,6 +73,95 @@ async function seedTeamAndCatalog(ownerId: string) {
   }
 }
 
+/** Gerador simples com semente fixa, para o seed produzir sempre o mesmo histórico. */
+function createRandom(seed: number) {
+  return () => {
+    seed = (seed * 1664525 + 1013904223) % 4294967296;
+    return seed / 4294967296;
+  };
+}
+
+const METHODS = ["CASH", "PIX", "DEBIT", "CREDIT"];
+const SLOT_MINUTES = [...Array(6).keys()].map((i) => 9 * 60 + i * 30).concat([...Array(12).keys()].map((i) => 13 * 60 + i * 30));
+
+/** Histórico fictício para demonstração: atendimentos dos últimos 30 dias, próximos dias e assinaturas. */
+async function seedDemoData() {
+  if ((await db.appointment.count()) > 0) return;
+
+  const clientIds: string[] = [];
+  for (const [name, email, phone] of [
+    ["Matheus Oliveira", "matheus@korte.test", "(19) 99288-5170"],
+    ["Gabriel Rocha", "gabriel@korte.test", "(19) 98761-0423"],
+    ["Pedro Henrique Costa", "pedro@korte.test", "(19) 99311-2045"],
+    ["Felipe Nunes", "felipe@korte.test", "(19) 99127-8804"],
+    ["Arthur Ribeiro", "arthur@korte.test", "(19) 99402-6618"],
+    ["Renan Vieira", "renan@korte.test", "(19) 98845-1290"],
+  ]) {
+    clientIds.push(await createAccount(name, email, phone, "CLIENT"));
+  }
+  const mainClient = await db.user.findUniqueOrThrow({ where: { email: "cliente@korte.test" } });
+  clientIds.push(mainClient.id);
+
+  const barbers = await db.barberProfile.findMany();
+  const services = await db.service.findMany();
+  const plan = await db.plan.findFirstOrThrow();
+  const random = createRandom(20261108);
+  const pick = <T,>(list: T[]) => list[Math.floor(random() * list.length)];
+
+  const now = new Date();
+  const today = toLocalDate(now);
+
+  for (let offset = -30; offset <= 7; offset++) {
+    const date = addDays(today, offset);
+    if ([0, 1].includes(weekdayOf(date))) continue;
+
+    for (const barber of barbers) {
+      for (const minute of SLOT_MINUTES) {
+        const startsAt = localToInstant(date, minute);
+        const isPast = startsAt < now;
+        if (random() > (isPast ? 0.6 : 0.3)) continue;
+
+        const service = pick(services);
+        const endsAt = new Date(startsAt.getTime() + service.durationMin * 60_000);
+        const roll = random();
+        const status = !isPast ? "AGENDADO" : roll < 0.86 ? "CONCLUIDO" : roll < 0.94 ? "CANCELADO" : "FALTOU";
+
+        const appointment = await db.appointment.create({
+          data: { barberProfileId: barber.id, serviceId: service.id, clientId: pick(clientIds), startsAt, endsAt, status },
+        });
+        if (status === "CONCLUIDO") {
+          await db.payment.create({
+            data: { appointmentId: appointment.id, amount: service.price, method: pick(METHODS), origin: "APPOINTMENT", paidAt: endsAt },
+          });
+        }
+      }
+    }
+  }
+
+  const subscriptions = [
+    { clientId: mainClient.id, startOffset: -10, used: 1 },
+    { clientId: clientIds[5], startOffset: -6, used: 2 },
+    { clientId: clientIds[3], startOffset: -2, used: 0 },
+    { clientId: clientIds[4], startOffset: -35, used: 4 },
+  ];
+  for (const { clientId, startOffset, used } of subscriptions) {
+    const cycleStart = addDays(today, startOffset);
+    const subscription = await db.subscription.create({
+      data: {
+        clientId,
+        planId: plan.id,
+        cycleStart: new Date(`${cycleStart}T00:00:00Z`),
+        cycleEnd: new Date(`${addDays(cycleStart, 30)}T00:00:00Z`),
+        totalUses: plan.usesPerCycle,
+        usedUses: used,
+      },
+    });
+    await db.payment.create({
+      data: { subscriptionId: subscription.id, amount: plan.price, method: "PIX", origin: "ACTIVATION", paidAt: localToInstant(cycleStart, 10 * 60) },
+    });
+  }
+}
+
 async function main() {
   const ownerId = await createAccount("Rafael Moura", "dono@korte.test", "(19) 99812-4470", "OWNER");
 
@@ -91,6 +181,7 @@ async function main() {
   }
 
   await seedTeamAndCatalog(ownerId);
+  if (process.env.SEED_DEMO !== "false") await seedDemoData();
 
   console.info("Seed concluído.");
 }
