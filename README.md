@@ -82,6 +82,7 @@ prisma/                schema, migrações e seed
 
 - [Documento de planejamento](docs/Korte%20-%20Documento%20de%20planejamento.docx): itens a–h do projeto
 - [Escopo do projeto](docs/escopo-funcional.md): requisitos, regras de negócio, arquitetura e decisões
+- [Quadro do projeto no Notion](https://app.notion.com/p/3ecd8be2c80f8196ae60f2a388926788): sprints, cronograma e backlog
 - [Diagramas](docs/diagramas/): fontes em Mermaid e SVG
 - [Protótipo](prototipo/index.html): telas em HTML
 
