@@ -27,6 +27,8 @@ export interface BarberUpdate {
   phone: string | null;
   active: boolean;
   serviceIds: string[];
+  /** Imagem em data URL; null remove a foto e ausente mantém a atual. */
+  photo?: string | null;
 }
 
 export interface BarberRepository {
@@ -36,6 +38,8 @@ export interface BarberRepository {
   create(userId: string, serviceIds: string[]): Promise<string>;
   update(id: string, data: BarberUpdate): Promise<void>;
   setActive(id: string, active: boolean): Promise<void>;
+  getPhoto(id: string): Promise<string | null>;
+  setPhoto(id: string, photo: string | null): Promise<void>;
 }
 
 export interface WorkScheduleRepository {

@@ -41,7 +41,7 @@ export function AgendaGrid({ agenda, barbers, date, now }: { agenda: AgendaDTO; 
           <span />
           {barbers.map((barber) => (
             <div key={barber.id} className="flex min-w-0 items-center gap-2.5 border-l border-borda px-3">
-              <Avatar name={barber.name} size="sm" />
+              <Avatar name={barber.name} src={barber.photoUrl} size="sm" />
               <div className="min-w-0 leading-tight">
                 <p className="truncate text-sm font-bold">{barber.name}</p>
                 <p className="text-xs whitespace-nowrap text-texto-2">

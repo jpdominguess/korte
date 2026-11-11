@@ -33,7 +33,7 @@ export default async function BarbeirosPage() {
           <ul>
             {barbers.map((barber) => (
               <li key={barber.id} className="flex items-center gap-3 border-b border-borda px-4 py-3 last:border-b-0 lg:px-6">
-                <Avatar name={barber.name} />
+                <Avatar name={barber.name} src={barber.photoUrl} />
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-semibold">
                     {barber.name}

@@ -12,14 +12,16 @@ export const metadata: Metadata = { title: "Horário marcado" };
 export default async function ConfirmadoPage({ params }: { params: Promise<{ id: string }> }) {
   const { user, name } = await requireSession(["CLIENT"]);
   const { id } = await params;
-  const [shop, subscription, appointment] = await Promise.all([
-    useCases.getBarbershop.execute(),
+  const [page, subscription, appointment] = await Promise.all([
+    useCases.getPublicPage.execute(),
     useCases.getClientSubscription.execute(user),
     useCases.getAppointmentDetails.execute(user, id).catch((error) => {
       if (error instanceof DomainError) notFound();
       throw error;
     }),
   ]);
+  const shop = page.barbershop;
+  const barberPhoto = page.barbers.find((b) => b.id === appointment.barberProfileId)?.photoUrl;
   const location = shop && [shop.street, shop.number].filter(Boolean).join(", ");
   const covered = subscription?.situation === "ATIVA" && subscription.remainingUses > 0 && subscription.coveredServiceIds.includes(appointment.serviceId);
 
@@ -42,7 +44,7 @@ export default async function ConfirmadoPage({ params }: { params: Promise<{ id:
           <div className="flex items-center justify-between gap-4 py-3">
             <dt className="text-texto-2">Barbeiro</dt>
             <dd className="flex items-center gap-2 font-semibold">
-              <Avatar name={appointment.barberName} size="xs" />
+              <Avatar name={appointment.barberName} src={barberPhoto} size="sm" />
               {appointment.barberName}
             </dd>
           </div>
