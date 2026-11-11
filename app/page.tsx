@@ -1,32 +1,37 @@
 import Link from "next/link";
-import { CalendarPlus, MessageCircle } from "lucide-react";
+import { CalendarPlus, MapPin, MessageCircle } from "lucide-react";
 import { formatBRL, whatsappLink } from "@/domain/shared/format";
+import { toLocalDate } from "@/domain/shared/time";
 import { useCases } from "@/infrastructure/container";
-import { Avatar, Badge, EmptyState, LinkButton, buttonClass } from "~/_components/ui";
+import { Badge, EmptyState, buttonClass } from "~/_components/ui";
 import { getSession } from "~/_lib/session";
+import { BookingPanel, type Viewer } from "./_booking/booking-panel";
 
 export const dynamic = "force-dynamic";
 
 export default async function PublicPage() {
   const [page, session] = await Promise.all([useCases.getPublicPage.execute(), getSession()]);
-  const { barbershop: shop, services, barbers, plans, openingHours, openNow } = page;
+  const { barbershop: shop, services, barbers, plans, openingHours, openNow, statusDetail } = page;
 
   if (!shop) return <EmptyState title="Barbearia não configurada" text="Rode o seed do banco para criá-la." />;
 
+  const viewer: Viewer = !session ? null : session.user.isClient() ? "CLIENT" : "STAFF";
+  const subscription = viewer === "CLIENT" && session ? await useCases.getClientSubscription.execute(session.user) : null;
   const address = [shop.street && [shop.street, shop.number].filter(Boolean).join(", "), shop.city].filter(Boolean);
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([shop.name, ...address].join(", "))}`;
 
   return (
-    <div className="min-h-dvh pb-24 lg:pb-12">
+    <div className="min-h-dvh">
       <header className="bg-marinho text-white">
-        <div className="mx-auto max-w-5xl px-4 pt-4 pb-6 lg:pb-12">
+        <div className="mx-auto max-w-5xl px-4 pt-3 pb-8 lg:pb-12">
           <div className="flex items-center justify-between">
             <span className="font-marca text-xl">Korte</span>
-            <Link href={session ? "/inicio" : "/login"} className="text-sm font-semibold text-white">
+            <Link href={session ? "/inicio" : "/login"} className={buttonClass("inverse", "sm")}>
               {session ? "Minha conta" : "Entrar"}
             </Link>
           </div>
 
-          <div className="mt-6 flex items-end justify-between gap-6 lg:mt-12">
+          <div className="mt-6 flex flex-col gap-6 lg:mt-10 lg:flex-row lg:items-end lg:justify-between">
             <div className="flex min-w-0 items-center gap-4">
               {shop.logoUrl && (
                 // eslint-disable-next-line @next/next/no-img-element -- o logo é um endereço externo escolhido pelo dono
@@ -34,58 +39,55 @@ export default async function PublicPage() {
               )}
               <div className="min-w-0">
                 <h1 className="font-marca text-4xl leading-tight text-balance lg:text-5xl">{shop.name}</h1>
-                {address.length > 0 && <p className="mt-2 text-sm text-white/75">{address.join(" · ")}</p>}
+                {address.length > 0 && (
+                  <a
+                    href={mapsUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-2 inline-flex items-start gap-1.5 text-sm text-white/80 no-underline hover:text-white hover:underline"
+                  >
+                    <MapPin className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                    {address.join(" · ")}
+                  </a>
+                )}
                 {openingHours && (
-                  <div className="mt-3 flex flex-wrap items-center gap-2.5 text-sm text-white/85">
+                  <div className="mt-3 flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-sm">
                     <Badge tone={openNow ? "success" : "neutral"}>{openNow ? "Aberto agora" : "Fechado agora"}</Badge>
-                    <span>{openingHours}</span>
+                    {statusDetail && <span className="font-semibold">{statusDetail}</span>}
+                    <span className="text-white/70">{openingHours}</span>
                   </div>
                 )}
               </div>
             </div>
-            <div className="hidden shrink-0 gap-2 lg:flex">
+
+            <div className="flex shrink-0 gap-2">
               {shop.whatsapp && (
-                <a href={whatsappLink(shop.whatsapp)} target="_blank" rel="noreferrer" className={buttonClass("ghost", "lg", "text-white hover:bg-marinho-hover")}>
+                <a href={whatsappLink(shop.whatsapp)} target="_blank" rel="noreferrer" className={buttonClass("inverse", "lg", "flex-1 px-5 lg:flex-none")}>
                   <MessageCircle />
                   WhatsApp
                 </a>
               )}
-              <LinkButton href="/agendar" variant="secondary" size="lg">
+              <a href="#agendar" className={buttonClass("secondary", "lg", "flex-1 px-5 lg:flex-none")}>
                 <CalendarPlus />
                 Agendar horário
-              </LinkButton>
+              </a>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="mx-auto grid max-w-5xl gap-x-10 gap-y-6 px-4 pt-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:pt-10">
-        <section>
-          <h2 className="mb-3 font-marca text-2xl">Serviços</h2>
-          {services.length === 0 ? (
-            <p className="text-sm text-texto-2">Nenhum serviço disponível no momento.</p>
-          ) : (
-            <ul className="rounded-card border border-borda bg-superficie">
-              {services.map((service) => (
-                <li key={service.id} className="flex items-center justify-between gap-4 border-b border-borda px-4 py-3 last:border-b-0">
-                  <div className="min-w-0">
-                    <p className="font-semibold">
-                      {service.name}
-                      <span className="num ml-2 text-sm font-medium text-texto-2">{service.durationMin} min</span>
-                    </p>
-                    {service.description && <p className="text-sm text-texto-2">{service.description}</p>}
-                  </div>
-                  <span className="num shrink-0 font-bold">{formatBRL(service.price)}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-
-        <div className="flex flex-col gap-6">
-          {plans.length > 0 && (
-            <section>
-              <h2 className="mb-3 font-marca text-2xl">Clube de assinatura</h2>
+      <BookingPanel
+        services={services.filter((service) => service.barberIds.length > 0)}
+        barbers={barbers}
+        today={toLocalDate(new Date())}
+        viewer={viewer}
+        subscription={subscription?.situation === "ATIVA" && subscription.remainingUses > 0 ? subscription : null}
+        aside={
+          plans.length > 0 && (
+            <section aria-labelledby="titulo-clube">
+              <h2 id="titulo-clube" className="mb-3 font-marca text-2xl">
+                Clube de assinatura
+              </h2>
               <ul className="flex flex-col gap-2">
                 {plans.map((plan) => (
                   <li key={plan.id} className="flex items-center justify-between gap-3 rounded-card border border-marinho bg-superficie px-4 py-3.5">
@@ -103,39 +105,9 @@ export default async function PublicPage() {
                 ))}
               </ul>
             </section>
-          )}
-
-          <section>
-            <h2 className="mb-3 font-marca text-2xl">Barbeiros</h2>
-            {barbers.length === 0 ? (
-              <p className="text-sm text-texto-2">Equipe em definição.</p>
-            ) : (
-              <ul className="grid grid-cols-4 gap-2 lg:grid-cols-3">
-                {barbers.map((barber) => (
-                  <li key={barber.id} className="flex flex-col items-center gap-1.5 text-center text-sm font-semibold">
-                    <Avatar name={barber.name} size="md" />
-                    {barber.name.split(" ")[0]}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
-        </div>
-      </main>
-
-      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-borda bg-superficie px-4 pt-3 pb-[max(12px,env(safe-area-inset-bottom))] lg:hidden">
-        <div className="flex gap-2">
-          {shop.whatsapp && (
-            <a href={whatsappLink(shop.whatsapp)} target="_blank" rel="noreferrer" className={buttonClass("secondary", "lg", "px-4")}>
-              <MessageCircle />
-              WhatsApp
-            </a>
-          )}
-          <LinkButton href="/agendar" size="lg" className="flex-1">
-            Agendar horário
-          </LinkButton>
-        </div>
-      </div>
+          )
+        }
+      />
     </div>
   );
 }

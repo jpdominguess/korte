@@ -1,22 +1,6 @@
-import type { Metadata } from "next";
-import { toLocalDate } from "@/domain/shared/time";
-import { useCases } from "@/infrastructure/container";
-import { requireSession } from "~/_lib/session";
-import { BookingFlow } from "./booking-flow";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "Agendar horário" };
-
-export default async function AgendarPage() {
-  const { user } = await requireSession(["CLIENT"], "/agendar");
-  const [page, subscription] = await Promise.all([useCases.getPublicPage.execute(), useCases.getClientSubscription.execute(user)]);
-
-  return (
-    <BookingFlow
-      shopName={page.barbershop?.name ?? "Barbearia"}
-      services={page.services.filter((service) => service.barberIds.length > 0)}
-      barbers={page.barbers}
-      today={toLocalDate(new Date())}
-      subscription={subscription?.situation === "ATIVA" && subscription.remainingUses > 0 ? subscription : null}
-    />
-  );
+/** O agendamento acontece na própria página da barbearia. */
+export default function AgendarPage() {
+  redirect("/#agendar");
 }

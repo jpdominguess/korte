@@ -7,7 +7,14 @@ import { PasswordInput } from "~/_components/password-input";
 import { Button, Check, Field, FormError, Input } from "~/_components/ui";
 import { authClient } from "~/_lib/auth-client";
 
-export function LoginForm({ next }: { next: string }) {
+interface LoginFormProps {
+  next?: string;
+  /** Quando informado, roda no lugar do redirecionamento (ex.: confirmar o agendamento). */
+  onDone?: () => Promise<void>;
+  submitLabel?: string;
+}
+
+export function LoginForm({ next = "/inicio", onDone, submitLabel = "Entrar" }: LoginFormProps) {
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,6 +31,11 @@ export function LoginForm({ next }: { next: string }) {
     });
     if (result.error) {
       setError("E-mail ou senha incorretos.");
+      setPending(false);
+      return;
+    }
+    if (onDone) {
+      await onDone();
       setPending(false);
       return;
     }
@@ -52,7 +64,7 @@ export function LoginForm({ next }: { next: string }) {
       </Check>
       <FormError message={error} />
       <Button type="submit" size="lg" disabled={pending} className="w-full">
-        {pending ? "Entrando..." : "Entrar"}
+        {pending ? "Entrando..." : submitLabel}
       </Button>
     </form>
   );

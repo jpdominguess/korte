@@ -1,9 +1,10 @@
 import type { WorkInterval } from "@/domain/entities/work-schedule";
-import { minutesOfDay, toLocalDate, weekdayOf } from "@/domain/shared/time";
+import { addDays, minutesOfDay, toLocalDate, weekdayOf } from "@/domain/shared/time";
 import type { PublicPageDTO } from "../dto";
 import type { BarberRepository, BarbershopRepository, PlanRepository, ServiceRepository, WorkScheduleRepository } from "../ports";
 
 const WEEKDAYS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+const WEEKDAY_NAMES = ["domingo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado"];
 
 function hourLabel(minutes: number) {
   const hour = Math.floor(minutes / 60);
@@ -23,6 +24,33 @@ function describeOpeningHours(intervals: WorkInterval[]): string | null {
   const start = Math.min(...intervals.map((i) => i.startMin));
   const end = Math.max(...intervals.map((i) => i.endMin));
   return `${dayLabel}, das ${hourLabel(start)} às ${hourLabel(end)}`;
+}
+
+/** Próxima mudança de estado: até que horas fica aberto ou quando abre de novo. */
+function describeStatus(intervals: WorkInterval[], today: string, minute: number): string | null {
+  const todays = intervals.filter((i) => i.weekday === weekdayOf(today));
+  if (todays.some((i) => i.startMin <= minute && minute < i.endMin)) {
+    let end = minute;
+    for (let grew = true; grew; ) {
+      grew = false;
+      for (const i of todays) {
+        if (i.startMin <= end && i.endMin > end) {
+          end = i.endMin;
+          grew = true;
+        }
+      }
+    }
+    return `Fecha às ${hourLabel(end)}`;
+  }
+  for (let offset = 0; offset <= 7; offset++) {
+    const day = addDays(today, offset);
+    const starts = intervals.filter((i) => i.weekday === weekdayOf(day) && (offset > 0 || i.startMin > minute)).map((i) => i.startMin);
+    if (starts.length > 0) {
+      const when = offset === 0 ? "hoje" : offset === 1 ? "amanhã" : WEEKDAY_NAMES[weekdayOf(day)];
+      return `Abre ${when} às ${hourLabel(Math.min(...starts))}`;
+    }
+  }
+  return null;
 }
 
 export class GetPublicPage {
@@ -45,7 +73,8 @@ export class GetPublicPage {
 
     const activeIds = new Set(barbers.map((barber) => barber.id));
     const activeIntervals = intervals.filter((i) => activeIds.has(i.barberProfileId));
-    const weekday = weekdayOf(toLocalDate(now));
+    const today = toLocalDate(now);
+    const weekday = weekdayOf(today);
     const minute = minutesOfDay(now);
 
     return {
@@ -63,6 +92,7 @@ export class GetPublicPage {
       plans: plans.map(({ id, name, price, usesPerCycle, active, serviceIds, serviceNames }) => ({ id, name, price, usesPerCycle, active, serviceIds, serviceNames })),
       openingHours: describeOpeningHours(activeIntervals),
       openNow: activeIntervals.some((i) => i.weekday === weekday && i.startMin <= minute && minute < i.endMin),
+      statusDetail: describeStatus(activeIntervals, today, minute),
     };
   }
 }

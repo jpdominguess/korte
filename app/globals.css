@@ -84,3 +84,16 @@
   background-color: var(--color-fundo);
   background-image: repeating-linear-gradient(135deg, var(--color-muted) 0 6px, transparent 6px 12px);
 }
+
+@keyframes surgir {
+  from {
+    opacity: 0.2;
+    transform: translateY(6px);
+  }
+}
+
+@utility surgir {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: surgir 260ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}
