@@ -4,6 +4,7 @@ import { CreateService, ListServices, UpdateService } from "@/application/use-ca
 import {
   CreateBarber,
   EnableOwnerBarberProfile,
+  GetBarberPhoto,
   GetManagedBarbers,
   ListBarbers,
   UpdateBarber,
@@ -78,6 +79,7 @@ export const useCases = {
   getManagedBarbers: new GetManagedBarbers(barbers),
   createBarber: new CreateBarber(barbers, accounts),
   updateBarber: new UpdateBarber(barbers),
+  getBarberPhoto: new GetBarberPhoto(barbers),
   enableOwnerBarberProfile: new EnableOwnerBarberProfile(barbers),
   getPublicPage: new GetPublicPage(barbershops, services, barbers, workSchedules, plans),
   listPlans: new ListPlans(plans),

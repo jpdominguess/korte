@@ -86,6 +86,7 @@ export class GetPublicPage {
       barbers: barbers.map((barber) => ({
         id: barber.id,
         name: barber.name,
+        photoUrl: barber.photoUrl,
         serviceIds: barber.serviceIds,
         workdays: [...new Set(activeIntervals.filter((i) => i.barberProfileId === barber.id).map((i) => i.weekday))],
       })),

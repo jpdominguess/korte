@@ -31,6 +31,7 @@ export interface BarberDTO {
   name: string;
   email: string;
   phone: string | null;
+  photoUrl: string | null;
   active: boolean;
   isOwner: boolean;
   serviceIds: string[];
@@ -39,6 +40,7 @@ export interface BarberDTO {
 export interface PublicBarberDTO {
   id: string;
   name: string;
+  photoUrl: string | null;
   serviceIds: string[];
   workdays: number[];
 }

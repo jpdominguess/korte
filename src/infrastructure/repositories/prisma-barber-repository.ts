@@ -12,6 +12,7 @@ function toDTO(row: Row): BarberDTO {
     name: row.user.name,
     email: row.user.email,
     phone: row.user.phone,
+    photoUrl: row.user.image ? `/api/barbeiros/${row.id}/foto?v=${row.user.updatedAt.getTime()}` : null,
     active: row.active,
     isOwner: row.user.role === "OWNER",
     serviceIds: row.services.map((s) => s.serviceId),
@@ -63,5 +64,14 @@ export class PrismaBarberRepository implements BarberRepository {
 
   async setActive(id: string, active: boolean) {
     await this.db.barberProfile.update({ where: { id }, data: { active } });
+  }
+
+  async getPhoto(id: string) {
+    const row = await this.db.barberProfile.findUnique({ where: { id }, select: { user: { select: { image: true } } } });
+    return row?.user.image ?? null;
+  }
+
+  async setPhoto(id: string, photo: string | null) {
+    await this.db.barberProfile.update({ where: { id }, data: { user: { update: { image: photo } } } });
   }
 }

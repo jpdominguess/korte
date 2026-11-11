@@ -128,8 +128,22 @@ export function Badge({ tone = "neutral", children }: { tone?: Tone; children: R
   );
 }
 
-export function Avatar({ name, size = "md", dark = false }: { name: string; size?: "xs" | "sm" | "md" | "lg"; dark?: boolean }) {
-  const sizes = { xs: "size-6 text-[10px]", sm: "size-8 text-xs", md: "size-10 text-sm", lg: "size-14 text-base" };
+export function Avatar({
+  name,
+  src,
+  size = "md",
+  dark = false,
+}: {
+  name: string;
+  src?: string | null;
+  size?: "xs" | "sm" | "md" | "lg" | "xl";
+  dark?: boolean;
+}) {
+  const sizes = { xs: "size-6 text-[10px]", sm: "size-8 text-xs", md: "size-10 text-sm", lg: "size-14 text-base", xl: "size-16 text-lg" };
+  if (src) {
+    // eslint-disable-next-line @next/next/no-img-element -- foto servida pela própria API, já reduzida no envio
+    return <img src={src} alt="" aria-hidden="true" className={`shrink-0 rounded-full bg-marinho-claro object-cover ${sizes[size]}`} />;
+  }
   return (
     <span
       aria-hidden="true"

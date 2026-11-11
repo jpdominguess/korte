@@ -28,6 +28,7 @@ export interface NewBarber {
   phone: string | null;
   password: string;
   serviceIds: string[];
+  photo?: string | null;
 }
 
 export class CreateBarber {
@@ -45,7 +46,9 @@ export class CreateBarber {
       password: input.password,
       role: "BARBER",
     });
-    return this.barbers.create(userId, input.serviceIds);
+    const id = await this.barbers.create(userId, input.serviceIds);
+    if (input.photo) await this.barbers.setPhoto(id, input.photo);
+    return id;
   }
 }
 
@@ -56,6 +59,16 @@ export class UpdateBarber {
     actor.assertOwner();
     if (!(await this.barbers.findById(id))) throw notFound("Barbeiro");
     await this.barbers.update(id, data);
+    if (data.photo !== undefined) await this.barbers.setPhoto(id, data.photo);
+  }
+}
+
+/** Foto pública do barbeiro, guardada como imagem embutida (data URL). */
+export class GetBarberPhoto {
+  constructor(private readonly barbers: BarberRepository) {}
+
+  execute(id: string) {
+    return this.barbers.getPhoto(id);
   }
 }
 

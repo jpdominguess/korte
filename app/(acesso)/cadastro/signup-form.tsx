@@ -26,7 +26,6 @@ export function SignupForm({ next = "/inicio", onDone, submitLabel = "Criar cont
     const result = await authClient.signUp.email({
       name: String(form.get("name")).trim(),
       email: String(form.get("email")),
-      phone: String(form.get("phone")).trim(),
       password: String(form.get("password")),
     });
     if (result.error) {
@@ -54,9 +53,6 @@ export function SignupForm({ next = "/inicio", onDone, submitLabel = "Criar cont
       </Field>
       <Field label="E-mail" htmlFor="email">
         <Input id="email" name="email" type="email" autoComplete="email" required className="h-12" />
-      </Field>
-      <Field label="Celular" htmlFor="phone">
-        <Input id="phone" name="phone" type="tel" autoComplete="tel" required placeholder="(19) 99999-9999" className="h-12" />
       </Field>
       <Field label="Senha" htmlFor="password" hint="Pelo menos 8 caracteres.">
         <PasswordInput id="password" name="password" autoComplete="new-password" minLength={8} />

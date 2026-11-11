@@ -1,13 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { BarberDTO, ServiceDTO } from "@/application/dto";
 import { Button, Card, Check, Field, FormError, Input, LinkButton } from "~/_components/ui";
 import { useSubmit } from "~/_lib/use-submit";
+import { PhotoField } from "./photo-field";
 
 export function BarberForm({ barber, services }: { barber?: BarberDTO; services: ServiceDTO[] }) {
   const router = useRouter();
   const { pending, error, submit } = useSubmit();
+  const [photo, setPhoto] = useState<string | null | undefined>(undefined);
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -16,6 +19,7 @@ export function BarberForm({ barber, services }: { barber?: BarberDTO; services:
       name: form.get("name"),
       phone: form.get("phone"),
       serviceIds: form.getAll("serviceIds"),
+      photo,
     };
     const done = () => {
       router.push("/painel/barbeiros");
@@ -31,6 +35,10 @@ export function BarberForm({ barber, services }: { barber?: BarberDTO; services:
   return (
     <Card className="max-w-2xl p-4 lg:p-6">
       <form onSubmit={onSubmit} className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1.5">
+          <span className="text-sm font-semibold">Foto</span>
+          <PhotoField name={barber?.name ?? ""} initialUrl={barber?.photoUrl ?? null} onChange={setPhoto} />
+        </div>
         <Field label="Nome" htmlFor="name">
           <Input id="name" name="name" required defaultValue={barber?.name} />
         </Field>

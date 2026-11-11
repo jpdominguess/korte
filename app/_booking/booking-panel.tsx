@@ -34,7 +34,8 @@ interface Props {
 
 export function BookingPanel({ services, barbers, today, viewer: initialViewer, subscription, aside }: Props) {
   const router = useRouter();
-  const summaryRef = useRef<HTMLElement>(null);
+  const confirmRef = useRef<HTMLElement>(null);
+  const scrollBlock = useRef<ScrollLogicalPosition>("nearest");
   const request = useRef(0);
   const [viewer, setViewer] = useState<Viewer>(initialViewer);
   const [serviceId, setServiceId] = useState<string | null>(null);
@@ -47,14 +48,19 @@ export function BookingPanel({ services, barbers, today, viewer: initialViewer, 
   const [auth, setAuth] = useState<"signup" | "login" | null>(null);
   const [saving, setSaving] = useState(false);
   const [bookingError, setBookingError] = useState<string | null>(null);
-  const [summaryFocus, setSummaryFocus] = useState(0);
+  const [scrollRequest, setScrollRequest] = useState(0);
 
-  // Rola até o resumo só depois que o formulário de conta já apareceu na tela.
+  // Leva a pessoa até o botão de agendar depois que ele já está na tela.
   useEffect(() => {
-    if (summaryFocus === 0) return;
+    if (scrollRequest === 0) return;
     const smooth = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    summaryRef.current?.scrollIntoView({ behavior: smooth ? "smooth" : "auto", block: "start" });
-  }, [summaryFocus]);
+    confirmRef.current?.scrollIntoView({ behavior: smooth ? "smooth" : "auto", block: scrollBlock.current });
+  }, [scrollRequest]);
+
+  function scrollToConfirm(block: ScrollLogicalPosition) {
+    scrollBlock.current = block;
+    setScrollRequest((n) => n + 1);
+  }
 
   const service = services.find((s) => s.id === serviceId) ?? null;
   const barber = barbers.find((b) => b.id === barberId) ?? null;
@@ -141,6 +147,13 @@ export function BookingPanel({ services, barbers, today, viewer: initialViewer, 
     else clearTime();
   }
 
+  function chooseSlot(chosen: string) {
+    setSlot(chosen);
+    setAuth(null);
+    setBookingError(null);
+    scrollToConfirm("nearest");
+  }
+
   async function book() {
     if (!service || !barber || !slot || !date) return;
     setSaving(true);
@@ -166,20 +179,17 @@ export function BookingPanel({ services, barbers, today, viewer: initialViewer, 
     await book();
   }
 
-  function confirm() {
+  function schedule() {
     if (viewer === "CLIENT") {
       book();
       return;
     }
     setAuth("signup");
-    setSummaryFocus((n) => n + 1);
+    scrollToConfirm("start");
   }
 
   return (
-    <div
-      id="agendar"
-      className={`mx-auto grid max-w-5xl scroll-mt-4 gap-x-10 gap-y-8 px-4 pt-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:pt-10 lg:pb-16 ${slot ? "pb-28" : "pb-10"}`}
-    >
+    <div id="agendar" className="mx-auto grid max-w-5xl scroll-mt-4 gap-x-10 gap-y-8 px-4 pt-6 pb-12 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:pt-10 lg:pb-16">
       <div className="flex min-w-0 flex-col gap-8">
         <section aria-labelledby="titulo-servico">
           <h2 id="titulo-servico" className="mb-3 font-marca text-2xl">
@@ -240,7 +250,7 @@ export function BookingPanel({ services, barbers, today, viewer: initialViewer, 
                       onClick={() => chooseBarber(b)}
                       className={`flex h-full w-full flex-col items-center gap-2 rounded-card border px-2 py-3 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-45 ${selected ? "border-marinho bg-marinho-claro" : "border-borda bg-superficie hover:border-borda-controle hover:bg-muted"}`}
                     >
-                      <Avatar name={b.name} size="lg" dark={selected} />
+                      <Avatar name={b.name} src={b.photoUrl} size="xl" dark={selected} />
                       <span>{b.name.split(" ")[0]}</span>
                       {!available && <span className="text-xs font-medium text-texto-2">Não faz este serviço</span>}
                     </button>
@@ -311,10 +321,7 @@ export function BookingPanel({ services, barbers, today, viewer: initialViewer, 
                                   key={s}
                                   type="button"
                                   aria-pressed={selected}
-                                  onClick={() => {
-                                    setSlot(s);
-                                    setBookingError(null);
-                                  }}
+                                  onClick={() => chooseSlot(s)}
                                   className={`num h-11 rounded-controle border text-sm font-semibold transition-colors ${selected ? "border-marinho bg-marinho text-white" : "border-borda-controle bg-superficie text-marinho hover:bg-muted"}`}
                                 >
                                   {formatTime(new Date(s))}
@@ -331,108 +338,79 @@ export function BookingPanel({ services, barbers, today, viewer: initialViewer, 
             </div>
           )}
         </section>
-      </div>
 
-      <div className={`flex min-w-0 flex-col gap-8 lg:self-start ${auth ? "" : "lg:sticky lg:top-6"}`}>
-        <section
-          ref={summaryRef}
-          aria-labelledby="titulo-resumo"
-          className="scroll-mt-4 rounded-card border border-borda bg-superficie p-5 shadow-[0_1px_2px_rgba(5,9,41,0.05),0_12px_32px_-16px_rgba(5,9,41,0.22)]"
-        >
-          <h2 id="titulo-resumo" className="font-marca text-2xl">
-            Seu horário
-          </h2>
-          <dl className="mt-3 divide-y divide-borda text-sm">
-            <SummaryRow label="Serviço" value={service && `${service.name} · ${service.durationMin} min`} />
-            <SummaryRow label="Profissional" value={barber?.name} />
-            <SummaryRow label="Quando" value={slotStart && `${formatLongDate(slotStart)}, ${formatTime(slotStart)}`} />
-            <SummaryRow
-              label="Valor"
-              value={
-                service &&
-                (covered && subscription ? (
-                  <>
-                    {formatBRL(0)} <s className="font-normal text-texto-2">{formatBRL(service.price)}</s>
-                    <small className="block font-medium text-texto-2">Coberto pelo {subscription.planName}</small>
-                  </>
-                ) : (
-                  formatBRL(service.price)
-                ))
-              }
-            />
-          </dl>
-
-          <div className="mt-4 flex flex-col gap-3">
-            <FormError message={bookingError} />
-            {viewer === "STAFF" ? (
-              <Notice tone="neutral">
-                Você entrou como equipe da barbearia. Para marcar para um cliente, use{" "}
-                <Link href="/agenda/novo" className="font-semibold text-destaque">
-                  o agendamento presencial
-                </Link>
-                .
-              </Notice>
-            ) : auth ? (
-              <div className="surgir border-t border-borda pt-4">
-                <p className="font-bold">{auth === "signup" ? "Crie sua conta para confirmar" : "Entre para confirmar"}</p>
-                <p className="mt-1 mb-4 text-sm text-texto-2">
-                  Assim a barbearia sabe quem vem, você recebe a confirmação por e-mail e pode cancelar pelo site.
+        {service && barber && (
+          <section
+            ref={confirmRef}
+            aria-labelledby="titulo-confirmar"
+            className="surgir scroll-mt-4 rounded-card border border-borda bg-superficie p-5 shadow-[0_1px_2px_rgba(5,9,41,0.05),0_12px_32px_-16px_rgba(5,9,41,0.22)]"
+          >
+            <h2 id="titulo-confirmar" className="font-marca text-2xl">
+              Seu horário
+            </h2>
+            <div className="mt-3 flex items-center gap-3">
+              <Avatar name={barber.name} src={barber.photoUrl} size="lg" />
+              <div className="min-w-0 flex-1">
+                <p className="leading-tight font-bold">
+                  {service.name} com {barber.name.split(" ")[0]}
                 </p>
-                {auth === "signup" ? (
-                  <SignupForm onDone={bookAfterAuth} submitLabel="Criar conta e confirmar" />
-                ) : (
-                  <LoginForm onDone={bookAfterAuth} submitLabel="Entrar e confirmar" />
-                )}
-                <p className="mt-4 text-sm text-texto-2">
-                  {auth === "signup" ? "Já tem conta? " : "Ainda não tem conta? "}
-                  <button type="button" onClick={() => setAuth(auth === "signup" ? "login" : "signup")} className="font-semibold text-destaque hover:underline">
-                    {auth === "signup" ? "Entrar" : "Criar conta"}
-                  </button>
+                <p className={`num mt-0.5 text-sm ${slotStart ? "text-texto" : "text-texto-2"}`}>
+                  {slotStart ? `${formatLongDate(slotStart)}, ${formatTime(slotStart)}` : "Escolha um horário acima"}
                 </p>
               </div>
-            ) : (
-              <>
-                <Button size="lg" className="w-full" disabled={!slot || saving} onClick={confirm}>
-                  {saving ? "Confirmando..." : "Confirmar agendamento"}
-                </Button>
-                <p className="text-xs text-texto-2">
-                  {viewer === "CLIENT" ? "" : "Na próxima etapa você cria sua conta ou entra. "}
-                  Pagamento na barbearia. Dá para cancelar pelo site até 2 horas antes.
-                </p>
-              </>
-            )}
-          </div>
-        </section>
-
-        {aside}
-      </div>
-
-      {slot && slotStart && service && barber && !auth && viewer !== "STAFF" && (
-        <div className="fixed inset-x-0 bottom-0 z-20 border-t border-borda bg-superficie px-4 pt-3 pb-[max(12px,env(safe-area-inset-bottom))] lg:hidden">
-          <div className="mx-auto flex max-w-xl items-center gap-3">
-            <div className="min-w-0 flex-1 leading-tight">
-              <p className="num truncate font-bold">
-                {date && `${WEEKDAY_SHORT[weekdayOf(date)]} ${date.slice(8)}/${date.slice(5, 7)}`} · {formatTime(slotStart)}
-              </p>
-              <p className="truncate text-xs text-texto-2">
-                {service.name} com {barber.name.split(" ")[0]}
+              <p className="num shrink-0 text-right leading-tight font-bold">
+                {covered ? formatBRL(0) : formatBRL(service.price)}
+                {covered && <small className="block text-xs font-medium text-texto-2">pelo plano</small>}
               </p>
             </div>
-            <Button size="lg" disabled={saving} onClick={confirm}>
-              {saving ? "Confirmando..." : "Confirmar"}
-            </Button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
 
-function SummaryRow({ label, value }: { label: string; value: ReactNode }) {
-  return (
-    <div className="flex items-baseline justify-between gap-4 py-2.5">
-      <dt className="shrink-0 text-texto-2">{label}</dt>
-      <dd className={`num text-right ${value ? "font-semibold" : "text-texto-3"}`}>{value || "—"}</dd>
+            <div className="mt-4 flex flex-col gap-3">
+              <FormError message={bookingError} />
+              {viewer === "STAFF" ? (
+                <Notice tone="neutral">
+                  Você entrou como equipe da barbearia. Para marcar para um cliente, use{" "}
+                  <Link href="/agenda/novo" className="font-semibold text-destaque">
+                    o agendamento presencial
+                  </Link>
+                  .
+                </Notice>
+              ) : auth ? (
+                <div className="surgir border-t border-borda pt-4">
+                  <p className="font-bold">{auth === "signup" ? "Falta só criar sua conta" : "Entre na sua conta"}</p>
+                  <p className="mt-1 mb-4 text-sm text-texto-2">
+                    {auth === "signup"
+                      ? "É com ela que a barbearia sabe quem vem. Você também recebe a confirmação por e-mail e pode cancelar pelo site."
+                      : "Use o e-mail e a senha que você cadastrou."}
+                  </p>
+                  {auth === "signup" ? (
+                    <SignupForm onDone={bookAfterAuth} submitLabel="Criar conta e agendar" />
+                  ) : (
+                    <LoginForm onDone={bookAfterAuth} submitLabel="Entrar e agendar" />
+                  )}
+                  <p className="mt-4 text-sm text-texto-2">
+                    {auth === "signup" ? "Já tem conta? " : "Ainda não tem conta? "}
+                    <button type="button" onClick={() => setAuth(auth === "signup" ? "login" : "signup")} className="font-semibold text-destaque hover:underline">
+                      {auth === "signup" ? "Entrar" : "Criar conta"}
+                    </button>
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <Button size="lg" className="w-full" disabled={!slot || saving} onClick={schedule}>
+                    {saving ? "Agendando..." : slot ? "Agendar horário" : "Escolha um horário"}
+                  </Button>
+                  <p className="text-xs text-texto-2">
+                    {viewer === "CLIENT" ? "" : "Para confirmar, você só informa nome, e-mail e uma senha. "}
+                    Pagamento na barbearia. Dá para cancelar pelo site até 2 horas antes.
+                  </p>
+                </>
+              )}
+            </div>
+          </section>
+        )}
+      </div>
+
+      {aside && <div className="flex min-w-0 flex-col gap-8 lg:sticky lg:top-6 lg:self-start">{aside}</div>}
     </div>
   );
 }
