@@ -90,6 +90,7 @@ export interface PublicPageDTO {
   plans: Array<Omit<PlanDTO, "activeSubscribers">>;
   openingHours: string | null;
   openNow: boolean;
+  statusDetail: string | null;
 }
 
 export interface AppointmentDTO {

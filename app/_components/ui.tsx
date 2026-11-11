@@ -3,7 +3,7 @@ import { CircleAlert, CircleCheck, Info, TriangleAlert } from "lucide-react";
 import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from "react";
 import { initials } from "@/domain/shared/format";
 
-type Variant = "primary" | "secondary" | "ghost" | "danger";
+type Variant = "primary" | "secondary" | "ghost" | "danger" | "inverse";
 type Size = "sm" | "md" | "lg";
 
 const variantClass: Record<Variant, string> = {
@@ -11,6 +11,7 @@ const variantClass: Record<Variant, string> = {
   secondary: "border-borda-controle bg-superficie text-marinho hover:bg-muted",
   ghost: "border-transparent bg-transparent text-marinho hover:bg-muted",
   danger: "border-transparent bg-erro text-white hover:bg-erro-escuro",
+  inverse: "border-white/30 bg-transparent text-white hover:border-white/60 hover:bg-white/10 focus-visible:outline-white",
 };
 
 const sizeClass: Record<Size, string> = {

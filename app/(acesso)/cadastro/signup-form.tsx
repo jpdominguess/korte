@@ -6,7 +6,14 @@ import { PasswordInput } from "~/_components/password-input";
 import { Button, Field, FormError, Input } from "~/_components/ui";
 import { authClient } from "~/_lib/auth-client";
 
-export function SignupForm({ next }: { next: string }) {
+interface SignupFormProps {
+  next?: string;
+  /** Quando informado, roda no lugar do redirecionamento (ex.: confirmar o agendamento). */
+  onDone?: () => Promise<void>;
+  submitLabel?: string;
+}
+
+export function SignupForm({ next = "/inicio", onDone, submitLabel = "Criar conta" }: SignupFormProps) {
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -31,6 +38,11 @@ export function SignupForm({ next }: { next: string }) {
       setPending(false);
       return;
     }
+    if (onDone) {
+      await onDone();
+      setPending(false);
+      return;
+    }
     router.replace(next);
     router.refresh();
   }
@@ -51,7 +63,7 @@ export function SignupForm({ next }: { next: string }) {
       </Field>
       <FormError message={error} />
       <Button type="submit" size="lg" disabled={pending} className="w-full">
-        {pending ? "Criando conta..." : "Criar conta"}
+        {pending ? "Criando conta..." : submitLabel}
       </Button>
     </form>
   );
