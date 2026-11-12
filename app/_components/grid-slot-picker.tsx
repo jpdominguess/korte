@@ -27,10 +27,14 @@ export function GridSlotPicker({ barberId, date, first, pxPerHour, free }: Props
     return free.some(([start, end]) => minute >= start && minute < end) ? minute : null;
   }
 
+  // O balão cobre até 30 minutos, mas para no fim do espaço livre (ex.: antes do almoço).
+  const hoverEnd = hover === null ? null : (free.find(([start, end]) => hover >= start && hover < end)?.[1] ?? hover + 3 * STEP);
+  const ghostMinutes = hover === null || hoverEnd === null ? 0 : Math.min(3 * STEP, hoverEnd - hover);
+
   return (
     <div
       aria-hidden="true"
-      className={`absolute inset-0 ${hover !== null ? "cursor-pointer" : ""}`}
+      className={`absolute inset-0 z-[1] ${hover !== null ? "cursor-pointer" : ""}`}
       onMouseMove={(event) => setHover(minuteAt(event))}
       onMouseLeave={() => setHover(null)}
       onClick={(event) => {
@@ -40,8 +44,8 @@ export function GridSlotPicker({ barberId, date, first, pxPerHour, free }: Props
     >
       {hover !== null && (
         <div
-          className="pointer-events-none absolute inset-x-1 flex items-center rounded-md border border-dashed border-destaque bg-info-bg px-2 text-xs font-semibold text-info"
-          style={{ top: ((hover - first) * pxPerHour) / 60 + 1, height: (3 * STEP * pxPerHour) / 60 - 2 }}
+          className="pointer-events-none absolute inset-x-1 flex items-center overflow-hidden rounded-md whitespace-nowrap border border-dashed border-destaque bg-info-bg px-2 text-xs font-semibold text-info"
+          style={{ top: ((hover - first) * pxPerHour) / 60 + 1, height: Math.max((ghostMinutes * pxPerHour) / 60 - 2, 20) }}
         >
           Marcar às {minutesToTime(hover)}
         </div>

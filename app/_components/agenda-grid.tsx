@@ -32,7 +32,9 @@ function subtractRanges(whole: [number, number], busy: Array<[number, number]>):
   return free.filter(([start, end]) => end > start);
 }
 
-export function AgendaGrid({ agenda, barbers, date, now }: { agenda: AgendaDTO; barbers: BarberDTO[]; date: string; now: Date }) {
+export function AgendaGrid({ agenda: fullAgenda, barbers, date, now }: { agenda: AgendaDTO; barbers: BarberDTO[]; date: string; now: Date }) {
+  // Cancelados ficam no histórico; na grade só ocupariam (e bloqueariam) um espaço que está livre.
+  const agenda = { ...fullAgenda, appointments: fullAgenda.appointments.filter((a) => a.status !== "CANCELADO") };
   const weekday = weekdayOf(date);
   const dayIntervals = agenda.workIntervals.filter((i) => i.weekday === weekday);
 
