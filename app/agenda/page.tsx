@@ -3,10 +3,10 @@ import { redirect } from "next/navigation";
 import { formatLongDate } from "@/domain/shared/format";
 import { localToInstant } from "@/domain/shared/time";
 import { useCases } from "@/infrastructure/container";
-import { AgendaList } from "~/_components/agenda-list";
+import { AgendaGrid } from "~/_components/agenda-grid";
 import { AgendaToolbar, readAgendaParams } from "~/_components/agenda-toolbar";
 import { AgendaWeek } from "~/_components/agenda-week";
-import { Card, EmptyState, LinkButton, PageHeader } from "~/_components/ui";
+import { LinkButton, PageHeader } from "~/_components/ui";
 import { requireSession } from "~/_lib/session";
 
 export const metadata: Metadata = { title: "Minha agenda" };
@@ -17,7 +17,12 @@ export default async function MinhaAgendaPage({ searchParams }: { searchParams: 
 
   const now = new Date();
   const { date, view, start, from, to } = readAgendaParams(await searchParams, now);
-  const { appointments, blocks } = await useCases.getAgenda.execute(user, { from, to, barberProfileId: user.barberProfileId });
+  const [agenda, managed] = await Promise.all([
+    useCases.getAgenda.execute(user, { from, to, barberProfileId: user.barberProfileId }),
+    useCases.getManagedBarbers.execute(user),
+  ]);
+  const { appointments, blocks } = agenda;
+  const me = managed.find((barber) => barber.id === user.barberProfileId);
   const done = appointments.filter((a) => a.status === "CONCLUIDO").length;
 
   return (
@@ -37,13 +42,7 @@ export default async function MinhaAgendaPage({ searchParams }: { searchParams: 
       {view === "semana" ? (
         <AgendaWeek start={start} appointments={appointments} blocks={blocks} now={now} />
       ) : (
-        <Card>
-          {appointments.length + blocks.length === 0 ? (
-            <EmptyState title="Nenhum agendamento neste dia" />
-          ) : (
-            <AgendaList appointments={appointments} blocks={blocks} now={now} />
-          )}
-        </Card>
+        me && <AgendaGrid agenda={agenda} barbers={[me]} date={date} now={now} />
       )}
     </>
   );

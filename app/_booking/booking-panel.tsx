@@ -379,7 +379,7 @@ export function BookingPanel({ services, barbers, today, viewer: initialViewer, 
                   <p className="font-bold">{auth === "signup" ? "Falta só criar sua conta" : "Entre na sua conta"}</p>
                   <p className="mt-1 mb-4 text-sm text-texto-2">
                     {auth === "signup"
-                      ? "É com ela que a barbearia sabe quem vem. Você também recebe a confirmação por e-mail e pode cancelar pelo site."
+                      ? "Você recebe a confirmação de agendamento por e-mail e pode cancelar caso necessário."
                       : "Use o e-mail e a senha que você cadastrou."}
                   </p>
                   {auth === "signup" ? (
