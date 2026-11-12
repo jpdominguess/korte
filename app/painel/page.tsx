@@ -3,8 +3,9 @@ import { Banknote, ChevronLeft, ChevronRight, Repeat, Scissors, type LucideIcon 
 import { formatBRL, formatLocalDate, formatMonth, formatShortDate } from "@/domain/shared/format";
 import { addMonths, currentMonth, localToInstant, toLocalDate } from "@/domain/shared/time";
 import { useCases } from "@/infrastructure/container";
-import { Avatar, Card, EmptyState, LinkButton, PageHeader } from "~/_components/ui";
+import { Card, LinkButton, PageHeader } from "~/_components/ui";
 import { requireSession } from "~/_lib/session";
+import { BarberDistribution } from "./barber-distribution";
 import { RevenueChart } from "./revenue-chart";
 
 export const metadata: Metadata = { title: "Painel" };
@@ -26,7 +27,11 @@ export default async function PainelPage({ searchParams }: { searchParams: Promi
   const { user } = await requireSession(["OWNER"]);
   const { mes } = await searchParams;
   const now = new Date();
-  const data = await useCases.getOwnerDashboard.execute(user, mes && /^\d{4}-\d{2}$/.test(mes) ? mes : undefined, now);
+  const [data, team] = await Promise.all([
+    useCases.getOwnerDashboard.execute(user, mes && /^\d{4}-\d{2}$/.test(mes) ? mes : undefined, now),
+    useCases.listBarbers.execute(user),
+  ]);
+  const photos = new Map(team.map((barber) => [barber.id, barber.photoUrl]));
   const today = toLocalDate(now);
   const isCurrent = data.month === currentMonth(now);
   const short = (date: string) => formatShortDate(localToInstant(date, 12 * 60));
@@ -101,64 +106,10 @@ export default async function PainelPage({ searchParams }: { searchParams: Promi
         </Card>
 
         <Card>
-          <div className="border-b border-borda px-4 py-4 lg:px-6">
-            <h2 className="font-bold">Distribuição por barbeiro</h2>
-            <p className="text-sm text-texto-2">Atendimentos concluídos no período</p>
-          </div>
-          {data.barbers.length === 0 ? (
-            <EmptyState title="Nenhum atendimento concluído neste período" />
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[420px] border-collapse text-sm">
-                <thead>
-                  <tr className="text-left text-xs text-texto-2">
-                    <th scope="col" className="px-4 py-2.5 font-semibold lg:px-6">Barbeiro</th>
-                    <th scope="col" className="px-2 py-2.5 text-right font-semibold">Atend.</th>
-                    <th scope="col" className="px-2 py-2.5 font-semibold">Participação</th>
-                    <th scope="col" className="px-4 py-2.5 text-right font-semibold lg:px-6">Faturamento</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.barbers.map((barber) => (
-                    <tr key={barber.id} className="border-t border-borda">
-                      <td className="px-4 py-2.5 lg:px-6">
-                        <span className="flex items-center gap-2.5 font-bold">
-                          <Avatar name={barber.name} size="sm" />
-                          {barber.name}
-                        </span>
-                      </td>
-                      <td className="num px-2 py-2.5 text-right">{barber.completed}</td>
-                      <td className="px-2 py-2.5">
-                        <span className="num flex items-center gap-2 text-xs text-texto-2">
-                          <span className="h-1.5 w-16 overflow-hidden rounded-full bg-muted">
-                            <span className="block h-full rounded-full bg-destaque" style={{ width: `${barber.share * 100}%` }} />
-                          </span>
-                          {Math.round(barber.share * 100)}%
-                        </span>
-                      </td>
-                      <td className="num px-4 py-2.5 text-right lg:px-6">{formatBRL(barber.revenue)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-                <tfoot>
-                  <tr className="border-t border-borda font-semibold">
-                    <td className="px-4 py-2.5 lg:px-6">Atendimentos</td>
-                    <td className="num px-2 py-2.5 text-right">{data.completed.total}</td>
-                    <td />
-                    <td className="num px-4 py-2.5 text-right lg:px-6">{formatBRL(data.revenue.appointments)}</td>
-                  </tr>
-                  <tr className="border-t border-borda">
-                    <td colSpan={3} className="px-4 py-2.5 lg:px-6">Ativações e renovações de assinatura</td>
-                    <td className="num px-4 py-2.5 text-right lg:px-6">{formatBRL(data.revenue.subscriptions)}</td>
-                  </tr>
-                  <tr className="border-t border-borda bg-fundo font-bold">
-                    <td colSpan={3} className="px-4 py-2.5 lg:px-6">Faturamento registrado</td>
-                    <td className="num px-4 py-2.5 text-right lg:px-6">{formatBRL(data.revenue.total)}</td>
-                  </tr>
-                </tfoot>
-              </table>
-            </div>
-          )}
+          <BarberDistribution
+            barbers={data.barbers.map((barber) => ({ ...barber, photoUrl: photos.get(barber.id) ?? null }))}
+            totals={{ completed: data.completed.total, appointments: data.revenue.appointments, subscriptions: data.revenue.subscriptions, total: data.revenue.total }}
+          />
         </Card>
       </div>
     </>
