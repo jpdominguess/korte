@@ -20,6 +20,9 @@ const PERIODS = [
   { name: "Noite", from: 18 * 60, to: 24 * 60 },
 ];
 
+/** Dois primeiros nomes, para diferenciar barbeiros com o mesmo primeiro nome. */
+const twoNames = (name: string) => name.trim().split(/\s+/).slice(0, 2);
+
 /** Quem está vendo a página: cliente logado, alguém da equipe ou visitante. */
 export type Viewer = "CLIENT" | "STAFF" | null;
 
@@ -247,12 +250,19 @@ export function BookingPanel({ services, barbers, today, viewer: initialViewer, 
                       type="button"
                       aria-pressed={selected}
                       disabled={!available}
+                      title={available ? undefined : "Não faz este serviço"}
                       onClick={() => chooseBarber(b)}
-                      className={`flex h-full w-full flex-col items-center gap-2 rounded-card border px-2 py-3 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-45 ${selected ? "border-marinho bg-marinho-claro" : "border-borda bg-superficie hover:border-borda-controle hover:bg-muted"}`}
+                      className={`flex h-full w-full flex-col items-center gap-1.5 rounded-card border px-2 py-2.5 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-45 ${selected ? "border-marinho bg-marinho-claro" : "border-borda bg-superficie hover:border-borda-controle hover:bg-muted"}`}
                     >
-                      <Avatar name={b.name} src={b.photoUrl} size="xl" dark={selected} />
-                      <span>{b.name.split(" ")[0]}</span>
-                      {!available && <span className="text-xs font-medium text-texto-2">Não faz este serviço</span>}
+                      <Avatar name={b.name} src={b.photoUrl} size="lg" dark={selected} />
+                      <span className="w-full leading-tight">
+                        {twoNames(b.name).map((part) => (
+                          <span key={part} className="block truncate">
+                            {part}
+                          </span>
+                        ))}
+                      </span>
+                      {!available && <span className="sr-only">Não faz este serviço</span>}
                     </button>
                   </li>
                 );
@@ -270,7 +280,7 @@ export function BookingPanel({ services, barbers, today, viewer: initialViewer, 
               Escolha o serviço e o profissional para ver os horários livres.
             </p>
           ) : days.length === 0 ? (
-            <Notice tone="neutral">{barber.name.split(" ")[0]} ainda não tem expediente nas próximas semanas.</Notice>
+            <Notice tone="neutral">{twoNames(barber.name).join(" ")} ainda não tem expediente nas próximas semanas.</Notice>
           ) : (
             <div className="surgir">
               <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:thin]">
@@ -352,7 +362,7 @@ export function BookingPanel({ services, barbers, today, viewer: initialViewer, 
               <Avatar name={barber.name} src={barber.photoUrl} size="lg" />
               <div className="min-w-0 flex-1">
                 <p className="leading-tight font-bold">
-                  {service.name} com {barber.name.split(" ")[0]}
+                  {service.name} com {twoNames(barber.name).join(" ")}
                 </p>
                 <p className={`num mt-0.5 text-sm ${slotStart ? "text-texto" : "text-texto-2"}`}>
                   {slotStart ? `${formatLongDate(slotStart)}, ${formatTime(slotStart)}` : "Escolha um horário acima"}
