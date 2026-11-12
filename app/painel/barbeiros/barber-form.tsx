@@ -27,7 +27,7 @@ export function BarberForm({ barber, services, isSelf = false }: { barber?: Barb
       router.refresh();
     };
     if (barber) {
-      await submit(`/api/barbeiros/${barber.id}`, "PUT", { ...common, active: form.get("active") === "on" }, done);
+      await submit(`/api/barbeiros/${barber.id}`, "PUT", { ...common, email: form.get("email"), active: form.get("active") === "on" }, done);
     } else {
       await submit("/api/barbeiros", "POST", { ...common, email: form.get("email"), password: form.get("password") }, done);
     }
@@ -43,8 +43,8 @@ export function BarberForm({ barber, services, isSelf = false }: { barber?: Barb
         <Field label="Nome" htmlFor="name">
           <Input id="name" name="name" required defaultValue={barber?.name} />
         </Field>
-        <Field label="E-mail" htmlFor="email">
-          <Input id="email" name="email" type="email" required disabled={!!barber} defaultValue={barber?.email} />
+        <Field label="E-mail" htmlFor="email" hint={barber ? "É o login da pessoa. Se mudar, avise que ela passa a entrar com o e-mail novo." : undefined}>
+          <Input id="email" name="email" type="email" required defaultValue={barber?.email} />
         </Field>
         <Field label="Celular" htmlFor="phone">
           <Input id="phone" name="phone" type="tel" defaultValue={barber?.phone ?? ""} />

@@ -19,22 +19,26 @@ export function BarberSelect({ barbers, value, path, params = {}, allLabel }: Pr
   return (
     <label className="mb-4 flex flex-wrap items-center gap-2 text-sm font-semibold">
       Barbeiro
-      <select
-        value={value ?? ""}
-        onChange={(event) => {
-          const query = new URLSearchParams(params);
-          if (event.target.value) query.set("barbeiro", event.target.value);
-          router.push(`${path}?${query}`);
-        }}
-        className={`${inputClass} w-auto min-w-56`}
-      >
-        {allLabel && <option value="">{allLabel}</option>}
-        {barbers.map((barber) => (
-          <option key={barber.id} value={barber.id}>
-            {barber.name}
-          </option>
-        ))}
-      </select>
+      <span className="w-64 max-w-full">
+        <select
+          value={value ?? ""}
+          onChange={(event) => {
+            const query = new URLSearchParams(params);
+            if (event.target.value) query.set("barbeiro", event.target.value);
+            // A troca leva para outra tela; sem o blur, o contorno de foco fica preso no seletor.
+            event.target.blur();
+            router.push(`${path}?${query}`);
+          }}
+          className={inputClass}
+        >
+          {allLabel && <option value="">{allLabel}</option>}
+          {barbers.map((barber) => (
+            <option key={barber.id} value={barber.id}>
+              {barber.name}
+            </option>
+          ))}
+        </select>
+      </span>
     </label>
   );
 }

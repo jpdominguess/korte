@@ -44,7 +44,8 @@ export async function readBody<T>(request: Request, schema: ZodType<T>): Promise
 
 function errorResponse(error: unknown) {
   if (error instanceof DomainError) {
-    return NextResponse.json({ error: error.message }, { status: statusByKind[error.kind] });
+    const body = error.details === undefined ? { error: error.message } : { error: error.message, details: error.details };
+    return NextResponse.json(body, { status: statusByKind[error.kind] });
   }
   if (error instanceof ZodError) {
     return NextResponse.json({ error: error.issues[0]?.message ?? "Dados inválidos." }, { status: 400 });

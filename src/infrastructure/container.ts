@@ -92,7 +92,7 @@ export const useCases = {
   getClientSubscription: new GetClientSubscription(subscriptions, plans),
   getSubscriptionCoverage: new GetSubscriptionCoverage(subscriptions, plans),
   getWorkSchedule: new GetWorkSchedule(workSchedules),
-  setWorkSchedule: new SetWorkSchedule(barbers, workSchedules),
+  setWorkSchedule: new SetWorkSchedule(barbers, workSchedules, appointments),
   getAvailableSlots: availableSlots,
   createAppointment: new CreateAppointment(services, clients, availableSlots, appointments, events),
   completeAppointment: new CompleteAppointment(unitOfWork, plans),

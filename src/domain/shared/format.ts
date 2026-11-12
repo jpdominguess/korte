@@ -1,4 +1,4 @@
-import { TIME_ZONE } from "./time";
+import { addDays, TIME_ZONE } from "./time";
 
 const brl = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -56,4 +56,14 @@ export function initials(name: string): string {
   const first = parts[0]?.[0] ?? "";
   const last = parts.length > 1 ? parts[parts.length - 1][0] : "";
   return (first + last).toUpperCase();
+}
+
+/** Semana que começa na data local informada, ex.: "Semana de 9 a 15 de novembro". */
+export function formatWeekRange(start: string): string {
+  const end = addDays(start, 6);
+  const month = (date: string) => new Intl.DateTimeFormat("pt-BR", { timeZone: "UTC", month: "long" }).format(new Date(`${date}T12:00:00Z`));
+  const day = (date: string) => Number(date.slice(8));
+  return month(start) === month(end)
+    ? `Semana de ${day(start)} a ${day(end)} de ${month(end)}`
+    : `Semana de ${day(start)} de ${month(start)} a ${day(end)} de ${month(end)}`;
 }

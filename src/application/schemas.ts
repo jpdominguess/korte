@@ -40,6 +40,7 @@ export const newBarberSchema = z.object({
 
 export const updateBarberSchema = z.object({
   name: z.string().trim().min(2, "Informe o nome.").max(80),
+  email: z.email("Informe um e-mail válido.").max(120).optional(),
   phone: optionalText,
   active: z.boolean(),
   serviceIds: uuids,
@@ -53,6 +54,8 @@ export const workScheduleSchema = z.object({
   intervals: z
     .array(z.object({ weekday: z.number().int().min(0).max(6), start: time, end: time }))
     .max(28),
+  /** Confirma o cancelamento dos clientes que ficariam fora do novo expediente. */
+  cancelConflicts: z.boolean().optional(),
 });
 
 const localDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Data inválida.");

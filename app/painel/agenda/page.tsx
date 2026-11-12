@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { CalendarPlus } from "lucide-react";
-import { formatLongDate } from "@/domain/shared/format";
-import { localToInstant } from "@/domain/shared/time";
+import { formatLongDate, formatWeekRange } from "@/domain/shared/format";
+import { localToInstant, toLocalDate } from "@/domain/shared/time";
 import { useCases } from "@/infrastructure/container";
 import { AgendaGrid } from "~/_components/agenda-grid";
 import { AgendaToolbar, readAgendaParams } from "~/_components/agenda-toolbar";
@@ -39,8 +39,8 @@ export default async function AgendaGeralPage({
   return (
     <>
       <PageHeader
-        title="Agenda"
-        subtitle={`${view === "dia" ? formatLongDate(localToInstant(date, 12 * 60)) : "Semana"} · ${counts.total} agendamentos · ${counts.done} concluídos · ${counts.scheduled} agendados`}
+        title={view === "dia" ? formatLongDate(localToInstant(date, 12 * 60)) : formatWeekRange(start)}
+        subtitle={`${view === "dia" && date === toLocalDate(now) ? "Hoje · " : ""}Agenda geral · ${counts.total} agendamentos · ${counts.done} concluídos · ${counts.scheduled} agendados`}
         actions={
           <>
             <AgendaToolbar

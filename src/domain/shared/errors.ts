@@ -4,6 +4,8 @@ export class DomainError extends Error {
   constructor(
     message: string,
     readonly kind: ErrorKind = "validation",
+    /** Dados extras para a tela, como a lista de agendamentos em conflito. */
+    readonly details?: unknown,
   ) {
     super(message);
     this.name = "DomainError";
