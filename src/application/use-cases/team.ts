@@ -1,6 +1,6 @@
-import { DomainError, notFound } from "@/domain/shared/errors";
+import { DomainError, forbidden, notFound } from "@/domain/shared/errors";
 import type { User } from "@/domain/entities/user";
-import type { AccountService, BarberRepository, BarberUpdate, TeamRole } from "../ports";
+import type { AccountService, BarberRepository, BarberUpdate, TeamRole, UnitOfWork } from "../ports";
 
 export class ListBarbers {
   constructor(private readonly barbers: BarberRepository) {}
@@ -33,39 +33,41 @@ export interface NewBarber {
 }
 
 export class CreateBarber {
-  constructor(
-    private readonly barbers: BarberRepository,
-    private readonly accounts: AccountService,
-  ) {}
+  constructor(private readonly accounts: AccountService) {}
 
   async execute(actor: User, input: NewBarber) {
     actor.assertOwner();
-    const userId = await this.accounts.createCredentialAccount({
+    return this.accounts.createBarberAccount({
       name: input.name,
       email: input.email,
       phone: input.phone,
       password: input.password,
       role: input.role ?? "BARBER",
+      serviceIds: input.serviceIds,
+      photo: input.photo,
     });
-    const id = await this.barbers.create(userId, input.serviceIds);
-    if (input.photo) await this.barbers.setPhoto(id, input.photo);
-    return id;
   }
 }
 
 export class UpdateBarber {
-  constructor(private readonly barbers: BarberRepository) {}
+  constructor(private readonly unitOfWork: UnitOfWork) {}
 
   async execute(actor: User, id: string, data: BarberUpdate) {
     actor.assertOwner();
-    const current = await this.barbers.findById(id);
-    if (!current) throw notFound("Barbeiro");
-    const roleChanged = data.role !== undefined && data.role !== (current.isOwner ? "OWNER" : "BARBER");
-    // Quem edita é dono e não pode mudar o próprio cargo, então a barbearia nunca fica sem dono.
-    if (roleChanged && current.userId === actor.id) throw new DomainError("Você não pode mudar o seu próprio cargo.");
-    await this.barbers.update(id, data);
-    if (roleChanged && data.role) await this.barbers.setRole(id, data.role);
-    if (data.photo !== undefined) await this.barbers.setPhoto(id, data.photo);
+    await this.unitOfWork.run(async ({ barbers }) => {
+      const actingProfile = await barbers.findByUserId(actor.id);
+      if (actingProfile && !actingProfile.isOwner) throw forbidden();
+      const current = await barbers.findById(id);
+      if (!current) throw notFound("Barbeiro");
+      const roleChanged = data.role !== undefined && data.role !== (current.isOwner ? "OWNER" : "BARBER");
+      if (roleChanged && current.userId === actor.id) throw new DomainError("Você não pode mudar o seu próprio cargo.");
+      if (roleChanged && current.isOwner && data.role === "BARBER" && (await barbers.countOwners()) <= 1) {
+        throw new DomainError("A barbearia precisa manter pelo menos um dono.", "conflict");
+      }
+      await barbers.update(id, data);
+      if (roleChanged && data.role) await barbers.setRole(id, data.role);
+      if (data.photo !== undefined) await barbers.setPhoto(id, data.photo);
+    });
   }
 }
 

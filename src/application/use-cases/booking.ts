@@ -9,6 +9,7 @@ import type {
   ClientRepository,
   ScheduleBlockRepository,
   ServiceRepository,
+  UnitOfWork,
   WorkScheduleRepository,
 } from "../ports";
 import type { EventPublisher } from "../events";
@@ -63,33 +64,35 @@ export interface CreateAppointmentInput {
 
 export class CreateAppointment {
   constructor(
-    private readonly services: ServiceRepository,
     private readonly clients: ClientRepository,
-    private readonly availableSlots: GetAvailableSlots,
-    private readonly appointments: AppointmentRepository,
+    private readonly unitOfWork: UnitOfWork,
     private readonly events: EventPublisher,
   ) {}
 
   async execute(actor: User, input: CreateAppointmentInput) {
     const customer = await this.resolveCustomer(actor, input);
 
-    const service = await this.services.findById(input.serviceId);
-    if (!service?.active) throw new DomainError("Serviço indisponível.");
+    const appointmentId = await this.unitOfWork.run(async ({ services, barbers, workSchedules, blocks, appointments }) => {
+      const service = await services.findById(input.serviceId);
+      if (!service?.active) throw new DomainError("Serviço indisponível.");
 
-    const slots = await this.availableSlots.execute({
-      serviceId: input.serviceId,
-      barberProfileId: input.barberProfileId,
-      date: toLocalDate(input.startsAt),
-    });
-    if (!slots.some((slot) => slot.getTime() === input.startsAt.getTime())) throw slotTaken();
+      const availableSlots = new GetAvailableSlots(services, barbers, workSchedules, blocks, appointments);
+      const slots = await availableSlots.execute({
+        serviceId: input.serviceId,
+        barberProfileId: input.barberProfileId,
+        date: toLocalDate(input.startsAt),
+      });
+      if (!slots.some((slot) => slot.getTime() === input.startsAt.getTime())) throw slotTaken();
 
-    const appointmentId = await this.appointments.create({
-      barberProfileId: input.barberProfileId,
-      serviceId: input.serviceId,
-      ...customer,
-      startsAt: input.startsAt,
-      endsAt: new Date(input.startsAt.getTime() + service.durationMin * 60_000),
+      return appointments.create({
+        barberProfileId: input.barberProfileId,
+        serviceId: input.serviceId,
+        ...customer,
+        startsAt: input.startsAt,
+        endsAt: new Date(input.startsAt.getTime() + service.durationMin * 60_000),
+      });
     });
+    // Publica apenas após o commit, inclusive quando a transação precisou ser repetida.
     this.events.publish({ type: "AppointmentCreated", appointmentId });
     return appointmentId;
   }

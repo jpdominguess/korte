@@ -125,7 +125,7 @@ export interface OwnerDashboardDTO {
   chartTotal: number;
   averagePerOpenDay: number;
   bestDay: { date: string; amount: number } | null;
-  barbers: Array<{ id: string; name: string; completed: number; share: number; revenue: number }>;
+  barbers: Array<{ id: string; name: string; completed: number; share: number; revenue: number; paidAppointments: number }>;
 }
 
 export interface ClientOptionDTO {

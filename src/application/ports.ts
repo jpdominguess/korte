@@ -47,6 +47,7 @@ export interface BarberRepository {
   getPhoto(id: string): Promise<string | null>;
   setPhoto(id: string, photo: string | null): Promise<void>;
   setRole(id: string, role: TeamRole): Promise<void>;
+  countOwners(): Promise<number>;
 }
 
 export interface WorkScheduleRepository {
@@ -97,6 +98,8 @@ export interface AppointmentRepository {
   /** Grava a mudança de situação; lança conflito se o agendamento já tiver sido encerrado. */
   saveStatus(appointment: Appointment): Promise<void>;
   list(filter: PeriodFilter): Promise<AppointmentDTO[]>;
+  /** Agendamentos ativos futuros, sem limitar o horizonte da consulta. */
+  listScheduledFrom(barberProfileId: string, from: Date): Promise<AppointmentDTO[]>;
   listBusyRanges(barberProfileId: string, from: Date, to: Date): Promise<TimeRange[]>;
   /** Grava o agendamento; lança conflito se o banco detectar sobreposição. */
   create(data: NewAppointment): Promise<string>;
@@ -132,7 +135,7 @@ export interface SubscriptionRepository {
   list(): Promise<SubscriptionRow[]>;
   findById(id: string): Promise<Subscription | null>;
   findActiveByClient(clientId: string, today: string): Promise<Subscription | null>;
-  findLatestRowByClient(clientId: string): Promise<SubscriptionRow | null>;
+  findLatestRowByClient(clientId: string, today: string): Promise<SubscriptionRow | null>;
   create(data: NewSubscription): Promise<string>;
   save(subscription: Subscription): Promise<void>;
   /** Incrementa o uso de forma atômica e registra qual atendimento o consumiu. */
@@ -143,6 +146,11 @@ export interface TransactionRepositories {
   appointments: AppointmentRepository;
   payments: PaymentRepository;
   subscriptions: SubscriptionRepository;
+  services: ServiceRepository;
+  barbers: BarberRepository;
+  workSchedules: WorkScheduleRepository;
+  blocks: ScheduleBlockRepository;
+  plans: PlanRepository;
 }
 
 /** Executa a operação em uma única transação do banco. */
@@ -151,7 +159,7 @@ export interface UnitOfWork {
 }
 
 export interface DashboardRepository {
-  listPayments(from: Date, to: Date): Promise<Array<{ amount: number; origin: PaymentOrigin; paidAt: Date; barberProfileId: string | null }>>;
+  listPayments(from: Date, to: Date): Promise<Array<{ amount: number; origin: PaymentOrigin; paidAt: Date; barberProfileId: string | null; barberName: string | null }>>;
   listCompleted(from: Date, to: Date): Promise<Array<{ barberProfileId: string; barberName: string; covered: boolean }>>;
   countActiveSubscriptions(today: string): Promise<number>;
 }
@@ -165,17 +173,19 @@ export interface AddressLookup {
   findByCep(cep: string): Promise<Address | null>;
 }
 
-export interface NewAccount {
+export interface NewBarberAccount {
   name: string;
   email: string;
   phone: string | null;
   password: string;
   role: Role;
+  serviceIds: string[];
+  photo?: string | null;
 }
 
 export interface AccountService {
-  /** Cria o usuário pelo mesmo mecanismo de autenticação do cadastro público. */
-  createCredentialAccount(account: NewAccount): Promise<string>;
+  /** Cria conta, credencial e perfil juntos e devolve o ID do perfil de atendimento. */
+  createBarberAccount(account: NewBarberAccount): Promise<string>;
 }
 
 export interface EmailMessage {

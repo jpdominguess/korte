@@ -104,17 +104,18 @@ export class ActivateSubscription {
 }
 
 export class RenewSubscription {
-  constructor(
-    private readonly plans: PlanRepository,
-    private readonly unitOfWork: UnitOfWork,
-  ) {}
+  constructor(private readonly unitOfWork: UnitOfWork) {}
 
   async execute(actor: User, id: string, input: PaymentInput, now = new Date()) {
     actor.assertOwner();
-    await this.unitOfWork.run(async ({ subscriptions, payments }) => {
+    await this.unitOfWork.run(async ({ subscriptions, payments, plans }) => {
       const subscription = await subscriptions.findById(id);
       if (!subscription) throw notFound("Assinatura");
-      const plan = await this.plans.findById(subscription.planId);
+      const active = await subscriptions.findActiveByClient(subscription.clientId, toLocalDate(now));
+      if (active && active.id !== subscription.id) {
+        throw new DomainError("Este cliente já tem outra assinatura ativa.", "conflict");
+      }
+      const plan = await plans.findById(subscription.planId);
       if (!plan) throw notFound("Plano");
 
       subscription.renew(toLocalDate(now), plan.usesPerCycle);
@@ -129,14 +130,16 @@ export class RenewSubscription {
 }
 
 export class CancelSubscription {
-  constructor(private readonly subscriptions: SubscriptionRepository) {}
+  constructor(private readonly unitOfWork: UnitOfWork) {}
 
   async execute(actor: User, id: string, now = new Date()) {
     actor.assertOwner();
-    const subscription = await this.subscriptions.findById(id);
-    if (!subscription) throw notFound("Assinatura");
-    subscription.cancel(now);
-    await this.subscriptions.save(subscription);
+    await this.unitOfWork.run(async ({ subscriptions }) => {
+      const subscription = await subscriptions.findById(id);
+      if (!subscription) throw notFound("Assinatura");
+      subscription.cancel(now);
+      await subscriptions.save(subscription);
+    });
   }
 }
 
@@ -146,10 +149,10 @@ export class GetClientSubscription {
     private readonly plans: PlanRepository,
   ) {}
 
-  /** Assinatura mais recente do cliente, ativa ou não. */
+  /** Prioriza a assinatura ativa; sem ela, mostra a mais recente do histórico. */
   async execute(actor: User, now = new Date()): Promise<ClientSubscriptionDTO | null> {
     actor.assertClient();
-    const row = await this.subscriptions.findLatestRowByClient(actor.id);
+    const row = await this.subscriptions.findLatestRowByClient(actor.id, toLocalDate(now));
     if (!row) return null;
     const plan = await this.plans.findById(row.planId);
     return { ...toDTO(row, toLocalDate(now)), coveredServiceIds: plan?.serviceIds ?? [] };

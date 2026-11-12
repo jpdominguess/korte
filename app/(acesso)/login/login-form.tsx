@@ -10,7 +10,7 @@ import { authClient } from "~/_lib/auth-client";
 interface LoginFormProps {
   next?: string;
   /** Quando informado, roda no lugar do redirecionamento (ex.: confirmar o agendamento). */
-  onDone?: () => Promise<void>;
+  onDone?: (role: string) => Promise<void>;
   submitLabel?: string;
 }
 
@@ -35,7 +35,7 @@ export function LoginForm({ next = "/inicio", onDone, submitLabel = "Entrar" }: 
       return;
     }
     if (onDone) {
-      await onDone();
+      await onDone(result.data.user.role);
       setPending(false);
       return;
     }

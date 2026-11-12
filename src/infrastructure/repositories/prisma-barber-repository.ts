@@ -1,4 +1,5 @@
-import { Prisma, type PrismaClient } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import type { Database } from "../prisma/client";
 import { DomainError } from "@/domain/shared/errors";
 import type { BarberDTO } from "@/application/dto";
 import type { BarberRepository, BarberUpdate, TeamRole } from "@/application/ports";
@@ -21,7 +22,7 @@ function toDTO(row: Row): BarberDTO {
 }
 
 export class PrismaBarberRepository implements BarberRepository {
-  constructor(private readonly db: PrismaClient) {}
+  constructor(private readonly db: Database) {}
 
   async list(filter?: { onlyActive?: boolean }) {
     const rows = await this.db.barberProfile.findMany({
@@ -81,6 +82,10 @@ export class PrismaBarberRepository implements BarberRepository {
 
   async setRole(id: string, role: TeamRole) {
     await this.db.barberProfile.update({ where: { id }, data: { user: { update: { role } } } });
+  }
+
+  countOwners() {
+    return this.db.user.count({ where: { role: "OWNER" } });
   }
 
   async setPhoto(id: string, photo: string | null) {

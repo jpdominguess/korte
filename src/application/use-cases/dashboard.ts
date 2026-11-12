@@ -40,16 +40,21 @@ export class GetOwnerDashboard {
     const openDays = daily.filter((d) => d.amount > 0);
     const best = openDays.reduce<(typeof daily)[number] | null>((top, d) => (!top || d.amount > top.amount ? d : top), null);
 
-    const barberIds = [...new Set(completed.map((c) => c.barberProfileId))];
+    const barberIds = [...new Set([
+      ...completed.map((c) => c.barberProfileId),
+      ...fromAppointments.flatMap((p) => p.barberProfileId ? [p.barberProfileId] : []),
+    ])];
     const barbers = barberIds
       .map((id) => {
         const attended = completed.filter((c) => c.barberProfileId === id);
+        const paid = fromAppointments.filter((p) => p.barberProfileId === id);
         return {
           id,
-          name: attended[0].barberName,
+          name: attended[0]?.barberName ?? paid[0]?.barberName ?? "Profissional",
           completed: attended.length,
-          share: attended.length / completed.length,
-          revenue: sum(fromAppointments.filter((p) => p.barberProfileId === id)),
+          share: completed.length ? attended.length / completed.length : 0,
+          revenue: sum(paid),
+          paidAppointments: paid.length,
         };
       })
       .sort((a, b) => b.completed - a.completed);

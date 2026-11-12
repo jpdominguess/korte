@@ -2,6 +2,7 @@ import { Ban, ChevronDown } from "lucide-react";
 import type { AppointmentDTO, BlockDTO } from "@/application/dto";
 import type { AppointmentStatus } from "@/domain/entities/appointment";
 import { formatTime } from "@/domain/shared/format";
+import { toLocalDate } from "@/domain/shared/time";
 import { AppointmentActions } from "./appointment-actions";
 import { Badge, type Tone } from "./ui";
 
@@ -19,11 +20,13 @@ export function AgendaList({
   blocks,
   now,
   showBarber = false,
+  date,
 }: {
   appointments: AppointmentDTO[];
   blocks: BlockDTO[];
   now: Date;
   showBarber?: boolean;
+  date?: string;
 }) {
   const entries: Entry[] = [
     ...appointments.map((item) => ({ kind: "appointment" as const, at: item.startsAt, item })),
@@ -38,7 +41,7 @@ export function AgendaList({
             <Ban className="size-4 shrink-0" aria-hidden="true" />
             {entry.item.reason || "Bloqueado"}
             <span className="num font-medium">
-              {formatTime(entry.item.startsAt)} às {formatTime(entry.item.endsAt)}
+              {formatTime(entry.item.startsAt)} às {date && toLocalDate(entry.item.endsAt) > date ? "24:00" : formatTime(entry.item.endsAt)}
             </span>
           </li>
         ) : (

@@ -8,13 +8,14 @@ export class PrismaDashboardRepository implements DashboardRepository {
   async listPayments(from: Date, to: Date) {
     const rows = await this.db.payment.findMany({
       where: { paidAt: { gte: from, lt: to } },
-      select: { amount: true, origin: true, paidAt: true, appointment: { select: { barberProfileId: true } } },
+      select: { amount: true, origin: true, paidAt: true, appointment: { select: { barberProfileId: true, barberProfile: { select: { user: { select: { name: true } } } } } } },
     });
     return rows.map((row) => ({
       amount: row.amount.toNumber(),
       origin: row.origin as PaymentOrigin,
       paidAt: row.paidAt,
       barberProfileId: row.appointment?.barberProfileId ?? null,
+      barberName: row.appointment?.barberProfile.user.name ?? null,
     }));
   }
 

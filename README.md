@@ -59,8 +59,11 @@ Sem `BREVO_API_KEY`, os e-mails (confirmação de agendamento e recuperação de
 ```bash
 npm run lint
 npm run typecheck
+npm test
 npm run build
 ```
+
+Os testes de integração exigem `TEST_DATABASE_URL` apontando para um banco de testes separado, com as migrações aplicadas. Sem essa variável, `npm test` executa os testes de domínio e apresentação e pula a integração. Para testar o cadastro de equipe, use também `DATABASE_URL` e `DIRECT_URL` desse mesmo banco e as variáveis de autenticação do `.env.example`.
 
 ## Publicação
 

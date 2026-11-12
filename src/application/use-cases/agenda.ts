@@ -6,7 +6,6 @@ import type { AgendaDTO } from "../dto";
 import type {
   AppointmentRepository,
   ClientRepository,
-  PlanRepository,
   ScheduleBlockRepository,
   UnitOfWork,
   WorkScheduleRepository,
@@ -88,15 +87,12 @@ export interface CompleteAppointmentInput {
 }
 
 export class CompleteAppointment {
-  constructor(
-    private readonly unitOfWork: UnitOfWork,
-    private readonly plans: PlanRepository,
-  ) {}
+  constructor(private readonly unitOfWork: UnitOfWork) {}
 
   /** Situação, pagamento e consumo da assinatura são gravados juntos, na mesma transação. */
   async execute(actor: User, id: string, input: CompleteAppointmentInput, now = new Date()) {
     actor.assertStaff();
-    await this.unitOfWork.run(async ({ appointments, payments, subscriptions }) => {
+    await this.unitOfWork.run(async ({ appointments, payments, subscriptions, plans }) => {
       const appointment = await appointments.findById(id);
       if (!appointment) throw notFound("Agendamento");
       actor.assertCanManage(appointment);
@@ -105,10 +101,10 @@ export class CompleteAppointment {
         const today = toLocalDate(now);
         const subscription = appointment.clientId && (await subscriptions.findActiveByClient(appointment.clientId, today));
         if (!subscription) throw new DomainError("Este cliente não tem assinatura ativa.");
-        const plan = await this.plans.findById(subscription.planId);
+        const plan = await plans.findById(subscription.planId);
         if (!plan?.covers(appointment.serviceId)) throw new DomainError("O plano do cliente não cobre este serviço.");
 
-        appointment.completeWithSubscription(subscription, today);
+        appointment.completeWithSubscription(subscription, now);
         await appointments.saveStatus(appointment);
         await subscriptions.registerUse(subscription.id, appointment.id, now);
         return;
@@ -116,7 +112,7 @@ export class CompleteAppointment {
 
       if (input.amount === undefined) throw new DomainError("Informe o valor.");
       if (!input.method) throw new DomainError("Escolha a forma de pagamento.");
-      appointment.complete();
+      appointment.complete(now);
       await appointments.saveStatus(appointment);
       await payments.create({
         appointmentId: id,

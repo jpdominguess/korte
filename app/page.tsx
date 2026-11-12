@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CalendarPlus, MapPin, MessageCircle } from "lucide-react";
+import { CalendarPlus, MapPin, MessageCircle, Phone } from "lucide-react";
 import { formatBRL, whatsappLink } from "@/domain/shared/format";
 import { toLocalDate } from "@/domain/shared/time";
 import { useCases } from "@/infrastructure/container";
@@ -56,6 +56,12 @@ export default async function PublicPage() {
                     {statusDetail && <span className="font-semibold">{statusDetail}</span>}
                     <span className="text-white/70">{openingHours}</span>
                   </div>
+                )}
+                {shop.phone && (
+                  <a href={`tel:${shop.phone.replace(/[^\d+]/g, "")}`} className="mt-2 inline-flex items-center gap-1.5 text-sm text-white/80 no-underline hover:text-white hover:underline">
+                    <Phone className="size-4 shrink-0" aria-hidden="true" />
+                    {shop.phone}
+                  </a>
                 )}
               </div>
             </div>

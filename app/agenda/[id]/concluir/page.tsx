@@ -5,6 +5,7 @@ import { DomainError } from "@/domain/shared/errors";
 import { formatBRL, formatShortDate, formatTime } from "@/domain/shared/format";
 import { useCases } from "@/infrastructure/container";
 import { Avatar, Card, LinkButton, Notice, PageHeader } from "~/_components/ui";
+import { ConfirmButton } from "~/_components/confirm-button";
 import { requireSession } from "~/_lib/session";
 import { CompleteForm } from "./complete-form";
 
@@ -17,7 +18,9 @@ export default async function ConcluirPage({ params }: { params: Promise<{ id: s
     if (error instanceof DomainError) notFound();
     throw error;
   });
-  const coverage = a.status === "AGENDADO" ? await useCases.getSubscriptionCoverage.execute(user, a) : null;
+  const started = a.startsAt <= new Date();
+  const canComplete = a.status === "AGENDADO" && started;
+  const coverage = canComplete ? await useCases.getSubscriptionCoverage.execute(user, a) : null;
   const backHref = user.isOwner() ? `/painel/agenda?barbeiro=${a.barberProfileId}` : "/agenda";
 
   return (
@@ -46,14 +49,20 @@ export default async function ConcluirPage({ params }: { params: Promise<{ id: s
         </div>
 
         <div>
-          {a.status === "AGENDADO" ? (
+          {canComplete ? (
             <CompleteForm appointmentId={a.id} price={a.servicePrice} backHref={backHref} coverage={coverage} />
           ) : (
             <div className="flex flex-col items-start gap-3">
-              <Notice tone="neutral">Este agendamento já foi encerrado.</Notice>
+              <Notice tone="neutral">{a.status === "AGENDADO" ? "O atendimento só pode ser concluído após o horário de início." : "Este agendamento já foi encerrado."}</Notice>
               <LinkButton href={backHref} variant="secondary">
                 Voltar
               </LinkButton>
+            </div>
+          )}
+          {a.status === "AGENDADO" && (
+            <div className="mt-4 flex flex-wrap gap-2 border-t border-borda pt-4">
+              {started && <ConfirmButton url={`/api/agendamentos/${a.id}/falta`} label="Marcar falta" confirmLabel="Confirmar falta" />}
+              <ConfirmButton url={`/api/agendamentos/${a.id}/cancelar`} label="Cancelar agendamento" confirmLabel="Confirmar cancelamento" />
             </div>
           )}
         </div>

@@ -1,4 +1,5 @@
-import type { Prisma, PrismaClient } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
+import type { Database } from "../prisma/client";
 import type { ServiceDTO } from "@/application/dto";
 import type { ServiceRepository } from "@/application/ports";
 import type { ServiceProps } from "@/domain/entities/service";
@@ -29,7 +30,7 @@ function columns(data: ServiceProps) {
 }
 
 export class PrismaServiceRepository implements ServiceRepository {
-  constructor(private readonly db: PrismaClient) {}
+  constructor(private readonly db: Database) {}
 
   async list(filter?: { onlyActive?: boolean }) {
     const rows = await this.db.service.findMany({
