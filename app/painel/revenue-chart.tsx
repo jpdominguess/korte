@@ -1,7 +1,8 @@
 import { formatBRL, formatShortDate } from "@/domain/shared/format";
 import { localToInstant } from "@/domain/shared/time";
 
-const BAR_AREA_HEIGHT = 140;
+/** Parte da altura que a maior barra ocupa; o resto fica para o valor do melhor dia. */
+const BAR_SHARE = 85;
 
 export function RevenueChart({ daily, today }: { daily: Array<{ date: string; amount: number }>; today: string }) {
   const max = Math.max(...daily.map((d) => d.amount), 1);
@@ -9,10 +10,11 @@ export function RevenueChart({ daily, today }: { daily: Array<{ date: string; am
   const label = (date: string) => formatShortDate(localToInstant(date, 12 * 60));
 
   return (
-    <div className="px-4 pb-2 lg:px-6">
-      <div className="flex items-end gap-0.5 border-b border-borda" style={{ height: BAR_AREA_HEIGHT + 20 }} aria-hidden="true">
+    <div className="flex flex-1 flex-col px-4 pb-2 lg:px-6">
+      {/* No celular a área tem altura fixa; lado a lado, ela cresce até a altura do card vizinho. */}
+      <div className="flex h-40 items-end gap-0.5 border-b border-borda xl:h-auto xl:min-h-40 xl:flex-1" aria-hidden="true">
         {daily.map((day) => {
-          const height = day.amount > 0 ? Math.max((day.amount / max) * BAR_AREA_HEIGHT, 4) : 2;
+          const height = day.amount > 0 ? `max(${((day.amount / max) * BAR_SHARE).toFixed(2)}%, 4px)` : "2px";
           return (
             <div key={day.date} className="group relative flex h-full min-w-0 flex-1 flex-col items-center justify-end">
               {day.date === best.date && best.amount > 0 && (
