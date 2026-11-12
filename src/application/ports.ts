@@ -24,6 +24,8 @@ export interface ServiceRepository {
 
 export interface BarberUpdate {
   name: string;
+  /** Login da pessoa; ausente mantém o atual. */
+  email?: string;
   phone: string | null;
   active: boolean;
   serviceIds: string[];

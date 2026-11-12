@@ -1,4 +1,5 @@
-import type { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma, type PrismaClient } from "@prisma/client";
+import { DomainError } from "@/domain/shared/errors";
 import type { BarberDTO } from "@/application/dto";
 import type { BarberRepository, BarberUpdate, TeamRole } from "@/application/ports";
 
@@ -49,17 +50,24 @@ export class PrismaBarberRepository implements BarberRepository {
   }
 
   async update(id: string, data: BarberUpdate) {
-    await this.db.barberProfile.update({
-      where: { id },
-      data: {
-        active: data.active,
-        user: { update: { name: data.name, phone: data.phone } },
-        services: {
-          deleteMany: {},
-          create: data.serviceIds.map((serviceId) => ({ serviceId })),
+    try {
+      await this.db.barberProfile.update({
+        where: { id },
+        data: {
+          active: data.active,
+          user: { update: { name: data.name, phone: data.phone, ...(data.email && { email: data.email.trim().toLowerCase() }) } },
+          services: {
+            deleteMany: {},
+            create: data.serviceIds.map((serviceId) => ({ serviceId })),
+          },
         },
-      },
-    });
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+        throw new DomainError("Já existe uma conta com esse e-mail.", "conflict");
+      }
+      throw error;
+    }
   }
 
   async setActive(id: string, active: boolean) {
