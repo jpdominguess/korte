@@ -6,6 +6,8 @@ export interface SessionUser {
   user: User;
   name: string;
   email: string;
+  /** Foto cadastrada em Equipe; só quem atende tem. */
+  photoUrl: string | null;
 }
 
 export async function loadSessionUser(headers: Headers): Promise<SessionUser | null> {
@@ -20,5 +22,6 @@ export async function loadSessionUser(headers: Headers): Promise<SessionUser | n
     user: new User(session.user.id, session.user.role as Role, profile?.id ?? null),
     name: session.user.name,
     email: session.user.email,
+    photoUrl: profile && session.user.image ? `/api/barbeiros/${profile.id}/foto?v=${new Date(session.user.updatedAt).getTime()}` : null,
   };
 }

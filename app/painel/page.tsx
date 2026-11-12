@@ -35,8 +35,8 @@ export default async function PainelPage({ searchParams }: { searchParams: Promi
   return (
     <>
       <PageHeader
-        title="Painel"
-        subtitle={`${formatMonth(data.month)}, até ${formatLocalDate(data.periodEnd).slice(0, 5)}`}
+        title={formatMonth(data.month)}
+        subtitle={`Painel · resultados até ${formatLocalDate(data.periodEnd).slice(0, 5)}`}
         actions={
           <>
             <LinkButton href={`/painel?mes=${addMonths(data.month, -1)}`} variant="secondary" size="sm" className="w-9 px-0">
