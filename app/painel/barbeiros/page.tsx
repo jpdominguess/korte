@@ -5,7 +5,7 @@ import { Avatar, Badge, Card, EmptyState, LinkButton, PageHeader } from "~/_comp
 import { requireSession } from "~/_lib/session";
 import { EnableOwnerButton } from "./enable-owner-button";
 
-export const metadata: Metadata = { title: "Barbeiros" };
+export const metadata: Metadata = { title: "Equipe" };
 
 export default async function BarbeirosPage() {
   const { user } = await requireSession(["OWNER"]);
@@ -14,21 +14,21 @@ export default async function BarbeirosPage() {
   return (
     <>
       <PageHeader
-        title="Barbeiros"
-        subtitle="Quem atende na barbearia e os serviços de cada um."
+        title="Equipe"
+        subtitle="Barbeiros e donos, com o cargo e os serviços de cada um."
         actions={
           <>
             {!user.barberProfileId && <EnableOwnerButton />}
             <LinkButton href="/painel/barbeiros/novo">
               <Plus />
-              Novo barbeiro
+              Novo integrante
             </LinkButton>
           </>
         }
       />
       <Card>
         {barbers.length === 0 ? (
-          <EmptyState title="Nenhum barbeiro cadastrado" text="Cadastre a equipe para abrir a agenda." />
+          <EmptyState title="Ninguém na equipe ainda" text="Cadastre a equipe para abrir a agenda." />
         ) : (
           <ul>
             {barbers.map((barber) => (
@@ -37,7 +37,7 @@ export default async function BarbeirosPage() {
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-semibold">
                     {barber.name}
-                    {barber.isOwner && <span className="ml-2 text-xs font-medium text-texto-2">dono</span>}
+                    <span className="ml-2 text-xs font-medium text-texto-2">{barber.isOwner ? "Dono" : "Barbeiro"}</span>
                   </p>
                   <p className="truncate text-sm text-texto-2">
                     {barber.serviceIds.length} {barber.serviceIds.length === 1 ? "serviço" : "serviços"} · {barber.phone ?? barber.email}

@@ -26,6 +26,8 @@ const photo = z
   .max(400_000, "A foto ficou grande demais.")
   .regex(/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/]+=*$/, "Envie uma foto em JPG, PNG ou WebP.");
 
+const teamRole = z.enum(["BARBER", "OWNER"], { error: "Escolha o cargo." });
+
 export const newBarberSchema = z.object({
   name: z.string().trim().min(2, "Informe o nome.").max(80),
   email: z.email("Informe um e-mail válido.").max(120),
@@ -33,6 +35,7 @@ export const newBarberSchema = z.object({
   password: z.string().min(8, "A senha inicial precisa ter pelo menos 8 caracteres.").max(128),
   serviceIds: uuids,
   photo: photo.nullish(),
+  role: teamRole.default("BARBER"),
 });
 
 export const updateBarberSchema = z.object({
@@ -41,6 +44,7 @@ export const updateBarberSchema = z.object({
   active: z.boolean(),
   serviceIds: uuids,
   photo: photo.nullish(),
+  role: teamRole.optional(),
 });
 
 const time = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Informe o horário no formato 00:00.");

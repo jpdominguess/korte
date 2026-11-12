@@ -29,7 +29,11 @@ export interface BarberUpdate {
   serviceIds: string[];
   /** Imagem em data URL; null remove a foto e ausente mantém a atual. */
   photo?: string | null;
+  /** Cargo na equipe; ausente mantém o atual. */
+  role?: TeamRole;
 }
+
+export type TeamRole = "BARBER" | "OWNER";
 
 export interface BarberRepository {
   list(filter?: { onlyActive?: boolean }): Promise<BarberDTO[]>;
@@ -40,6 +44,7 @@ export interface BarberRepository {
   setActive(id: string, active: boolean): Promise<void>;
   getPhoto(id: string): Promise<string | null>;
   setPhoto(id: string, photo: string | null): Promise<void>;
+  setRole(id: string, role: TeamRole): Promise<void>;
 }
 
 export interface WorkScheduleRepository {

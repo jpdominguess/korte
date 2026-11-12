@@ -11,7 +11,7 @@ export default async function MaisPage() {
   const items = [
     ...(user.barberProfileId ? [{ href: "/agenda", label: "Minha agenda" }] : []),
     { href: "/agenda/bloqueios", label: "Bloqueios de agenda" },
-    { href: "/painel/barbeiros", label: "Barbeiros" },
+    { href: "/painel/barbeiros", label: "Equipe" },
     { href: "/painel/servicos", label: "Serviços" },
     { href: "/painel/expedientes", label: "Expedientes" },
     { href: "/painel/planos", label: "Planos e assinaturas" },

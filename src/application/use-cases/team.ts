@@ -1,6 +1,6 @@
-import { notFound } from "@/domain/shared/errors";
+import { DomainError, notFound } from "@/domain/shared/errors";
 import type { User } from "@/domain/entities/user";
-import type { AccountService, BarberRepository, BarberUpdate } from "../ports";
+import type { AccountService, BarberRepository, BarberUpdate, TeamRole } from "../ports";
 
 export class ListBarbers {
   constructor(private readonly barbers: BarberRepository) {}
@@ -29,6 +29,7 @@ export interface NewBarber {
   password: string;
   serviceIds: string[];
   photo?: string | null;
+  role?: TeamRole;
 }
 
 export class CreateBarber {
@@ -44,7 +45,7 @@ export class CreateBarber {
       email: input.email,
       phone: input.phone,
       password: input.password,
-      role: "BARBER",
+      role: input.role ?? "BARBER",
     });
     const id = await this.barbers.create(userId, input.serviceIds);
     if (input.photo) await this.barbers.setPhoto(id, input.photo);
@@ -57,8 +58,13 @@ export class UpdateBarber {
 
   async execute(actor: User, id: string, data: BarberUpdate) {
     actor.assertOwner();
-    if (!(await this.barbers.findById(id))) throw notFound("Barbeiro");
+    const current = await this.barbers.findById(id);
+    if (!current) throw notFound("Barbeiro");
+    const roleChanged = data.role !== undefined && data.role !== (current.isOwner ? "OWNER" : "BARBER");
+    // Quem edita é dono e não pode mudar o próprio cargo, então a barbearia nunca fica sem dono.
+    if (roleChanged && current.userId === actor.id) throw new DomainError("Você não pode mudar o seu próprio cargo.");
     await this.barbers.update(id, data);
+    if (roleChanged && data.role) await this.barbers.setRole(id, data.role);
     if (data.photo !== undefined) await this.barbers.setPhoto(id, data.photo);
   }
 }
