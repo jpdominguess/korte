@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Ban } from "lucide-react";
+import { Ban, Info, MousePointerClick } from "lucide-react";
 import type { AgendaDTO, BarberDTO } from "@/application/dto";
 import type { AppointmentStatus } from "@/domain/entities/appointment";
 import { formatTime } from "@/domain/shared/format";
@@ -51,8 +51,50 @@ export function AgendaGrid({ agenda, barbers, date, now }: { agenda: AgendaDTO; 
   const pastUntil = date < today ? last : nowMinute !== null ? Math.ceil(nowMinute / 10) * 10 : first;
   const showNow = nowMinute !== null && nowMinute >= first && nowMinute <= last;
 
+  const columns = barbers.map((barber) => {
+    const intervals = dayIntervals.filter((i) => i.barberProfileId === barber.id).sort((a, b) => a.startMin - b.startMin);
+    const offRanges: Array<[number, number]> = [];
+    let cursor = first;
+    for (const interval of intervals) {
+      if (interval.startMin > cursor) offRanges.push([cursor, interval.startMin]);
+      cursor = Math.max(cursor, interval.endMin);
+    }
+    if (cursor < last) offRanges.push([cursor, last]);
+
+    const minuteOf = (instant: Date, edge: number) => (toLocalDate(instant) === date ? minutesOfDay(instant) : edge);
+    const free = barber.active
+      ? subtractRanges([first, last], [
+          ...offRanges,
+          [first, pastUntil],
+          ...agenda.blocks
+            .filter((b) => b.barberProfileId === barber.id)
+            .map((b): [number, number] => [minuteOf(b.startsAt, first), minuteOf(b.endsAt, last)]),
+          ...agenda.appointments
+            .filter((a) => a.barberProfileId === barber.id && a.status !== "CANCELADO")
+            .map((a): [number, number] => [minutesOfDay(a.startsAt), minutesOfDay(a.endsAt)]),
+        ])
+      : [];
+    return { barber, offRanges, free };
+  });
+
+  // Sem esta frase, uma grade sem espaço livre (dia passado, fim do expediente) parece quebrada.
+  const anyFree = columns.some((column) => column.free.length > 0);
+  const hint = anyFree
+    ? "Clique num espaço livre da grade para marcar um horário."
+    : date < today
+      ? "Este dia já passou. Use as setas para ir a outro dia."
+      : date === today && pastUntil >= last
+        ? "Os horários de hoje já passaram. Use as setas para ir a outro dia."
+        : "Não há espaço livre neste dia.";
+  const HintIcon = anyFree ? MousePointerClick : Info;
+
   return (
-    <div className="overflow-x-auto rounded-card border border-borda bg-superficie">
+    <div>
+      <p className="mb-2 flex items-center gap-1.5 text-sm text-texto-2">
+        <HintIcon className="size-4 shrink-0" aria-hidden="true" />
+        {hint}
+      </p>
+      <div className="overflow-x-auto rounded-card border border-borda bg-superficie">
       <div style={{ minWidth: 56 + barbers.length * COLUMN_MIN_WIDTH }}>
         <div className="grid h-13 border-b border-borda" style={{ gridTemplateColumns: `56px repeat(${barbers.length}, minmax(0, 1fr))` }}>
           <span />
@@ -78,30 +120,7 @@ export function AgendaGrid({ agenda, barbers, date, now }: { agenda: AgendaDTO; 
             ))}
           </div>
 
-          {barbers.map((barber) => {
-            const intervals = dayIntervals.filter((i) => i.barberProfileId === barber.id).sort((a, b) => a.startMin - b.startMin);
-            const offRanges: Array<[number, number]> = [];
-            let cursor = first;
-            for (const interval of intervals) {
-              if (interval.startMin > cursor) offRanges.push([cursor, interval.startMin]);
-              cursor = Math.max(cursor, interval.endMin);
-            }
-            if (cursor < last) offRanges.push([cursor, last]);
-
-            const minuteOf = (instant: Date, edge: number) => (toLocalDate(instant) === date ? minutesOfDay(instant) : edge);
-            const free = barber.active
-              ? subtractRanges([first, last], [
-                  ...offRanges,
-                  [first, pastUntil],
-                  ...agenda.blocks
-                    .filter((b) => b.barberProfileId === barber.id)
-                    .map((b): [number, number] => [minuteOf(b.startsAt, first), minuteOf(b.endsAt, last)]),
-                  ...agenda.appointments
-                    .filter((a) => a.barberProfileId === barber.id && a.status !== "CANCELADO")
-                    .map((a): [number, number] => [minutesOfDay(a.startsAt), minutesOfDay(a.endsAt)]),
-                ])
-              : [];
-
+          {columns.map(({ barber, offRanges, free }) => {
             return (
               <div
                 key={barber.id}
@@ -168,6 +187,7 @@ export function AgendaGrid({ agenda, barbers, date, now }: { agenda: AgendaDTO; 
             </div>
           )}
         </div>
+      </div>
       </div>
     </div>
   );
