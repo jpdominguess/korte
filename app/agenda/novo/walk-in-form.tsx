@@ -13,22 +13,27 @@ interface Props {
   services: ServiceDTO[];
   clients: ClientOptionDTO[];
   initialBarberId: string;
+  initialDate: string;
+  /** Hora clicada na agenda (HH:MM), escolhida sozinha quando o serviço cabe nela. */
+  desiredTime: string | null;
   today: string;
   backHref: string;
 }
 
-export function WalkInForm({ barbers, services, clients, initialBarberId, today, backHref }: Props) {
+export function WalkInForm({ barbers, services, clients, initialBarberId, initialDate, desiredTime, today, backHref }: Props) {
   const router = useRouter();
   const { pending, error, setError, submit } = useSubmit();
   const [barberId, setBarberId] = useState(initialBarberId);
   const [serviceId, setServiceId] = useState("");
-  const [date, setDate] = useState(today);
+  const [date, setDate] = useState(initialDate);
   const [slots, setSlots] = useState<string[] | null>(null);
   const [slot, setSlot] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState<"registered" | "walkIn">("walkIn");
 
   const barber = barbers.find((b) => b.id === barberId);
+  const fromAgenda = !!desiredTime && barberId === initialBarberId && date === initialDate;
+  const desiredMissing = fromAgenda && slots !== null && !slots.some((s) => formatTime(new Date(s)) === desiredTime);
   const options = services.filter((s) => barber?.serviceIds.includes(s.id));
 
   async function loadSlots(nextBarber: string, nextService: string, nextDate: string) {
@@ -38,7 +43,12 @@ export function WalkInForm({ barbers, services, clients, initialBarberId, today,
     setLoading(true);
     try {
       const params = new URLSearchParams({ servico: nextService, barbeiro: nextBarber, data: nextDate });
-      setSlots(await apiRequest<string[]>(`/api/horarios-livres?${params}`, "GET"));
+      const found = await apiRequest<string[]>(`/api/horarios-livres?${params}`, "GET");
+      setSlots(found);
+      if (desiredTime && nextBarber === initialBarberId && nextDate === initialDate) {
+        const match = found.find((s) => formatTime(new Date(s)) === desiredTime);
+        if (match) setSlot(match);
+      }
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -131,7 +141,18 @@ export function WalkInForm({ barbers, services, clients, initialBarberId, today,
               Buscando horários...
             </p>
           )}
-          {!loading && slots === null && <p className="text-sm text-texto-2">Escolha o serviço e a data para ver os horários.</p>}
+          {!loading && slots === null && (
+            <p className="text-sm text-texto-2">
+              {fromAgenda ? `Você escolheu ${desiredTime} na agenda. Escolha o serviço para confirmar.` : "Escolha o serviço e a data para ver os horários."}
+            </p>
+          )}
+          {!loading && desiredMissing && (
+            <div className="mb-3">
+              <Notice tone="warning">
+                Esse serviço não cabe às {desiredTime}: o espaço livre é menor que a duração, ou o horário foi ocupado. Escolha um dos horários livres abaixo.
+              </Notice>
+            </div>
+          )}
           {!loading && slots?.length === 0 && <Notice tone="neutral">Sem horários livres nesta data.</Notice>}
           {slots && slots.length > 0 && (
             <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">

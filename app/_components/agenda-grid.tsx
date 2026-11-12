@@ -4,7 +4,8 @@ import type { AgendaDTO, BarberDTO } from "@/application/dto";
 import type { AppointmentStatus } from "@/domain/entities/appointment";
 import { formatTime } from "@/domain/shared/format";
 import { minutesOfDay, minutesToTime, toLocalDate, weekdayOf } from "@/domain/shared/time";
-import { Avatar } from "~/_components/ui";
+import { GridSlotPicker } from "./grid-slot-picker";
+import { Avatar } from "./ui";
 
 const PX_PER_HOUR = 64;
 const COLUMN_MIN_WIDTH = 168;
@@ -17,6 +18,19 @@ const blockStyle: Record<AppointmentStatus, string> = {
 };
 
 const px = (minutes: number) => (minutes * PX_PER_HOUR) / 60;
+
+/** Tira os trechos ocupados de um intervalo e devolve o que sobra livre. */
+function subtractRanges(whole: [number, number], busy: Array<[number, number]>): Array<[number, number]> {
+  const free: Array<[number, number]> = [];
+  let cursor = whole[0];
+  for (const [start, end] of [...busy].sort((a, b) => a[0] - b[0])) {
+    if (start > cursor) free.push([cursor, Math.min(start, whole[1])]);
+    cursor = Math.max(cursor, end);
+    if (cursor >= whole[1]) break;
+  }
+  if (cursor < whole[1]) free.push([cursor, whole[1]]);
+  return free.filter(([start, end]) => end > start);
+}
 
 export function AgendaGrid({ agenda, barbers, date, now }: { agenda: AgendaDTO; barbers: BarberDTO[]; date: string; now: Date }) {
   const weekday = weekdayOf(date);
@@ -31,7 +45,10 @@ export function AgendaGrid({ agenda, barbers, date, now }: { agenda: AgendaDTO; 
   const height = px(last - first);
   const hours = Array.from({ length: (last - first) / 60 + 1 }, (_, i) => first + i * 60);
 
-  const nowMinute = toLocalDate(now) === date ? minutesOfDay(now) : null;
+  const today = toLocalDate(now);
+  const nowMinute = today === date ? minutesOfDay(now) : null;
+  // O que já passou não pode ser marcado: o dia inteiro, se for passado, ou até o próximo horário de 10 em 10 minutos.
+  const pastUntil = date < today ? last : nowMinute !== null ? Math.ceil(nowMinute / 10) * 10 : first;
   const showNow = nowMinute !== null && nowMinute >= first && nowMinute <= last;
 
   return (
@@ -71,6 +88,20 @@ export function AgendaGrid({ agenda, barbers, date, now }: { agenda: AgendaDTO; 
             }
             if (cursor < last) offRanges.push([cursor, last]);
 
+            const minuteOf = (instant: Date, edge: number) => (toLocalDate(instant) === date ? minutesOfDay(instant) : edge);
+            const free = barber.active
+              ? subtractRanges([first, last], [
+                  ...offRanges,
+                  [first, pastUntil],
+                  ...agenda.blocks
+                    .filter((b) => b.barberProfileId === barber.id)
+                    .map((b): [number, number] => [minuteOf(b.startsAt, first), minuteOf(b.endsAt, last)]),
+                  ...agenda.appointments
+                    .filter((a) => a.barberProfileId === barber.id && a.status !== "CANCELADO")
+                    .map((a): [number, number] => [minutesOfDay(a.startsAt), minutesOfDay(a.endsAt)]),
+                ])
+              : [];
+
             return (
               <div
                 key={barber.id}
@@ -80,6 +111,8 @@ export function AgendaGrid({ agenda, barbers, date, now }: { agenda: AgendaDTO; 
                   backgroundSize: `100% ${PX_PER_HOUR}px, 100% ${PX_PER_HOUR / 2}px`,
                 }}
               >
+                {free.length > 0 && <GridSlotPicker barberId={barber.id} date={date} first={first} pxPerHour={PX_PER_HOUR} free={free} />}
+
                 {offRanges.map(([start, end]) => (
                   <div key={start} aria-hidden="true" className="hachurado absolute inset-x-0" style={{ top: px(start - first), height: px(end - start) }} />
                 ))}
