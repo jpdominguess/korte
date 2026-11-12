@@ -132,9 +132,14 @@ export function BookingPanel({ services, barbers, today, viewer: initialViewer, 
   }
 
   function chooseService(chosen: ServiceDTO) {
-    setServiceId(chosen.id);
     setAuth(null);
     setBookingError(null);
+    if (chosen.id === serviceId) {
+      setServiceId(null);
+      clearTime();
+      return;
+    }
+    setServiceId(chosen.id);
     const available = barbers.filter((b) => chosen.barberIds.includes(b.id));
     const next = barber && chosen.barberIds.includes(barber.id) ? barber : available.length === 1 ? available[0] : null;
     setBarberId(next?.id ?? null);
@@ -143,9 +148,14 @@ export function BookingPanel({ services, barbers, today, viewer: initialViewer, 
   }
 
   function chooseBarber(chosen: PublicBarberDTO) {
-    setBarberId(chosen.id);
     setAuth(null);
     setBookingError(null);
+    if (chosen.id === barberId) {
+      setBarberId(null);
+      clearTime();
+      return;
+    }
+    setBarberId(chosen.id);
     if (service) showFirstFreeDay(service.id, chosen);
     else clearTime();
   }
@@ -204,13 +214,16 @@ export function BookingPanel({ services, barbers, today, viewer: initialViewer, 
             <ul className="divide-y divide-borda overflow-hidden rounded-card border border-borda bg-superficie">
               {services.map((s) => {
                 const selected = s.id === serviceId;
+                const available = !barber || s.barberIds.includes(barber.id);
                 return (
                   <li key={s.id}>
                     <button
                       type="button"
                       aria-pressed={selected}
+                      disabled={!available}
+                      title={available ? undefined : `${twoNames(barber.name).join(" ")} não faz este serviço`}
                       onClick={() => chooseService(s)}
-                      className={`flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors ${selected ? "bg-marinho-claro" : "hover:bg-muted"}`}
+                      className={`flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-45 ${selected ? "bg-marinho-claro" : "enabled:hover:bg-muted"}`}
                     >
                       <span
                         aria-hidden="true"
@@ -225,6 +238,7 @@ export function BookingPanel({ services, barbers, today, viewer: initialViewer, 
                         </span>
                       </span>
                       <span className="num shrink-0 font-bold">{formatBRL(s.price)}</span>
+                      {!available && <span className="sr-only">O profissional escolhido não faz este serviço</span>}
                     </button>
                   </li>
                 );
@@ -252,7 +266,7 @@ export function BookingPanel({ services, barbers, today, viewer: initialViewer, 
                       disabled={!available}
                       title={available ? undefined : "Não faz este serviço"}
                       onClick={() => chooseBarber(b)}
-                      className={`flex h-full w-full flex-col items-center gap-1.5 rounded-card border px-2 py-2.5 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-45 ${selected ? "border-marinho bg-marinho-claro" : "border-borda bg-superficie hover:border-borda-controle hover:bg-muted"}`}
+                      className={`flex h-full w-full flex-col items-center gap-1.5 rounded-card border px-2 py-2.5 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-45 ${selected ? "border-marinho bg-marinho-claro" : "border-borda bg-superficie enabled:hover:border-borda-controle enabled:hover:bg-muted"}`}
                     >
                       <Avatar name={b.name} src={b.photoUrl} size="lg" dark={selected} />
                       <span className="w-full leading-tight">
