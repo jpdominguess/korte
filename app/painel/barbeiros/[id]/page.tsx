@@ -5,7 +5,7 @@ import { PageHeader } from "~/_components/ui";
 import { requireSession } from "~/_lib/session";
 import { BarberForm } from "../barber-form";
 
-export const metadata: Metadata = { title: "Editar barbeiro" };
+export const metadata: Metadata = { title: "Editar integrante" };
 
 export default async function EditarBarbeiroPage({ params }: { params: Promise<{ id: string }> }) {
   const { user } = await requireSession(["OWNER"]);
@@ -19,8 +19,8 @@ export default async function EditarBarbeiroPage({ params }: { params: Promise<{
 
   return (
     <>
-      <PageHeader title={barber.name} subtitle="Dados, serviços e situação do barbeiro." />
-      <BarberForm barber={barber} services={services} />
+      <PageHeader title={barber.name} subtitle="Dados, cargo, serviços e situação." />
+      <BarberForm barber={barber} services={services} isSelf={barber.userId === user.id} />
     </>
   );
 }

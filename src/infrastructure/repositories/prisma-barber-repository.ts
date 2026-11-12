@@ -1,6 +1,6 @@
 import type { Prisma, PrismaClient } from "@prisma/client";
 import type { BarberDTO } from "@/application/dto";
-import type { BarberRepository, BarberUpdate } from "@/application/ports";
+import type { BarberRepository, BarberUpdate, TeamRole } from "@/application/ports";
 
 const include = { user: true, services: true } satisfies Prisma.BarberProfileInclude;
 type Row = Prisma.BarberProfileGetPayload<{ include: typeof include }>;
@@ -69,6 +69,10 @@ export class PrismaBarberRepository implements BarberRepository {
   async getPhoto(id: string) {
     const row = await this.db.barberProfile.findUnique({ where: { id }, select: { user: { select: { image: true } } } });
     return row?.user.image ?? null;
+  }
+
+  async setRole(id: string, role: TeamRole) {
+    await this.db.barberProfile.update({ where: { id }, data: { user: { update: { role } } } });
   }
 
   async setPhoto(id: string, photo: string | null) {

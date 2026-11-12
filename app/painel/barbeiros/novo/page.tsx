@@ -4,7 +4,7 @@ import { PageHeader } from "~/_components/ui";
 import { requireSession } from "~/_lib/session";
 import { BarberForm } from "../barber-form";
 
-export const metadata: Metadata = { title: "Novo barbeiro" };
+export const metadata: Metadata = { title: "Novo integrante" };
 
 export default async function NovoBarbeiroPage() {
   await requireSession(["OWNER"]);
@@ -12,7 +12,7 @@ export default async function NovoBarbeiroPage() {
 
   return (
     <>
-      <PageHeader title="Novo barbeiro" />
+      <PageHeader title="Novo integrante" subtitle="Barbeiro ou dono. Passe o e-mail e a senha inicial para a pessoa entrar." />
       <BarberForm services={services} />
     </>
   );

@@ -52,7 +52,7 @@ function sidebarGroups(role: Role, hasBarberProfile: boolean): Group[] {
     {
       title: "Cadastros",
       items: [
-        { href: "/painel/barbeiros", label: "Barbeiros", icon: Users },
+        { href: "/painel/barbeiros", label: "Equipe", icon: Users },
         { href: "/painel/servicos", label: "Serviços", icon: Scissors },
         { href: "/painel/expedientes", label: "Expedientes", icon: Clock },
         { href: "/painel/planos", label: "Planos e assinaturas", icon: Repeat },

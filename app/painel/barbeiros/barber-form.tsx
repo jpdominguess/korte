@@ -7,7 +7,7 @@ import { Button, Card, Check, Field, FormError, Input, LinkButton } from "~/_com
 import { useSubmit } from "~/_lib/use-submit";
 import { PhotoField } from "./photo-field";
 
-export function BarberForm({ barber, services }: { barber?: BarberDTO; services: ServiceDTO[] }) {
+export function BarberForm({ barber, services, isSelf = false }: { barber?: BarberDTO; services: ServiceDTO[]; isSelf?: boolean }) {
   const router = useRouter();
   const { pending, error, submit } = useSubmit();
   const [photo, setPhoto] = useState<string | null | undefined>(undefined);
@@ -20,6 +20,7 @@ export function BarberForm({ barber, services }: { barber?: BarberDTO; services:
       phone: form.get("phone"),
       serviceIds: form.getAll("serviceIds"),
       photo,
+      role: form.get("role") || undefined,
     };
     const done = () => {
       router.push("/painel/barbeiros");
@@ -55,6 +56,23 @@ export function BarberForm({ barber, services }: { barber?: BarberDTO; services:
         )}
 
         <fieldset>
+          <legend className="mb-1 text-sm font-semibold">Cargo</legend>
+          <div className="flex flex-wrap gap-x-6">
+            <label className="inline-flex min-h-9 items-center gap-2 text-sm">
+              <input type="radio" name="role" value="BARBER" defaultChecked={!barber?.isOwner} disabled={isSelf} className="size-4.5" />
+              Barbeiro
+            </label>
+            <label className="inline-flex min-h-9 items-center gap-2 text-sm">
+              <input type="radio" name="role" value="OWNER" defaultChecked={!!barber?.isOwner} disabled={isSelf} className="size-4.5" />
+              Dono
+            </label>
+          </div>
+          <p className="text-xs text-texto-2">
+            {isSelf ? "Você não pode mudar o seu próprio cargo." : "Barbeiro vê a própria agenda. Dono vê e altera tudo no painel."}
+          </p>
+        </fieldset>
+
+        <fieldset>
           <legend className="mb-1 text-sm font-semibold">Serviços que realiza</legend>
           {services.length === 0 ? (
             <p className="text-sm text-texto-2">Nenhum serviço cadastrado ainda.</p>
@@ -71,7 +89,7 @@ export function BarberForm({ barber, services }: { barber?: BarberDTO; services:
 
         {barber && (
           <Check name="active" defaultChecked={barber.active}>
-            Ativo (recebe novos agendamentos)
+            Ativo (aparece na página e recebe agendamentos)
           </Check>
         )}
 
