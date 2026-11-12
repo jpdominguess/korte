@@ -26,7 +26,7 @@ export async function AppShell({ session, children }: { session: SessionUser; ch
             {shop?.city && <p className="truncate text-xs leading-tight text-texto-2">{shop.city}</p>}
           </div>
           <div className="flex shrink-0 items-center gap-3">
-            <Avatar name={name} size="sm" dark />
+            <Avatar name={name} src={session.photoUrl} size="md" dark />
             <div className="hidden sm:block">
               <p className="text-sm leading-tight font-semibold">{name}</p>
               <p className="text-xs leading-tight text-texto-2">{roleLabel[user.role]}</p>
