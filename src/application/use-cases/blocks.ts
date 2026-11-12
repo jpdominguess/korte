@@ -1,23 +1,22 @@
 import { DomainError, forbidden, notFound } from "@/domain/shared/errors";
 import type { User } from "@/domain/entities/user";
-import type { AppointmentRepository, NewScheduleBlock, ScheduleBlockRepository } from "../ports";
+import type { NewScheduleBlock, ScheduleBlockRepository, UnitOfWork } from "../ports";
 
 export class CreateScheduleBlock {
-  constructor(
-    private readonly blocks: ScheduleBlockRepository,
-    private readonly appointments: AppointmentRepository,
-  ) {}
+  constructor(private readonly unitOfWork: UnitOfWork) {}
 
   async execute(actor: User, input: NewScheduleBlock) {
     actor.assertStaff();
     actor.assertCanManage(input);
     if (input.endsAt <= input.startsAt) throw new DomainError("O fim do bloqueio deve ser depois do início.");
 
-    const busy = await this.appointments.listBusyRanges(input.barberProfileId, input.startsAt, input.endsAt);
-    if (busy.length > 0) {
-      throw new DomainError("Há agendamentos nesse período. Cancele-os antes de bloquear.", "conflict");
-    }
-    return this.blocks.create(input);
+    return this.unitOfWork.run(async ({ appointments, blocks }) => {
+      const busy = await appointments.listBusyRanges(input.barberProfileId, input.startsAt, input.endsAt);
+      if (busy.length > 0) {
+        throw new DomainError("Há agendamentos nesse período. Cancele-os antes de bloquear.", "conflict");
+      }
+      return blocks.create(input);
+    });
   }
 }
 

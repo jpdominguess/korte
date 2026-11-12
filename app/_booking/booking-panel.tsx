@@ -187,7 +187,13 @@ export function BookingPanel({ services, barbers, today, viewer: initialViewer, 
   }
 
   /** Depois de criar a conta ou entrar, a pessoa já está logada e o agendamento segue. */
-  async function bookAfterAuth() {
+  async function bookAfterAuth(role = "CLIENT") {
+    if (role !== "CLIENT") {
+      setViewer("STAFF");
+      setAuth(null);
+      router.refresh();
+      return;
+    }
     setViewer("CLIENT");
     await book();
   }

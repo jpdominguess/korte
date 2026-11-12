@@ -81,6 +81,15 @@ export class PrismaAppointmentRepository implements AppointmentRepository {
     return rows.map((row) => ({ start: row.startsAt, end: row.endsAt }));
   }
 
+  async listScheduledFrom(barberProfileId: string, from: Date) {
+    const rows = await this.db.appointment.findMany({
+      where: { barberProfileId, status: "AGENDADO", startsAt: { gte: from } },
+      include,
+      orderBy: { startsAt: "asc" },
+    });
+    return rows.map(toDTO);
+  }
+
   async create(data: NewAppointment) {
     try {
       const row = await this.db.appointment.create({ data, select: { id: true } });

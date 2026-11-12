@@ -151,7 +151,7 @@ async function seedDemoData() {
         clientId,
         planId: plan.id,
         cycleStart: new Date(`${cycleStart}T00:00:00Z`),
-        cycleEnd: new Date(`${addDays(cycleStart, 30)}T00:00:00Z`),
+        cycleEnd: new Date(`${addDays(cycleStart, 29)}T00:00:00Z`),
         totalUses: plan.usesPerCycle,
         usedUses: used,
       },

@@ -1,29 +1,30 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { formatLongDate } from "@/domain/shared/format";
-import { addDays, addMonths, isLocalDate, localToInstant, toLocalDate } from "@/domain/shared/time";
+import { formatLongDate, formatWeekRange } from "@/domain/shared/format";
+import { addMonths, localToInstant, toLocalDate } from "@/domain/shared/time";
 import { useCases } from "@/infrastructure/container";
 import { AgendaGrid } from "~/_components/agenda-grid";
-import { AgendaToolbar } from "~/_components/agenda-toolbar";
+import { AgendaToolbar, readAgendaParams } from "~/_components/agenda-toolbar";
+import { AgendaWeek } from "~/_components/agenda-week";
 import { MonthCalendar } from "~/_components/month-calendar";
 import { LinkButton, PageHeader } from "~/_components/ui";
 import { requireSession } from "~/_lib/session";
 
 export const metadata: Metadata = { title: "Minha agenda" };
 
-export default async function MinhaAgendaPage({ searchParams }: { searchParams: Promise<{ data?: string; mes?: string }> }) {
+export default async function MinhaAgendaPage({ searchParams }: { searchParams: Promise<{ data?: string; mes?: string; vista?: string }> }) {
   const { user } = await requireSession(["OWNER", "BARBER"]);
   if (!user.barberProfileId) redirect(user.isOwner() ? "/painel/agenda" : "/inicio");
 
   const params = await searchParams;
   const now = new Date();
   const today = toLocalDate(now);
-  const date = isLocalDate(params.data) ? params.data : today;
+  const { date, view, start, from, to } = readAgendaParams(params, now);
   const month = params.mes && /^\d{4}-(0[1-9]|1[0-2])$/.test(params.mes) ? params.mes : date.slice(0, 7);
   const own = { barberProfileId: user.barberProfileId };
 
   const [agenda, monthAgenda, managed] = await Promise.all([
-    useCases.getAgenda.execute(user, { ...own, from: localToInstant(date, 0), to: localToInstant(addDays(date, 1), 0) }),
+    useCases.getAgenda.execute(user, { ...own, from, to }),
     useCases.getAgenda.execute(user, { ...own, from: localToInstant(`${month}-01`, 0), to: localToInstant(`${addMonths(month, 1)}-01`, 0) }),
     useCases.getManagedBarbers.execute(user),
   ]);
@@ -42,11 +43,11 @@ export default async function MinhaAgendaPage({ searchParams }: { searchParams: 
   return (
     <>
       <PageHeader
-        title={formatLongDate(localToInstant(date, 12 * 60))}
+        title={view === "semana" ? formatWeekRange(start) : formatLongDate(localToInstant(date, 12 * 60))}
         subtitle={`${date === today ? "Hoje · " : ""}Minha agenda · ${active} ${active === 1 ? "cliente" : "clientes"} · ${done} ${done === 1 ? "concluído" : "concluídos"}`}
         actions={
           <>
-            <AgendaToolbar basePath="/agenda" date={date} view="dia" allowWeek={false} />
+            <AgendaToolbar basePath="/agenda" date={date} view={view} />
             <LinkButton href="/agenda/bloqueios" variant="secondary" size="sm">
               Bloqueios
             </LinkButton>
@@ -54,7 +55,11 @@ export default async function MinhaAgendaPage({ searchParams }: { searchParams: 
         }
       />
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px] lg:items-start">
-        <div className="order-2 min-w-0 lg:order-1">{me && <AgendaGrid agenda={agenda} barbers={[me]} date={date} now={now} />}</div>
+        <div className="order-2 min-w-0 lg:order-1">
+          {view === "semana" ? (
+            <AgendaWeek start={start} appointments={agenda.appointments} blocks={agenda.blocks} now={now} />
+          ) : me && <AgendaGrid agenda={agenda} barbers={[me]} date={date} now={now} />}
+        </div>
         <div className="order-1 lg:sticky lg:top-6 lg:order-2">
           <MonthCalendar basePath="/agenda" selected={date} month={month} today={today} counts={counts} workdays={workdays} />
         </div>

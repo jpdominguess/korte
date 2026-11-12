@@ -23,7 +23,15 @@ export function AgendaWeek({
     <div className="flex flex-col gap-4">
       {days.map((day) => {
         const dayAppointments = appointments.filter((a) => toLocalDate(a.startsAt) === day);
-        const dayBlocks = blocks.filter((b) => toLocalDate(b.startsAt) === day);
+        const from = localToInstant(day, 0);
+        const to = localToInstant(addDays(day, 1), 0);
+        const dayBlocks = blocks
+          .filter((b) => b.startsAt < to && b.endsAt > from)
+          .map((b) => ({
+            ...b,
+            startsAt: b.startsAt < from ? from : b.startsAt,
+            endsAt: b.endsAt > to ? to : b.endsAt,
+          }));
         return (
           <Card key={day}>
             <h2 className="flex items-baseline justify-between gap-2 border-b border-borda px-4 py-2.5 text-sm font-bold">
@@ -35,7 +43,7 @@ export function AgendaWeek({
             {dayAppointments.length + dayBlocks.length === 0 ? (
               <p className="px-4 py-3 text-sm text-texto-2">Sem agendamentos.</p>
             ) : (
-              <AgendaList appointments={dayAppointments} blocks={dayBlocks} now={now} showBarber={showBarber} />
+              <AgendaList appointments={dayAppointments} blocks={dayBlocks} now={now} showBarber={showBarber} date={day} />
             )}
           </Card>
         );

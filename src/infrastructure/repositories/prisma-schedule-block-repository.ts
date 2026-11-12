@@ -1,8 +1,8 @@
-import type { PrismaClient } from "@prisma/client";
+import type { Database } from "../prisma/client";
 import type { NewScheduleBlock, PeriodFilter, ScheduleBlockRepository } from "@/application/ports";
 
 export class PrismaScheduleBlockRepository implements ScheduleBlockRepository {
-  constructor(private readonly db: PrismaClient) {}
+  constructor(private readonly db: Database) {}
 
   list({ from, to, barberProfileId }: PeriodFilter) {
     return this.db.scheduleBlock.findMany({

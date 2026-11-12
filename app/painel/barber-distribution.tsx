@@ -18,6 +18,7 @@ interface BarberRow {
   completed: number;
   share: number;
   revenue: number;
+  paidAppointments: number;
   photoUrl: string | null;
 }
 
@@ -26,7 +27,7 @@ interface Props {
   totals: { completed: number; appointments: number; subscriptions: number; total: number };
 }
 
-const average = (b: BarberRow) => (b.completed ? b.revenue / b.completed : 0);
+const average = (b: BarberRow) => (b.paidAppointments ? b.revenue / b.paidAppointments : 0);
 
 /** Compara os barbeiros com barras medidas contra o primeiro colocado; trocar a métrica não muda a altura do quadro. */
 export function BarberDistribution({ barbers, totals }: Props) {
@@ -41,7 +42,7 @@ export function BarberDistribution({ barbers, totals }: Props) {
       <div className="flex flex-wrap items-start justify-between gap-3 border-b border-borda px-4 py-4 lg:px-6">
         <div>
           <h2 className="font-bold">Distribuição por barbeiro</h2>
-          <p className="text-sm text-texto-2">Atendimentos concluídos no período</p>
+          <p className="text-sm text-texto-2">Atendimentos pela data agendada; valores pelos pagamentos do período.</p>
         </div>
         {rows.length > 0 && (
           <div role="group" aria-label="Comparar por" className="flex w-full rounded-controle border border-borda bg-muted p-0.5 sm:inline-flex sm:w-auto">
@@ -50,6 +51,7 @@ export function BarberDistribution({ barbers, totals }: Props) {
                 key={option.id}
                 type="button"
                 aria-pressed={option.id === metric}
+                title={option.id === "average" ? "Média por atendimento pago no período" : undefined}
                 onClick={() => setMetric(option.id)}
                 className={`inline-flex h-8 flex-1 items-center justify-center rounded-controle px-1.5 text-[13px] font-semibold whitespace-nowrap transition-colors sm:flex-none sm:px-2.5 sm:text-sm ${option.id === metric ? "bg-superficie text-marinho shadow-[0_1px_2px_rgba(5,9,41,.08)]" : "text-texto-2 hover:text-marinho"}`}
               >
@@ -68,7 +70,7 @@ export function BarberDistribution({ barbers, totals }: Props) {
             {rows.map((barber) => (
               <li
                 key={barber.id}
-                title={`${barber.name}: ${barber.completed} atendimentos (${Math.round(barber.share * 100)}% do total), ${formatBRL(barber.revenue)}, ${formatBRL(average(barber))} por atendimento`}
+                title={`${barber.name}: ${barber.completed} atendimentos (${Math.round(barber.share * 100)}% do total), ${formatBRL(barber.revenue)}, ${formatBRL(average(barber))} por atendimento pago`}
                 className="grid grid-cols-[minmax(0,1fr)_6.5rem] items-center gap-x-4 gap-y-2 border-b border-borda px-4 py-3 transition-colors last:border-b-0 hover:bg-fundo lg:grid-cols-[minmax(0,15rem)_minmax(0,1fr)_7rem] lg:px-6"
               >
                 <div className="flex min-w-0 items-center gap-3">
@@ -76,7 +78,7 @@ export function BarberDistribution({ barbers, totals }: Props) {
                   <div className="min-w-0">
                     <p className="truncate font-bold">{barber.name}</p>
                     <p className="num truncate text-xs text-texto-2">
-                      {barber.completed} atend. · {formatBRL(barber.revenue)} · {formatBRL(average(barber))} cada
+                      {barber.completed} atend. · {formatBRL(barber.revenue)} · média {formatBRL(average(barber))}
                     </p>
                   </div>
                 </div>

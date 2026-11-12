@@ -1,4 +1,4 @@
-import type { PrismaClient } from "@prisma/client";
+import type { Database } from "../prisma/client";
 import type { WorkScheduleRepository } from "@/application/ports";
 import type { WorkInterval } from "@/domain/entities/work-schedule";
 
@@ -22,7 +22,7 @@ function toInterval(row: Row) {
 }
 
 export class PrismaWorkScheduleRepository implements WorkScheduleRepository {
-  constructor(private readonly db: PrismaClient) {}
+  constructor(private readonly db: Database) {}
 
   async listForBarber(barberProfileId: string) {
     const rows = await this.db.workSchedule.findMany({
@@ -38,16 +38,18 @@ export class PrismaWorkScheduleRepository implements WorkScheduleRepository {
   }
 
   async replace(barberProfileId: string, intervals: WorkInterval[]) {
-    await this.db.$transaction([
-      this.db.workSchedule.deleteMany({ where: { barberProfileId } }),
-      this.db.workSchedule.createMany({
+    const replace = async (db: Database) => {
+      await db.workSchedule.deleteMany({ where: { barberProfileId } });
+      await db.workSchedule.createMany({
         data: intervals.map((interval) => ({
           barberProfileId,
           weekday: interval.weekday,
           startTime: toTime(interval.startMin),
           endTime: toTime(interval.endMin),
         })),
-      }),
-    ]);
+      });
+    };
+    if ("$transaction" in this.db) await this.db.$transaction(replace);
+    else await replace(this.db);
   }
 }

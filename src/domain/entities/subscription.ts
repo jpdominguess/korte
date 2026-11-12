@@ -38,7 +38,8 @@ export class Subscription {
   }
 
   static firstCycle(today: string, usesPerCycle: number) {
-    return { cycleStart: today, cycleEnd: addDays(today, Subscription.CYCLE_DAYS), totalUses: usesPerCycle, usedUses: 0 };
+    // O primeiro e o último dia fazem parte dos 30 dias de validade.
+    return { cycleStart: today, cycleEnd: addDays(today, Subscription.CYCLE_DAYS - 1), totalUses: usesPerCycle, usedUses: 0 };
   }
 
   get cycleStart() {
@@ -71,7 +72,7 @@ export class Subscription {
   }
 
   isUsable(today: string): boolean {
-    return this.situation(today) === "ATIVA" && this.remainingUses > 0;
+    return today >= this.start && this.situation(today) === "ATIVA" && this.remainingUses > 0;
   }
 
   consumeUse(today: string): void {

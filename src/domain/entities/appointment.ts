@@ -1,4 +1,5 @@
 import { DomainError, forbidden } from "../shared/errors";
+import { toLocalDate } from "../shared/time";
 import type { Subscription } from "./subscription";
 import type { User } from "./user";
 
@@ -59,16 +60,16 @@ export class Appointment {
     this.currentStatus = "CANCELADO";
   }
 
-  complete(): void {
-    this.assertScheduled();
+  complete(now: Date): void {
+    this.assertCanComplete(now);
     this.currentStatus = "CONCLUIDO";
   }
 
   /** RN07: serviço coberto sai por R$ 0,00 e consome um uso da assinatura. */
-  completeWithSubscription(subscription: Subscription, today: string): void {
-    this.assertScheduled();
+  completeWithSubscription(subscription: Subscription, now: Date): void {
+    this.assertCanComplete(now);
     if (subscription.clientId !== this.clientId) throw new DomainError("A assinatura não é deste cliente.");
-    subscription.consumeUse(today);
+    subscription.consumeUse(toLocalDate(now));
     this.currentStatus = "CONCLUIDO";
   }
 
@@ -81,5 +82,10 @@ export class Appointment {
 
   private assertScheduled(): void {
     if (this.currentStatus !== "AGENDADO") throw new DomainError("Este agendamento já foi encerrado.", "conflict");
+  }
+
+  private assertCanComplete(now: Date): void {
+    this.assertScheduled();
+    if (now < this.startsAt) throw new DomainError("O atendimento só pode ser concluído após o horário de início.");
   }
 }
