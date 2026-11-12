@@ -74,8 +74,8 @@ export default async function PainelPage({ searchParams }: { searchParams: Promi
         </Kpi>
       </section>
 
-      <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-2">
-        <Card>
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        <Card className="flex flex-col">
           <div className="flex items-start justify-between gap-4 px-4 pt-4 lg:px-6">
             <div>
               <h2 className="font-bold">Faturamento registrado por dia</h2>
@@ -105,7 +105,7 @@ export default async function PainelPage({ searchParams }: { searchParams: Promi
           </dl>
         </Card>
 
-        <Card>
+        <Card className="flex flex-col">
           <BarberDistribution
             barbers={data.barbers.map((barber) => ({ ...barber, photoUrl: photos.get(barber.id) ?? null }))}
             totals={{ completed: data.completed.total, appointments: data.revenue.appointments, subscriptions: data.revenue.subscriptions, total: data.revenue.total }}

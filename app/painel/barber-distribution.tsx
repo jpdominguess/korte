@@ -64,7 +64,7 @@ export function BarberDistribution({ barbers, totals }: Props) {
         <EmptyState title="Nenhum atendimento concluído neste período" />
       ) : (
         <>
-          <ul>
+          <ul className="flex-1">
             {rows.map((barber) => (
               <li
                 key={barber.id}
