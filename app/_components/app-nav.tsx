@@ -142,7 +142,7 @@ export function LogoutButton({ className = "" }: { className?: string }) {
   const router = useRouter();
   async function logout() {
     await authClient.signOut();
-    router.replace("/login");
+    router.replace("/");
     router.refresh();
   }
   return (

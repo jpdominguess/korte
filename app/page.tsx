@@ -52,7 +52,7 @@ export default async function PublicPage() {
                 )}
                 {openingHours && (
                   <div className="mt-3 flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-sm">
-                    <Badge tone={openNow ? "success" : "neutral"}>{openNow ? "Aberto agora" : "Fechado agora"}</Badge>
+                    <Badge tone={openNow ? "success" : "danger"}>{openNow ? "Aberto agora" : "Fechado agora"}</Badge>
                     {statusDetail && <span className="font-semibold">{statusDetail}</span>}
                     <span className="text-white/70">{openingHours}</span>
                   </div>
